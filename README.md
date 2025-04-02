@@ -5,10 +5,12 @@ Thành viên: Trần Hoài Nam, Vũ Tuấn Minh, Lê Quý Thành, Trần Tuấn 
 
 Để chạy được ứng dụng, thực hiện lần lượt các bước sau:
 
-B1: Clone repository này về máy tính của bạn.
+B1: Cài đặt maven về máy tính của bạn.
 
-B2: Mở terminal lên.
+B2: Clone repository này về máy tính của bạn.
 
-B3: Chạy lệnh: "mvn clean install".
+B3: Mở terminal lên.
 
-B4: Sau khi thực hiện 3 bước trên, bạn có thể chạy thử ứng dụng bằng lệnh: "mvn spring-boot:run".
+B4: Tại thư mục của dự án, chạy lệnh: "mvn clean install".
+
+B5: Sau khi thực hiện các bước trên, bạn có thể chạy thử ứng dụng bằng lệnh: "mvn spring-boot:run".
