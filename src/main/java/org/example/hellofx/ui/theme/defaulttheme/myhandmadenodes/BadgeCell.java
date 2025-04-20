@@ -1,11 +1,8 @@
 package org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes;
 
-import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class BadgeCell extends ListCell<Badge> {

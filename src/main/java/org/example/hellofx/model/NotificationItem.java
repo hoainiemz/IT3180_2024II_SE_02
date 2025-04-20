@@ -1,7 +1,6 @@
 package org.example.hellofx.model;
 
 import jakarta.persistence.*;
-import org.example.hellofx.model.enums.NotificationType;
 
 import java.time.LocalDateTime;
 

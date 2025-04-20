@@ -1,7 +1,5 @@
 package org.example.hellofx.controller;
 
-import org.example.hellofx.controller.BillCreationController;
-import org.example.hellofx.controller.ProfileController;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Payment;

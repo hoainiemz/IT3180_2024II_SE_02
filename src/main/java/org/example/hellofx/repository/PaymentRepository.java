@@ -2,8 +2,6 @@ package org.example.hellofx.repository;
 
 import org.example.hellofx.dto.ResidentBillPaymentDTO;
 import org.example.hellofx.model.Payment;
-import org.example.hellofx.model.Bill;
-import org.example.hellofx.model.Resident;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

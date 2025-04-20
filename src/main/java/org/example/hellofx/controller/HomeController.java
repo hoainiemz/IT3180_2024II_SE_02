@@ -1,7 +1,5 @@
 package org.example.hellofx.controller;
 
-import org.example.hellofx.controller.HomeController;
-import org.example.hellofx.controller.ProfileController;
 import org.example.hellofx.model.Noticement;
 import org.example.hellofx.model.NotificationItem;
 import org.example.hellofx.model.Resident;

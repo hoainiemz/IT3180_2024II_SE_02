@@ -1,7 +1,5 @@
 package org.example.hellofx.controller;
 
-import org.example.hellofx.controller.PasswordChangeController;
-import org.example.hellofx.controller.ProfileController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

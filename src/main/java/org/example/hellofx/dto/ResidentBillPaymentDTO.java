@@ -1,7 +1,5 @@
 package org.example.hellofx.dto;
 
-import org.example.hellofx.model.Bill;
-import org.example.hellofx.model.Resident;
 import org.example.hellofx.model.enums.GenderType;
 
 import java.time.LocalDate;

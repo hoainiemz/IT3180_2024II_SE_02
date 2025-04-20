@@ -24,7 +24,6 @@ import org.example.hellofx.model.Resident;
 import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.model.enums.GenderType;
 import org.example.hellofx.ui.JavaFxApplication;
-import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.VerticleTextAndComboBox;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.VerticleTextAndDateTimePicker;

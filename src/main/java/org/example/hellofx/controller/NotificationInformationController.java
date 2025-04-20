@@ -1,8 +1,9 @@
 package org.example.hellofx.controller;
 
-import org.example.hellofx.controller.NotificationInformationController;
-import org.example.hellofx.controller.ProfileController;
-import org.example.hellofx.model.*;
+import org.example.hellofx.model.Account;
+import org.example.hellofx.model.Noticement;
+import org.example.hellofx.model.NotificationItem;
+import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.NoticementRepository;
 import org.example.hellofx.repository.NotificationItemRepository;
 import org.example.hellofx.ui.JavaFxApplication;

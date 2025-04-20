@@ -1,7 +1,5 @@
 package org.example.hellofx.controller;
 
-import org.example.hellofx.controller.BillManagerController;
-import org.example.hellofx.controller.ProfileController;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.ui.JavaFxApplication;

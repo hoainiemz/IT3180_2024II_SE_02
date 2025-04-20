@@ -1,11 +1,10 @@
 package org.example.hellofx.controller;
 
 import org.example.hellofx.SpringBootFxApplication;
-import org.example.hellofx.controller.ProfileController;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
-import org.example.hellofx.service.DataBaseService;
 import org.example.hellofx.repository.AccountRepository;
+import org.example.hellofx.service.DataBaseService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.HomeScene;
 import org.example.hellofx.ui.theme.defaulttheme.LoginScene;

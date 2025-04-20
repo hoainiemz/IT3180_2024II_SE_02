@@ -1,6 +1,5 @@
 package org.example.hellofx.controller;
 
-import org.example.hellofx.controller.NotificationManagementController;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.springframework.stereotype.Component;
 
