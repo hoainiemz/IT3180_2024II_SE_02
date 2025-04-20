@@ -87,7 +87,15 @@ public class SupabaseService implements DataBaseService {
     @Override
     public void createAccount(String username, String password, String email, String phone) {
         Account acc = new Account(null, username, email, phone, password, null);
-        accountRepository.save(acc);
+        for (int i = 0; i < 10; i++) {
+            try {
+                accountRepository.save(acc);
+                break;
+            }
+            catch (Exception e) {
+                continue;
+            }
+        }
     }
 
     public Account findAccountByUsernameAndPassword(String username, String passwordHash) {
