@@ -9,8 +9,8 @@ import org.example.hellofx.SpringBootFxApplication;
 import org.example.hellofx.controller.ProfileController;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
-import org.example.hellofx.ui.theme.*;
-import org.example.hellofx.ui.theme.NotificationInformationScene;
+import org.example.hellofx.ui.theme.ThemeScene;
+import org.example.hellofx.ui.theme.defaulttheme.*;
 import org.example.hellofx.utils.ScreenUtils;
 
 public class JavaFxApplication extends Application {
@@ -31,7 +31,7 @@ public class JavaFxApplication extends Application {
 //        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         currentStage.setTitle("Hello World");
         LoginScene theme = SpringBootFxApplication.context.getBean(LoginScene.class);
-        showLoginScene();
+        showThemeScene(LoginScene.class);
         currentStage.setWidth(ScreenUtils.getScreenWidth());
         currentStage.setHeight(ScreenUtils.getScreenHeight());
 
@@ -44,79 +44,29 @@ public class JavaFxApplication extends Application {
         currentStage.show();
     }
 
-    public static void showHomeScene(){
-        HomeScene theme = SpringBootFxApplication.context.getBean(HomeScene.class);
-        currentStage.setScene(theme.getHomeScene());
-    }
-
-    public static void showLoginScene(){
-        LoginScene theme = SpringBootFxApplication.context.getBean(LoginScene.class);
-        currentStage.setScene(theme.getLoginScene());
-    }
-
-    public static void showPasswordChangeScene(){
-        PasswordChangeScene theme = SpringBootFxApplication.context.getBean(PasswordChangeScene.class);
-        currentStage.setScene(theme.getPasswordChangeScene());
-    }
-
-    public static void showSignUpScene(){
-        SignUpScene theme = SpringBootFxApplication.context.getBean(SignUpScene.class);
-        currentStage.setScene(theme.getSignUpScene());
-    }
-
-    public static void showResidentListScene(){
-        ResidentScene theme = SpringBootFxApplication.context.getBean(ResidentScene.class);
-        currentStage.setScene(theme.getResidentScene());
+    public static <T> void showThemeScene(Class<T> clazz){
+        ThemeScene theme = (ThemeScene) SpringBootFxApplication.context.getBean(clazz);
+        currentStage.setScene(theme.getScene());
     }
 
     public static void showUserInformationScene() {
         UserInformationScene theme = SpringBootFxApplication.context.getBean(UserInformationScene.class);
         ProfileController profileController = SpringBootFxApplication.context.getBean(ProfileController.class);
-        currentStage.setScene(theme.getUserInformationScene(profileController.getProfile(), profileController.getResident()));
+        currentStage.setScene(theme.getScene(profileController.getProfile(), profileController.getResident()));
     }
 
     public static void showUserInformationScene(Account profile, Resident resident) {
         UserInformationScene theme = SpringBootFxApplication.context.getBean(UserInformationScene.class);
-        currentStage.setScene(theme.getUserInformationScene(profile, resident));
-    }
-
-    public static void showBilCreationScene() {
-        BillCreationScene theme = SpringBootFxApplication.context.getBean(BillCreationScene.class);
-        currentStage.setScene(theme.getBillCreationScene());
-    }
-
-    public static void showAllResidentRequestScene() {
-        AllResidentRequestScene theme = SpringBootFxApplication.context.getBean(AllResidentRequestScene.class);
-        currentStage.setScene(theme.getAllResidentRequestScene());
-    }
-
-    public static void showBillScene() {
-        BillScene theme = SpringBootFxApplication.context.getBean(BillScene.class);
-        currentStage.setScene(theme.getBillScene());
-    }
-
-    public static void showBillManagerScene() {
-        BillManagementScene theme = SpringBootFxApplication.context.getBean(BillManagementScene.class);
-        currentStage.setScene(theme.getBillManagementScene());
+        currentStage.setScene(theme.getScene(profile, resident));
     }
 
     public static void showBillInformationScene(Integer billId) {
         BillInformationScene theme = SpringBootFxApplication.context.getBean(BillInformationScene.class);
-        currentStage.setScene(theme.getBillInformationScene(billId));
-    }
-
-    public static void showNotificationCreationScene() {
-        NotificationCreationScene theme = SpringBootFxApplication.context.getBean(NotificationCreationScene.class);
-        currentStage.setScene(theme.getNotificationCreationScene());
-    }
-
-    public static void showNotificationManagementScene() {
-        NotificationManagementScene theme = SpringBootFxApplication.context.getBean(NotificationManagementScene.class);
-        currentStage.setScene(theme.getNotificationManagementScene());
+        currentStage.setScene(theme.getScene(billId));
     }
 
     public static void showNotificationInformationScene(Integer notiId) {
         NotificationInformationScene theme = SpringBootFxApplication.context.getBean(NotificationInformationScene.class);
-        currentStage.setScene(theme.getNotificationInformationScene(notiId));
+        currentStage.setScene(theme.getScene(notiId));
     }
 }

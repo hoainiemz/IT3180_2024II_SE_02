@@ -1,92 +1,114 @@
 package org.example.hellofx.controller;
 
+import org.example.hellofx.SpringBootFxApplication;
+import org.example.hellofx.controller.ProfileController;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
+import org.example.hellofx.service.DataBaseService;
+import org.example.hellofx.repository.AccountRepository;
+import org.example.hellofx.ui.JavaFxApplication;
+import org.example.hellofx.ui.theme.defaulttheme.HomeScene;
+import org.example.hellofx.ui.theme.defaulttheme.LoginScene;
+import org.example.hellofx.ui.theme.defaulttheme.ResidentScene;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public interface ProfileController {
-    /**
-     * user logged in succesfull, tell application to log in
-     * @param profile
-     */
-    public void logInRequest(Account profile);
+public class ProfileController{
+    @Autowired
+    private DataBaseService dataBaseHandler;
+    private Account profile;
+    private Resident resident;
+    @Autowired
+    private AccountRepository accountRepository;
 
-    /**
-     *
-     * @return current username
-     */
-    public String getProfileNameRequest();
+//    public DefaultProfileController(DataBaseHandler dataBaseHandler) {
+//        this.dataBaseHandler = dataBaseHandler;
+//    }
 
-    /**
-     * user logged out, get back to the login page
-     */
-    public void logOutRequest();
+    public void logInRequest (Account profile) {
+        this.profile = profile;
+        resident = dataBaseHandler.findResidentByAccount(profile);
+//        System.out.println("Logged in with profile: " + profile);
+        JavaFxApplication.showThemeScene(HomeScene.class);
+    }
 
-    /**
-     * check if logged in or not
-     */
-    public boolean isLoggedIn();
+    public String getProfileNameRequest() {
+        if (profile != null) {
+            return profile.getUsername();
+        }
+        return null;
+    }
 
-    /**
-     * user filled the password change form, send the request to the database
-     * @return a string, state of the request
-     */
-    public String passwordChangeRequest(String currentPassword, String newPassword, String confirmPassword);
+    public void logOutRequest(){
+        this.profile = null;
+        this.resident = null;
+        ((ResidentScene) SpringBootFxApplication.context.getBean(ResidentScene.class)).reset();
+//        System.out.println("Logged out succesfully!");
+        JavaFxApplication.showThemeScene(LoginScene.class);
+    }
 
-    /**
-     * profile getter
-     * @return current profile
-     */
-    public Account getProfile();
+    public String passwordChangeRequest(String currentPassword, String newPassword, String confirmPassword) {
+        assert isLoggedIn() == true;
+        if (newPassword.equals(confirmPassword) == false) {
+            return "New password do not match!";
+        }
+        if (getCurrentPassword().equals(currentPassword) == false) {
+            return "Current password do not match!";
+        }
+        int cnt = dataBaseHandler.passwordChangeQuery(profile, newPassword);
+        if (cnt == 0) {
+            return "Failed to change password, please try again later!";
+        }
+        profile.setPasswordHash(newPassword);
+        return "Password changed successfully!";
+    }
 
-    /**
-     * resident getter
-     * @return current resident
-     */
-    public Resident getResident();
+    public boolean isLoggedIn() {
+        return profile != null;
+    }
 
-    /**
-     * resident change request
-     * @param resident
-     */
-    public void residentProfileUpdateRequest(Resident resident);
+    private String getCurrentPassword() {
+        return profile.getPasswordHash();
+    }
 
-    /**
-     * check if identity card whether existed or not
-     * @param identityCard
-     * @return true / false
-     */
-    public boolean checkIdentityCardValidity(String identityCard);
+    public Resident getResident() {
+        return resident;
+    }
 
-    /**
-     * check if email is whether existed or not
-     * @param email
-     * @return true / false
-     */
-    public boolean checkEmailValidity(String email);
-    /**
-     * check if phone is whether existed or not
-     * @param phone
-     * @return true / false
-     */
-    public boolean checkPhoneValidity(String phone);
+    public void residentProfileUpdateRequest(Resident resident) {
+        dataBaseHandler.updateResident(resident);
+        this.resident = dataBaseHandler.findResidentByAccount(profile);
+    }
 
-    /**
-     * Account change request
-     * @param account
-     */
-    public void accountProfileUpdateRequest(Account account);
+    public Account getProfile() {
+        return profile;
+    }
 
-    /**
-     * find Account by user id
-     * @param userId
-     */
-    public Account findAccountByUserId(int userId);
+    public boolean checkIdentityCardValidity(String identityCard) {
+        return dataBaseHandler.checkResidentExistByIdentityCard(identityCard);
+    }
 
-    /**
-     * find Resident by user id
-     * @param userId
-     */
-    public Resident findResidentByUserId(int userId);
+    public boolean checkEmailValidity(String email) {
+        return accountRepository.existsByEmail(email);
+    }
+
+    public boolean checkPhoneValidity(String phone) {
+        return accountRepository.existsByPhone(phone);
+    }
+
+    public void accountProfileUpdateRequest(Account account) {
+        dataBaseHandler.updateAccount(account);
+        if (profile.getUserId().equals(account.getUserId())) {
+            profile = accountRepository.findByUserId(account.getUserId()).get();
+        }
+    }
+
+    public Account findAccountByUserId(int userId) {
+        return dataBaseHandler.findAccountByUserId(userId);
+    }
+
+    public Resident findResidentByUserId(int userId) {
+        return dataBaseHandler.findResidentByUserId(userId);
+    }
 }

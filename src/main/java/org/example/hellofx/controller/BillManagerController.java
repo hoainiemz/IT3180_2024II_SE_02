@@ -1,12 +1,27 @@
 package org.example.hellofx.controller;
 
+import org.example.hellofx.controller.BillManagerController;
+import org.example.hellofx.controller.ProfileController;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
+import org.example.hellofx.ui.JavaFxApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public interface BillManagerController {
-    public Resident getResident();
+@Component
+public class BillManagerController{
+    @Autowired
+    private ProfileController profileController;
 
-    public Account getProfile();
+    public Resident getResident() {
+        return profileController.getResident();
+    }
 
-    public void seeBillInformation(Integer billId);
+    public Account getProfile() {
+        return profileController.getProfile();
+    }
+
+    public void seeBillInformation(Integer billId) {
+        JavaFxApplication.showBillInformationScene(billId);
+    }
 }

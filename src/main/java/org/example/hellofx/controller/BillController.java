@@ -1,10 +1,24 @@
 package org.example.hellofx.controller;
 
+import org.example.hellofx.controller.ProfileController;
+import org.example.hellofx.controller.BillController;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public interface BillController {
-    public Resident getResident();
+@Component
+public class BillController{
+    @Autowired
+    private ProfileController profileController;
 
-    public Account getProfile();
+    public Resident getResident() {
+        return profileController.getResident();
+    }
+
+    public Account getProfile() {
+        return profileController.getProfile();
+    }
+
+
 }

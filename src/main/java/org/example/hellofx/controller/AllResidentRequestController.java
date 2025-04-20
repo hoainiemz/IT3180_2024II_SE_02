@@ -1,24 +1,30 @@
 package org.example.hellofx.controller;
 
+
+import org.example.hellofx.controller.ProfileController;
+import org.example.hellofx.controller.AllResidentRequestController;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
+import org.example.hellofx.repository.ResidentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public interface AllResidentRequestController {
-    /**
-     * get current profile
-     * @return current profile
-     */
-    Account getProfile();
+@Component
+public class AllResidentRequestController{
+    @Autowired
+    private ProfileController profileController;
+    @Autowired
+    ResidentRepository residentRepository;
 
-    /**
-     * get current resident
-     * @return current resident
-     */
-    Resident getResident();
+    public Account getProfile() {
+        return profileController.getProfile();
+    }
 
-    /**
-     * the newresident is accepted and be a resident of bluemoon
-     * @param newResident
-     */
-    void acceptButtonClicked(Resident newResident);
+    public Resident getResident() {
+        return profileController.getResident();
+    }
+
+    public void acceptButtonClicked(Resident newResident) {
+        residentRepository.save(newResident);
+    }
 }

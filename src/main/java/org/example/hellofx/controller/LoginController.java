@@ -1,16 +1,33 @@
 package org.example.hellofx.controller;
 
-public interface LoginController {
-    /**
-     * User clicked the login button
-     * @param username
-     * @param password
-     * @return the string for the profile
-     */
-    public String loginButtonClicked(String username, String password);
+import org.example.hellofx.model.Account;
+import org.example.hellofx.service.DataBaseService;
+import org.example.hellofx.ui.JavaFxApplication;
+import org.example.hellofx.ui.theme.defaulttheme.ForgotPasswordScene;
+import org.example.hellofx.ui.theme.defaulttheme.SignUpScene;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-    /**
-     * user clicked the signup button
-     */
-    public void signUpButtonClicked();
+@Component
+public class LoginController {
+    @Autowired
+    DataBaseService dataBaseHandler;
+    @Autowired
+    ProfileController profileController;
+
+    public String loginButtonClicked(String username, String password) {
+        Account response = dataBaseHandler.findAccountByUsernameAndPassword(username, password);
+        if (response != null) {
+            profileController.logInRequest(response);
+        }
+        return response != null ? response.toString() : null;
+    }
+
+    public void signUpButtonClicked() {
+        JavaFxApplication.showThemeScene(SignUpScene.class);
+    }
+
+    public void forgotPasswordClicked() {
+        JavaFxApplication.showThemeScene(ForgotPasswordScene.class);
+    }
 }

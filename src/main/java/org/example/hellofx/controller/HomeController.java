@@ -1,67 +1,92 @@
 package org.example.hellofx.controller;
 
-
+import org.example.hellofx.controller.HomeController;
+import org.example.hellofx.controller.ProfileController;
 import org.example.hellofx.model.Noticement;
 import org.example.hellofx.model.NotificationItem;
 import org.example.hellofx.model.Resident;
+import org.example.hellofx.repository.NoticementRepository;
+import org.example.hellofx.repository.NotificationItemRepository;
+import org.example.hellofx.ui.JavaFxApplication;
+import org.example.hellofx.ui.theme.defaulttheme.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-public interface HomeController {
-    /**
-     * user clicked the logout button
-     */
-    public void logoutButtonClicked();
+@Component
+public class HomeController{
+    @Autowired
+    private ProfileController profileController;
+    @Autowired
+    private NotificationItemRepository notificationItemRepository;
 
-    /**
-     * user clicked the change password button
-     */
-    public void passwordChangeButtonClicked();
+    private static final int NUM_NOTIES = 20;
+    @Autowired
+    private NoticementRepository noticementRepository;
 
-    /**
-     * user clicked to watch all resident list
-     * if user's role is admin or client, show all current resident list
-     * if user is a resident, show all resident with the same house_id
-     */
-    public void danhSachDanCuClicked();
+    public void logoutButtonClicked(){
+        profileController.logOutRequest();
+    }
 
-    /**
-     * user clicked to see current information
-     * if user is a resident, show all resident with the same house_id
-     */
-    public void thongTinCaNhanClicked();
+    public void passwordChangeButtonClicked() {
+        assert profileController.isLoggedIn();
+        JavaFxApplication.showThemeScene(PasswordChangeScene.class);
+    }
 
-    /**
-     * user clicked to see current information
-     * show bill creation form
-     */
-    public void taoKhoanThuClicked();
+    public void danhSachDanCuClicked() {
+        JavaFxApplication.showThemeScene(ResidentScene.class);
+    }
 
-    /**
-     * show all resient request
-     */
-    public void hienThiCacYeuCauClicked();
+    public void thongTinCaNhanClicked() {
+        JavaFxApplication.showUserInformationScene();
+    }
 
-    /**
-     * show all bills
-     */
-    public void danhSachKhoanThuClicked();
+    public void taoKhoanThuClicked() {
+        JavaFxApplication.showThemeScene(BillCreationScene.class);
+    }
 
-    /**
-     * show admin all bills
-     */
-    public void quanLyKhoanThuClicked();
+    public void hienThiCacYeuCauClicked() {
+        JavaFxApplication.showThemeScene(AllResidentRequestScene.class);
+    }
 
-    /**
-     * show notification creator scene
-     */
-    public void taoThongBaoClicked();
+    public void danhSachKhoanThuClicked() {
+        JavaFxApplication.showThemeScene(BillScene.class);
+    }
 
-    public void quanLyThongBaoClicked();
+    public void quanLyKhoanThuClicked() {
+        JavaFxApplication.showThemeScene(BillManagementScene.class);
+    }
 
-    public Resident getResident();
+    public void taoThongBaoClicked() {
+        JavaFxApplication.showThemeScene(NotificationCreationScene.class);
+    }
 
-    public List<NotificationItem> getNotificationList(Integer residentId, boolean unReadOnly);
+    public void quanLyThongBaoClicked() {
+        JavaFxApplication.showThemeScene(NotificationManagementScene.class);
+    }
 
-    public void noticementClicked(Noticement notice);
+    public List<NotificationItem> getNotificationList(Integer residentId, boolean unReadOnly) {
+//        for (int i = 0; i < 10; i++) {
+//
+//        }
+        return notificationItemRepository.findTopByResidentIdAndWatchedStatusOrderByCreatedAtDesc(residentId, unReadOnly, PageRequest.of(0, 20));
+    }
+
+    public Resident getResident() {
+        return profileController.getResident();
+    }
+
+    public void noticementClicked(Noticement notice) {
+        for (int i = 0; i < 10; i++) {
+            try {
+                noticementRepository.markAsWatched(notice.getNotificationId(), notice.getResidentId());
+                break;
+            }
+            catch (Exception e) {
+                continue;
+            }
+        }
+    }
 }

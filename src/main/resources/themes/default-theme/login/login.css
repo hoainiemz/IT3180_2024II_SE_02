@@ -198,3 +198,54 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 3, 0, 0, 1);
 }
 
+.text-foreground Text {
+    -fx-font-size: 18px;
+}
+
+#forgotPasswordContainer {
+    -fx-text-alignment: center;
+    -fx-font-size: 14px;
+}
+
+#forgotPasswordContainer Button {
+    -fx-background-color: transparent; /* Bright blue color */
+    -fx-text-fill: #344565;
+    -fx-padding: 0px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+#forgotPasswordContainer Button:hover {
+    -fx-text-fill: #5a9ad4;
+    /*-fx-effect: dropshadow(gaussian, #1a8cff, 20, 0.5, 0, 0);*/
+    -fx-underline: true;
+}
+
+#sendResetEmailButton {
+    -fx-background-color: #1a8cff;
+
+    /* Bo tròn các góc */
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+
+    /* Padding cho nút */
+    -fx-padding: 8px 15px;
+
+    /* Thay đổi con trỏ khi hover */
+    -fx-cursor: hand;
+}
+
+
+#sendResetEmailButton:hover {
+    -fx-background-color: #0066cc; /* Darker blue on hover */
+}
+
+#sendResetEmailButton:pressed {
+    -fx-background-color: #0052a3; /* Even darker when pressed */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 3, 0, 0, 1);
+}
+

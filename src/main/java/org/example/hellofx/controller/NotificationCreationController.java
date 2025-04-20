@@ -1,17 +1,67 @@
 package org.example.hellofx.controller;
 
-import org.example.hellofx.model.Account;
-import org.example.hellofx.model.NotificationItem;
-import org.example.hellofx.model.Resident;
+import org.example.hellofx.controller.NotificationCreationController;
+import org.example.hellofx.controller.ProfileController;
+import org.example.hellofx.model.*;
+import org.example.hellofx.repository.NoticementRepository;
+import org.example.hellofx.repository.NotificationItemRepository;
+import org.example.hellofx.ui.JavaFxApplication;
+import org.example.hellofx.ui.theme.defaulttheme.NotificationCreationScene;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public interface NotificationCreationController {
-    public Resident getResident();
+@Component
+public class NotificationCreationController{
+    @Autowired
+    private ProfileController profileController;
+    @Autowired
+    private NotificationItemRepository notificationItemRepository;
+    @Autowired
+    private NoticementRepository noticementRepository;
 
-    public Account getProfile();
+    public Resident getResident() {
+        return profileController.getResident();
+    }
 
-    public void reset();
+    public Account getProfile() {
+        return profileController.getProfile();
+    }
 
-    public void createNotificationClicked(NotificationItem notification, List<Integer> ds);
+    public void reset() {
+        JavaFxApplication.showThemeScene(NotificationCreationScene.class);
+    }
+
+    @Transactional
+    public void createNotificationClicked(NotificationItem notification, List<Integer> ds) {
+//        System.out.println(notification.getTitle() + "\n" + notification.getMessage() + "\n" + notification.getType() + "\n" + notification.getCreatedAt());
+        int numTries = 10;
+        NotificationItem noti = null;
+        for (int i = 0; i < numTries; i++) {
+            try {
+                noti = notificationItemRepository.save(notification);
+                break;
+            }
+            catch (Exception e) {
+                continue;
+            }
+        }
+        assert  noti != null;
+        Integer notiId = noti.getId();
+        List<Noticement> noticements = ds.stream()
+                .map(d -> new Noticement(null, notiId, d, false))
+                .collect(Collectors.toList());
+        for (int i = 0; i < 10; i++) {
+            try {
+                noticementRepository.saveAll(noticements);
+                return;
+            }
+            catch (Exception e) {
+                continue;
+            }
+        }
+    }
 }

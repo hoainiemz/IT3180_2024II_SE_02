@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.example.hellofx.controller.LoginController;
 import org.example.hellofx.ui.JavaFxApplication;
-import org.example.hellofx.ui.theme.LoginScene;
+import org.example.hellofx.ui.theme.defaulttheme.LoginScene;
 import org.example.hellofx.utils.Effects;
 import org.example.hellofx.utils.ScreenUtils;
 
@@ -31,7 +31,7 @@ interface MyFun {
 };
 
 //@Component
-public class TestLoginScene implements LoginScene {
+public class TestLoginScene{
 //    @Autowired
     private LoginController loginController;
 

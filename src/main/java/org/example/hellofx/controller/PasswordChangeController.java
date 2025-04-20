@@ -1,12 +1,16 @@
 package org.example.hellofx.controller;
 
-public interface PasswordChangeController {
-    /**
-     * user request to change the password with the following information
-     * @param username
-     * @param password
-     * @param xacNhanMatKhauMoiPasswordField
-     * @return state of the request
-     */
-    public String passwordChangeRequest(String username, String password, String xacNhanMatKhauMoiPasswordField);
+import org.example.hellofx.controller.PasswordChangeController;
+import org.example.hellofx.controller.ProfileController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PasswordChangeController{
+    @Autowired
+    private ProfileController profileController;
+
+    public String passwordChangeRequest(String username, String password, String xacNhanMatKhauMoiPasswordField) {
+        return profileController.passwordChangeRequest(username, password, xacNhanMatKhauMoiPasswordField);
+    }
 }
