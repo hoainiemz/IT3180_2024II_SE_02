@@ -5,141 +5,193 @@ import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Payment;
 import org.example.hellofx.model.Resident;
+import org.example.hellofx.model.enums.AccountType;
+import org.example.hellofx.model.enums.GenderType;
+import org.example.hellofx.repository.AccountRepository;
+import org.example.hellofx.repository.BillRepository;
+import org.example.hellofx.repository.PaymentRepository;
+import org.example.hellofx.repository.ResidentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+@Primary
+@Service
+public class DataBaseService {
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private ResidentRepository residentRepository;
+    @Autowired
+    private RepositoryImpl repositoryImpl;
+    @Autowired
+    private PaymentRepository paymentRepository;
+    @Autowired
+    private BillRepository billRepository;
 
-public interface DataBaseService {
+    public List<ResidentBillPaymentDTO> getResidentPayments(Integer residentId) {
+        List<Object[]> results = paymentRepository.findResidentBillsWithPayments(residentId);
 
-    /**
-     * getLoginState: User login and DataBaseHandler check if the information mathch or not, return a Profile instance
-     * @param username
-     * @param password
-     * @return a profile of the matched account
-     */
-    public Account findAccountByUsernameAndPassword(String username, String password);
+        return results.stream().map(row -> new ResidentBillPaymentDTO(
+                (Integer) row[0],  // residentId
+                (Integer) row[1],  // userId
+                (String) row[2],   // firstName
+                (String) row[3],   // lastName
+                (GenderType) row[4],   // gender (should be GenderType if applicable)
+                (LocalDate) row[5], // dateOfBirth
+                (String) row[6],   // identityCard
+                (String) row[7],   // houseId
+                (LocalDate) row[8], // moveInDate
+                (Integer) row[9],  // billId
+                (Double) row[10],  // amount
+                (Double) row[11],  // lateFee
+                (LocalDateTime) row[12], // dueDate
+                (String) row[13],  // content
+                (String) row[14],  // description
+                (Boolean) row[15], // required
+                (LocalDateTime) row[16] // payTime
+        )).collect(Collectors.toList());
+    }
 
-    /**
-     * change the profile's password
-     * @param profile
-     * @param newPassword
-     * @return the number of accounts changed
-     */
-    public int passwordChangeQuery(Account profile, String newPassword);
+    
 
-    /**
-     * get all accounts
-     * @return a list of all accounts
-     */
-    public List<Account> getAllAccounts();
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
+    }
 
-    /**
-     * check if there are any account with given username
-     * @return
-     */
-    public boolean checkAccountExistByUsername( String value);
-    /**
-     * check if there are any account with given email
-     * @return
-     */
-    public boolean checkAccountExistByEmail( String value);
-    /**
-     * check if there are any account with given phone
-     * @return
-     */
-    public boolean checkAccountExistByPhone( String value);
+    public boolean checkAccountExistByUsername(String value) {
+        return accountRepository.existsByUsername(value);
+    }
 
-    /**
-     * user signed up
-     * @param username
-     * @param password
-     * @param email
-     * @param phone
-     */
-    public void createAccount(String username, String password, String email, String phone);
+    public boolean checkAccountExistByEmail(String value) {
+        return accountRepository.existsByEmail(value);
+    }
 
-    /**
-     * the user with Account profile and Resident resident want to take a resident query.
-     * @param profile
-     * @param resident
-     * @return List of resident
-     */
-    public List<Resident> residentsQuery(Account profile, Resident resident);
+    public boolean checkAccountExistByPhone(String value) {
+        return accountRepository.existsByPhone(value);
+    }
 
-    /**
-     * find resident by Account
-     * @param profile
-     * @return the matched resident
-     */
-    public Resident findResidentByAccount(Account profile);
+    public void createAccount(String username, String password, String email, String phone) {
+        Account acc = new Account(null, username, email, phone, password, null);
+        for (int i = 0; i < 10; i++) {
+            try {
+                accountRepository.save(acc);
+                break;
+            }
+            catch (Exception e) {
+                continue;
+            }
+        }
+    }
 
-    /**
-     * return all non-null house id
-     * @return List of all house id
-     */
-    List<String> findDistinctNonNullHouseId(Account profile, Resident resident);
+    public Account findAccountByUsernameAndPassword(String username, String passwordHash) {
+        Optional<Account> result = accountRepository.findByUsernameAndPasswordHash(username, passwordHash);
+        if (result.isPresent()) {
+            return result.get();
+        }
+        return null;
+    }
 
-    /**
-     * query with the following string
-     * @param query
-     * @return the result of the query
-     */
-    List<Resident> nativeResidentQuery(String query);
+    public int passwordChangeQuery(Account profile, String newPassword) {
+        return accountRepository.updatePasswordByUsername(profile.getUsername(), newPassword);
+    }
 
-    /**
-     * query with the following string
-     * @param query
-     * @return the result of the query
-     */
-    List<Account> nativeAccountQuery(String query);
+    public List<Resident> residentsQuery(Account profile, Resident resident) {
+        if (profile.getRole() == AccountType.Admin || profile.getRole() == AccountType.Client) {
+            return residentRepository.findAll();
+        }
+        return residentRepository.findByHouseId(resident.getHouseId());
+    }
 
-    /**
-     * Query the Account with user_id = id
-     * @param id
-     * @return
-     */
-    Account findAccountByUserId(int id);
+    public List<Resident> nativeResidentQuery(String query) {
+        return repositoryImpl.executeRawSql(query, Resident.class);
+    }
 
-    /**
-     * Query the Resident with user_id = id
-     * @param id
-     * @return
-     */
-    Resident findResidentByUserId(int id);
+    public List<Account> nativeAccountQuery(String query) {
+        return repositoryImpl.executeRawSql(query, Account.class);
+    }
 
-    /**
-     * check if there are any resident with given identiry card
-     * @param identityCard
-     * @return
-     */
-    boolean checkResidentExistByIdentityCard(String identityCard);
+    public Account findAccountByUserId(int id) {
+        return accountRepository.findByUserId(id).get();
+    }
 
-    /**
-     * update a row
-     * @param resident
-     */
-    public void updateResident(Resident resident);
+    public Resident findResidentByUserId(int id) {
+        return residentRepository.findByUserId(id).get();
+    }
 
-    /**
-     * update a row
-     * @param account
-     */
-    public void updateAccount(Account account);
+    public boolean checkResidentExistByIdentityCard(String identityCard) {
+        return residentRepository.existsByIdentityCard(identityCard);
+    }
 
-    /**
-     * very important
-     * @param residentId
-     * @return
-     */
-    public List<ResidentBillPaymentDTO> getResidentPayments(Integer residentId);
+    public Resident findResidentByAccount(Account profile) {
+        return residentRepository.findByUserId(profile.getUserId()).get();
+    }
 
     @Transactional
-    public void saveAllPayments(List<Payment> payments);
+    public List<String> findDistinctNonNullHouseId(Account profile, Resident resident) {
+        if (profile.getRole() == AccountType.Resident) {
+            return Arrays.asList(resident.getHouseId());
+        }
+        for (int i = 0; i < 10; i++) {
+            try {
+                return residentRepository.findDistinctNonNullHouseId();
+            }
+            catch (Exception e) {
+                continue;
+            }
+        }
+        return null;
+    }
+
+    public void updateResident(Resident resident) {
+        residentRepository.updateRowByUserId(
+            resident.getUserId(),
+            resident.getFirstName(),
+            resident.getLastName(),
+            resident.getDateOfBirth(),
+            resident.getGender(),
+            resident.getHouseId(),
+            resident.getIdentityCard(),
+            resident.getMoveInDate()
+        );
+    }
+
+    public void updateAccount(Account account) {
+        accountRepository.updateRowByUserId(account.getUserId(), account.getRole(), account.getEmail(), account.getPhone());
+    }
 
     @Transactional
-    public void updateBill(Bill bill);
+    public void saveAllPayments(List<Payment> payments) {
+        paymentRepository.saveAll(payments);
+    }
 
     @Transactional
-    public void deletePayments(List<Integer> dsOut);
+    public void updateBill(Bill bill) {
+        int d = 10;
+        while (d --> 0) {
+            try {
+                billRepository.save(bill);
+                return;
+            } catch (Exception e) {
+                continue;
+            }
+        }
+    }
+
+    @Transactional
+    public void deletePayments(List<Integer> dsOut) {
+        if (dsOut == null || dsOut.isEmpty()) {
+            throw new IllegalArgumentException("List of bill IDs cannot be null or empty");
+        }
+        paymentRepository.deletePaymentsByPaymentId(dsOut);
+    }
+
 }

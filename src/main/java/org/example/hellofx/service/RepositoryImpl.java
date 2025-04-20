@@ -1,10 +1,9 @@
-package org.example.hellofx.service.databaseservice;
+package org.example.hellofx.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.example.hellofx.dto.ResidentBillPaymentDTO;
-import org.example.hellofx.model.Account;
 import org.example.hellofx.model.enums.GenderType;
 import org.springframework.stereotype.Repository;
 
