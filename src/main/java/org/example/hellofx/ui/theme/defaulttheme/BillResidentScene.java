@@ -19,7 +19,6 @@ import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 import org.example.hellofx.controller.BillResidentController;
 import org.example.hellofx.dto.ResidentBillPaymentDTO;
-import org.example.hellofx.repository.PaymentRepository;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;

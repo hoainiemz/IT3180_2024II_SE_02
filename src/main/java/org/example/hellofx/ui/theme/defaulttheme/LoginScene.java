@@ -1,9 +1,5 @@
 package org.example.hellofx.ui.theme.defaulttheme;
 
-import atlantafx.base.controls.Notification;
-import atlantafx.base.theme.Styles;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;

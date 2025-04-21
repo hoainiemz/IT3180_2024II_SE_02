@@ -1,9 +1,6 @@
 package org.example.hellofx.ui.theme.defaulttheme;
 
-import atlantafx.base.controls.Notification;
 import atlantafx.base.theme.Styles;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -25,7 +22,6 @@ import org.example.hellofx.controller.BillCreationController;
 import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.model.enums.AccountType;
-import org.example.hellofx.service.DataBaseService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.*;

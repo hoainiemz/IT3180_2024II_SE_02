@@ -6,8 +6,6 @@ import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Payment;
 import org.example.hellofx.model.Resident;
-import org.example.hellofx.repository.BillRepository;
-import org.example.hellofx.repository.PaymentRepository;
 import org.example.hellofx.service.BillService;
 import org.example.hellofx.service.DataBaseService;
 import org.example.hellofx.ui.JavaFxApplication;

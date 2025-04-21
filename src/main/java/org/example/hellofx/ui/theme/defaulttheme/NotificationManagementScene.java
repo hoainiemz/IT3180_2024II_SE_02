@@ -19,7 +19,6 @@ import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 import org.example.hellofx.controller.NotificationManagementController;
 import org.example.hellofx.model.NotificationItem;
-import org.example.hellofx.repository.NotificationItemRepository;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.Badge;
