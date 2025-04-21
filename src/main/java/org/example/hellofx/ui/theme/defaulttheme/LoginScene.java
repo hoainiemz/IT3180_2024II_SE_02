@@ -49,7 +49,6 @@ public class LoginScene extends Notificable implements ThemeScene {
     private LoginController loginController;
 
     private static final String ADVICE_API_URL = "https://api.adviceslip.com/advice";
-    private Notification info;
     private Scene scene;
 
     @Override

@@ -19,10 +19,10 @@ public class HomeController{
     private ProfileController profileController;
     @Autowired
     private NotificationItemRepository notificationItemRepository;
-
-    private static final int NUM_NOTIES = 20;
     @Autowired
     private NoticementRepository noticementRepository;
+
+    private static final int NUM_NOTIES = 20;
 
     public void logoutButtonClicked(){
         profileController.logOutRequest();

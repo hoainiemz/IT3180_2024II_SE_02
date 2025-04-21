@@ -43,7 +43,6 @@ public class AllResidentRequestScene extends Notificable implements ThemeScene {
     private Pagination pagination;
     private VBox mainContent;
     private Scene scene;
-    private Notification info;
 
     @Override
     protected Scene getCurrentScene() {

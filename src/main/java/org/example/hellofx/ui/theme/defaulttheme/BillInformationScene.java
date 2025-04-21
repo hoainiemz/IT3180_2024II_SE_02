@@ -45,7 +45,6 @@ public class BillInformationScene extends Notificable{
     private DataBaseService dataBaseService;
 
     private Scene scene;
-    private Notification info;
 
     private static final int ITEMS_PER_PAGE = 9;
     private ObservableList<Resident> masterData;

@@ -40,7 +40,6 @@ public class UserInformationScene extends Notificable{
     private final ProfileController profileController;
 
     private Scene scene;
-    private Notification info;
     private Account profile;
     private Resident resident;
 

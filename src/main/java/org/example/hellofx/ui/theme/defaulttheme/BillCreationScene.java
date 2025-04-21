@@ -44,7 +44,6 @@ public class BillCreationScene extends Notificable implements ThemeScene {
     private BillCreationController billCreationController;
 
     private Scene scene;
-    private Notification info;
 
     private static final int ITEMS_PER_PAGE = 9;
     private ObservableList<Resident> masterData;

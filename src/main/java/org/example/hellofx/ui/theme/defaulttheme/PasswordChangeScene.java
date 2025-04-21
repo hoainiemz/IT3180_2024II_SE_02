@@ -29,7 +29,6 @@ public class PasswordChangeScene extends Notificable implements ThemeScene {
     @Autowired
     private PasswordChangeController passwordChangeController;
     private Scene scene;
-    private Notification info;
 
     protected Scene getCurrentScene() {
         return scene;
