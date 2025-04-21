@@ -37,11 +37,7 @@ import java.util.TreeMap;
 @Component
 public class ResidentScene implements ThemeScene {
     @Autowired
-    ResidentController showResidentController;
-    @Autowired
-    private ProfileController profileController;
-    @Autowired
-    private DataBaseService dataBaseService;
+    ResidentController residentController;
 
     private static final int ITEMS_PER_PAGE = 9;
     private ObservableList<Resident> masterData;
@@ -68,11 +64,11 @@ public class ResidentScene implements ThemeScene {
             }
             condition = condition + "r.house_id = '" + houseIdFilter.getValue() + "'";
         }
-        if (profileController.getProfile().getRole() == AccountType.Resident) {
+        if (residentController.getProfile().getRole() == AccountType.Resident) {
             if (!condition.isEmpty()) {
                 condition += " and ";
             }
-            condition = condition + "r.house_id = '" + profileController.getResident().getHouseId() + "'";
+            condition = condition + "r.house_id = '" + residentController.getResident().getHouseId() + "'";
         }
         if (roleFilter != null && roleFilter.getValue() != null) {
             if (!condition.isEmpty()) {
@@ -99,7 +95,7 @@ public class ResidentScene implements ThemeScene {
         query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
 //        table.getItems().clear();
-        masterData = FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+        masterData = residentController.residentQuery(query);
         resetPagination();
 //        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
     }
@@ -153,10 +149,10 @@ public class ResidentScene implements ThemeScene {
 
 //        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150));
 //        filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(profileController.getProfile(), profileController.getResident())), true, 100, "houseIdFilter"));
+        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", residentController.getAllHouseIds(), true, 100, "houseIdFilter"));
         filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Theo nhóm: ", FXCollections.observableArrayList(), true, 100, "groupFilter"));
-        if (profileController.getProfile().getRole() != AccountType.Resident) {
+        if (residentController.getProfile().getRole() != AccountType.Resident) {
             TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.Client, AccountType.Resident), false, 140, "roleFilter");
             role.getComboBox().setValue(AccountType.Resident);
             filter.getChildren().add(new Separator(Orientation.VERTICAL));
@@ -266,14 +262,14 @@ public class ResidentScene implements ThemeScene {
             row.setOnMouseClicked(event -> {
                 if (!row.isEmpty() && event.getClickCount() == 1) {
                     Resident clickedResident = row.getItem();
-                    showResidentController.seeMoreInformation(clickedResident.getUserId().intValue());
+                    residentController.seeMoreInformation(clickedResident.getUserId().intValue());
 //                    System.out.println("Clicked on: " + clickedResident.getFirstName());
                 }
             });
             return row;
         });
         Styles.toggleStyleClass(table, Styles.STRIPED);
-        if (profileController.getProfile().getRole() == AccountType.Admin || profileController.getProfile().getRole() == AccountType.Client) {
+        if (residentController.getProfile().getRole() == AccountType.Admin || residentController.getProfile().getRole() == AccountType.Client) {
             table.setEditable(true);
         }
         else {

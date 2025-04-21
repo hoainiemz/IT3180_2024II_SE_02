@@ -46,8 +46,6 @@ import java.util.TreeMap;
 public class NotificationCreationScene extends Notificable implements ThemeScene {
     @Autowired
     private NotificationCreationController notificationCreationController;
-    @Autowired
-    private DataBaseService dataBaseService;
 
     private Scene scene;
 
@@ -118,7 +116,7 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
         query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
 //        table.getItems().clear();
-        masterData = FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+        masterData = notificationCreationController.residentQuery(query);
         resetPagination();
 //        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
     }
@@ -204,7 +202,7 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
 
 //        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150, ""));
 //        filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(notificationCreationController.getProfile(), notificationCreationController.getResident())), true, 100, "houseIdFilter"));
+        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", notificationCreationController.getAllHouseIds(), true, 100, "houseIdFilter"));
         filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Theo nhóm: ", FXCollections.observableArrayList(), true, 100, "groupFilter"));
         if (notificationCreationController.getProfile().getRole() != AccountType.Resident) {

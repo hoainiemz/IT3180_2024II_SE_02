@@ -20,4 +20,8 @@ public class BillService {
     public Bill findBillByBillId(Integer billId) {
         return billRepository.findBillByBillId(billId).get();
     }
+
+    public List<Bill> findBillsByFilters(int requireFilter, int dueFilter, String searchFilter) {
+        return billRepository.findBillsWithFilters(requireFilter, dueFilter, searchFilter);
+    }
 }

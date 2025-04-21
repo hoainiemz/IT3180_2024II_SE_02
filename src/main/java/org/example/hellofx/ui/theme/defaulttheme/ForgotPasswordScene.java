@@ -24,10 +24,10 @@ import org.springframework.stereotype.Component;
 public class ForgotPasswordScene extends Notificable implements ThemeScene {
     @Autowired
     ForgotPasswordController forgotPasswordController;
-
-    private Scene scene;
     @Autowired
     private EmailValidator emailValidator;
+
+    private Scene scene;
 
     String realCode = null;
 

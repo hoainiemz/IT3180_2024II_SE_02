@@ -1,9 +1,12 @@
 package org.example.hellofx.controller;
 
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.ResidentRepository;
+import org.example.hellofx.service.DataBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +16,8 @@ public class AllResidentRequestController{
     private ProfileController profileController;
     @Autowired
     ResidentRepository residentRepository;
+    @Autowired
+    private DataBaseService dataBaseService;
 
     public Account getProfile() {
         return profileController.getProfile();
@@ -24,5 +29,9 @@ public class AllResidentRequestController{
 
     public void acceptButtonClicked(Resident newResident) {
         residentRepository.save(newResident);
+    }
+
+    public ObservableList<Account> accountsQuery(String query) {
+        return FXCollections.observableArrayList(dataBaseService.nativeAccountQuery(query));
     }
 }

@@ -1,9 +1,6 @@
 package org.example.hellofx.ui.theme.defaulttheme;
 
-import atlantafx.base.controls.Notification;
 import atlantafx.base.theme.Styles;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,8 +31,6 @@ import org.springframework.stereotype.Component;
 public class AllResidentRequestScene extends Notificable implements ThemeScene {
     @Autowired
     AllResidentRequestController allResidentRequestController;
-    @Autowired
-    private DataBaseService dataBaseService;
 
     private static final int ITEMS_PER_PAGE = 9;
     private ObservableList<Account> masterData;
@@ -72,7 +67,7 @@ public class AllResidentRequestScene extends Notificable implements ThemeScene {
         query += ';';
 //        TableView<Account> table = (TableView) scene.lookup("#resident-table");
         table.getItems().clear();
-        masterData = FXCollections.observableArrayList(dataBaseService.nativeAccountQuery(query));
+        masterData = allResidentRequestController.accountsQuery(query);
         System.out.println(masterData);
         resetPagination();
     }

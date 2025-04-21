@@ -13,7 +13,6 @@ public abstract class Notificable {
     private Notification info;
 
     protected abstract Scene getCurrentScene();
-
     protected void showPopUpMessage(String state, String message) {
         StackPane tmp = (StackPane) getCurrentScene().lookup("#rightFrame");
         if (tmp == null) {

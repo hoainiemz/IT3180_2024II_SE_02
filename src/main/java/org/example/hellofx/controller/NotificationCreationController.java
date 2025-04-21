@@ -1,11 +1,14 @@
 package org.example.hellofx.controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Noticement;
 import org.example.hellofx.model.NotificationItem;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.NoticementRepository;
 import org.example.hellofx.repository.NotificationItemRepository;
+import org.example.hellofx.service.DataBaseService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.NotificationCreationScene;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,8 @@ public class NotificationCreationController{
     private NotificationItemRepository notificationItemRepository;
     @Autowired
     private NoticementRepository noticementRepository;
+    @Autowired
+    private DataBaseService dataBaseService;
 
     public Resident getResident() {
         return profileController.getResident();
@@ -64,5 +69,12 @@ public class NotificationCreationController{
                 continue;
             }
         }
+    }
+    public ObservableList<Resident> residentQuery(String query) {
+        return FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+    }
+
+    public ObservableList<String> getAllHouseIds(){
+        return FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(getProfile(), getResident()));
     }
 }

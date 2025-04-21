@@ -40,8 +40,6 @@ import java.util.List;
 @Component
 public class NotificationManagementScene implements ThemeScene {
     @Autowired
-    private NotificationItemRepository notificationItemRepository;
-    @Autowired
     private NotificationManagementController notificationManagementController;
 
 
@@ -67,7 +65,7 @@ public class NotificationManagementScene implements ThemeScene {
         table.getItems().clear();
         for (int i = 0; i < 10; i++) {
             try {
-                masterData = FXCollections.observableArrayList(notificationItemRepository.findNotifications(typeFilter.getValue().text(), searchFilter.getText()));
+                masterData = notificationManagementController.getNotifications(typeFilter.getValue().text(), searchFilter.getText());
                 break;
             }
             catch (Exception e) {

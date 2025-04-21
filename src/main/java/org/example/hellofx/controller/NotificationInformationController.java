@@ -1,11 +1,16 @@
 package org.example.hellofx.controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Noticement;
 import org.example.hellofx.model.NotificationItem;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.NoticementRepository;
 import org.example.hellofx.repository.NotificationItemRepository;
+import org.example.hellofx.service.DataBaseService;
+import org.example.hellofx.service.NoticementService;
+import org.example.hellofx.service.NotificationService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +27,12 @@ public class NotificationInformationController{
     private NoticementRepository noticementRepository;
     @Autowired
     private NotificationItemRepository notificationItemRepository;
+    @Autowired
+    private DataBaseService dataBaseService;
+    @Autowired
+    private NoticementService noticementService;
+    @Autowired
+    private NotificationService notificationService;
 
     public Account getProfile() {
         return profileController.getProfile();
@@ -56,5 +67,21 @@ public class NotificationInformationController{
 
     public void reset(Integer id) {
         JavaFxApplication.showNotificationInformationScene(id);
+    }
+
+    public ObservableList<Resident> residentQuery(String query) {
+        return FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+    }
+
+    public ObservableList<String> getAllHouseIds(){
+        return FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(getProfile(), getResident()));
+    }
+
+    public List<Noticement> getNoticementsById(Integer notiId) {
+        return noticementService.findAllByNotificationId(notiId);
+    }
+
+    public NotificationItem getNotificationItemById(Integer notiId) {
+        return notificationService.findById(notiId);
     }
 }

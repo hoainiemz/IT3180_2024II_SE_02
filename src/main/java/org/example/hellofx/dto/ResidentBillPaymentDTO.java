@@ -52,21 +52,6 @@ public class ResidentBillPaymentDTO {
         this.payTime = payTime;
     }
 
-    // ✅ Constructor for JPQL Query
-//    public ResidentBillPaymentDTO(Resident resident, Bill bill, LocalDateTime payTime) {
-//        this.resident = resident;
-//        this.bill = bill;
-//        this.payTime = payTime;
-//    }
-
-//    public Resident getResident() {
-//        return resident;
-//    }
-//
-//    public Bill getBill() {
-//        return bill;
-//    }
-
     public LocalDateTime getPayTime() {
         return payTime;
     }

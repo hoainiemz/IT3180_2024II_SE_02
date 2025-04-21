@@ -33,8 +33,6 @@ import java.time.format.DateTimeFormatter;
 public class BillManagementScene implements ThemeScene {
     @Autowired
     private BillManagerController billManagerController;
-    @Autowired
-    private BillRepository billRepository;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -82,7 +80,7 @@ public class BillManagementScene implements ThemeScene {
             }
         }
 
-        masterData = FXCollections.observableArrayList(billRepository.findBillsWithFilters(kt2, kt3, searchFilter.getText()));
+        masterData = billManagerController.getBills(kt2, kt3, searchFilter.getText());;
         resetPagination();
     }
 

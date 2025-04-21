@@ -41,8 +41,6 @@ import java.util.*;
 public class BillInformationScene extends Notificable{
     @Autowired
     private BillInformationController billInformationController;
-    @Autowired
-    private DataBaseService dataBaseService;
 
     private Scene scene;
 

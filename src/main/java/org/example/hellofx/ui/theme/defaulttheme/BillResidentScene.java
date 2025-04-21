@@ -41,8 +41,6 @@ public class BillResidentScene implements ThemeScene {
     private TableView<ResidentBillPaymentDTO> table;
     private Pagination pagination;
     private VBox mainContent;
-    @Autowired
-    private PaymentRepository paymentRepository;
 
 
     public void reset() {
@@ -93,9 +91,7 @@ public class BillResidentScene implements ThemeScene {
                 kt3 = 1;
             }
         }
-//        masterData = FXCollections.observableArrayList(dataBaseService.getResidentPayments(showBillController.getResident().getResidentId()));
-        masterData = FXCollections.observableArrayList(paymentRepository.findResidentBillsWithResidentFilters(billController.getResident().getResidentId(), kt1, kt2, kt3, searchFilter.getText()));
-//        masterData = FXCollections.observableArrayList(repositoryImpl.executeRawSql2(query, ResidentBillPaymentDTO.class));
+        masterData = billController.getPayment(billController.getResident().getResidentId(), kt1, kt2, kt3, searchFilter.getText());
         resetPagination();
     }
 

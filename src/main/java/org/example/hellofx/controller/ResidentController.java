@@ -1,5 +1,7 @@
 package org.example.hellofx.controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.service.DataBaseService;
@@ -24,5 +26,21 @@ public class ResidentController {
         Account profile = dataBaseService.findAccountByUserId(id);
         Resident resident = dataBaseService.findResidentByUserId(id);
         JavaFxApplication.showUserInformationScene(profile, resident);
+    }
+
+    public Account getProfile() {
+        return profileController.getProfile();
+    }
+
+    public Resident getResident() {
+        return profileController.getResident();
+    }
+
+    public ObservableList<Resident> residentQuery(String query) {
+        return FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+    }
+
+    public ObservableList<String> getAllHouseIds(){
+        return FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(getProfile(), getResident()));
     }
 }

@@ -45,13 +45,7 @@ import java.util.*;
 @Component
 public class NotificationInformationScene extends Notificable{
     @Autowired
-    private DataBaseService dataBaseService;
-    @Autowired
     private NotificationInformationController notificationInformationController;
-    @Autowired
-    private NotificationItemRepository notificationItemRepository;
-    @Autowired
-    private NoticementRepository noticementRepository;
 
     private Scene scene;
 
@@ -125,7 +119,7 @@ public class NotificationInformationScene extends Notificable{
         query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
 //        table.getItems().clear();
-        masterData = FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+        masterData = notificationInformationController.residentQuery(query);
         resetPagination();
 //        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
     }
@@ -133,7 +127,7 @@ public class NotificationInformationScene extends Notificable{
     @Transactional
     public Scene getScene(Integer notiId) {
         reset();
-        noti = notificationItemRepository.findById(notiId).get();
+        noti = notificationInformationController.getNotificationItemById(notiId);
         scene = JavaFxApplication.getCurrentScene();
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
@@ -215,7 +209,7 @@ public class NotificationInformationScene extends Notificable{
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
 
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(notificationInformationController.getProfile(), notificationInformationController.getResident())), true, 100, "houseIdFilter"));
+        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", notificationInformationController.getAllHouseIds(), true, 100, "houseIdFilter"));
         filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Theo nhóm: ", FXCollections.observableArrayList(), true, 100, "groupFilter"));
         if (notificationInformationController.getProfile().getRole() != AccountType.Resident) {
@@ -331,7 +325,7 @@ public class NotificationInformationScene extends Notificable{
 
         selectedMapUpdater = new TreeMap<>();
         selectedMap = new TreeMap<>();
-        oldData = noticementRepository.findAllByNotificationId(noti.getId());
+        oldData = notificationInformationController.getNoticementsById(noti.getId());
 
 
         for (int i = 0; i < oldData.size(); i++) {
