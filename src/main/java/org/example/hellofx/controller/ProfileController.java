@@ -22,10 +22,6 @@ public class ProfileController{
     private Account profile;
     private Resident resident;
 
-//    public DefaultProfileController(DataBaseHandler residentService) {
-//        this.residentService = residentService;
-//    }
-
     public void logInRequest (Account profile) {
         this.profile = profile;
         resident = residentService.findResidentByAccount(profile);
