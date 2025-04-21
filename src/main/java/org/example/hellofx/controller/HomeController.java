@@ -50,7 +50,7 @@ public class HomeController{
     }
 
     public void danhSachKhoanThuClicked() {
-        JavaFxApplication.showThemeScene(BillScene.class);
+        JavaFxApplication.showThemeScene(BillResidentScene.class);
     }
 
     public void quanLyKhoanThuClicked() {

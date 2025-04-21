@@ -17,7 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
-import org.example.hellofx.controller.BillController;
+import org.example.hellofx.controller.BillResidentController;
 import org.example.hellofx.dto.ResidentBillPaymentDTO;
 import org.example.hellofx.repository.PaymentRepository;
 import org.example.hellofx.ui.JavaFxApplication;
@@ -30,9 +30,9 @@ import org.springframework.stereotype.Component;
 import java.time.format.DateTimeFormatter;
 
 @Component
-public class BillScene implements ThemeScene {
+public class BillResidentScene implements ThemeScene {
     @Autowired
-    private BillController billController;
+    private BillResidentController billController;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
