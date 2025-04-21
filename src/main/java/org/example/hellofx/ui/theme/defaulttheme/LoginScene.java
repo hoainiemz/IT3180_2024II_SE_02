@@ -44,7 +44,7 @@ interface MyFun {
 
 @Component
 @Primary
-public class LoginScene implements ThemeScene {
+public class LoginScene extends Notificable implements ThemeScene {
     @Autowired
     private LoginController loginController;
 
@@ -52,6 +52,10 @@ public class LoginScene implements ThemeScene {
     private Notification info;
     private Scene scene;
 
+    @Override
+    protected Scene getCurrentScene() {
+        return scene;
+    }
 
     public String getAdvice() {
         try {
@@ -287,44 +291,6 @@ public class LoginScene implements ThemeScene {
 //        tf2.setText("2005vtmvtm");
         tf1.setText("admin");
         tf2.setText("admin");
-    }
-    private void showPopUpMessage(String state, String message) {
-        StackPane rightFrame = (StackPane) scene.lookup("#rightFrame");
-        if (info == null) {
-            info = new Notification(message);
-            info.getStyleClass().add(Styles.ELEVATED_1);
-            StackPane.setAlignment(info, Pos.BOTTOM_RIGHT);
-            StackPane.setMargin(info, new Insets(10, 10, 30, 10));
-            info.setMaxHeight(100);
-        }
-        else {
-            info.setMessage(message);
-            try {
-                rightFrame.getChildren().remove(info);
-            }
-            catch (NullPointerException e) {
-            }
-        }
-        try {
-            info.getStyleClass().remove(Styles.WARNING);
-        }
-        catch (NullPointerException e) {}
-        try {
-            info.getStyleClass().remove(Styles.SUCCESS);
-        }
-        catch (NullPointerException e) {}
-        if (state.equals("Error")) {
-            info.getStyleClass().add(Styles.WARNING);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
-        }
-        else {
-            info.getStyleClass().add(Styles.SUCCESS);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE));
-        }
-        info.setOnClose(event -> {
-            rightFrame.getChildren().remove(info);
-        });
-        rightFrame.getChildren().add(info);
     }
 }
 

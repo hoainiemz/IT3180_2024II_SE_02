@@ -10,7 +10,7 @@ import java.util.Optional;
 
 
 public interface BillRepository  extends JpaRepository<Bill, Integer> {
-    Optional<Bill> findBillsByBillId(Integer billId);
+    Optional<Bill> findBillByBillId(Integer billId);
     @Query("SELECT b FROM Bill b " +
             "WHERE (:requireFilter = 0 OR (:requireFilter > 0 AND b.required = true) OR (:requireFilter < 0 AND b.required = false)) " +
             "AND (:dueFilter = 0 OR (:dueFilter > 0 AND b.dueDate > CURRENT_TIMESTAMP) OR (:dueFilter < 0 AND b.dueDate < CURRENT_TIMESTAMP)) " +
@@ -19,6 +19,4 @@ public interface BillRepository  extends JpaRepository<Bill, Integer> {
             @Param("requireFilter") int requireFilter,
             @Param("dueFilter") int dueFilter,
             @Param("searchFilter") String searchFilter);
-
-
 }

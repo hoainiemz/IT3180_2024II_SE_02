@@ -1,11 +1,14 @@
 package org.example.hellofx.controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Payment;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.BillRepository;
 import org.example.hellofx.repository.PaymentRepository;
+import org.example.hellofx.service.BillService;
 import org.example.hellofx.service.DataBaseService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.BillCreationScene;
@@ -23,11 +26,9 @@ public class BillCreationController{
     @Autowired
     private ProfileController profileController;
     @Autowired
-    private BillRepository billRepository;
-    @Autowired
-    private  PaymentRepository paymentRepository;
-    @Autowired
     private DataBaseService dataBaseService;
+    @Autowired
+    private BillService billService;
 
     public Account getProfile() {
         return profileController.getProfile();
@@ -40,7 +41,7 @@ public class BillCreationController{
 
     @Transactional
     public void createButtonClicked(Bill bill, List<Integer> residentIds) {
-        bill = billRepository.save(bill);
+        bill = billService.save(bill);
         Integer billId = bill.getBillId();
         List<Payment> payments = residentIds.stream()
                 .map(d -> new Payment(null, billId, d, null))  // Create a Payment object
@@ -55,5 +56,13 @@ public class BillCreationController{
 
     public void reset() {
         JavaFxApplication.showThemeScene(BillCreationScene.class);
+    }
+
+    public ObservableList<Resident> residentQuery(String query) {
+        return FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+    }
+
+    public ObservableList<String> getAllHouseIds(){
+        return FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(getProfile(), getResident()));
     }
 }

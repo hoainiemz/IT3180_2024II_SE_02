@@ -15,7 +15,11 @@ public abstract class Notificable {
     protected abstract Scene getCurrentScene();
 
     protected void showPopUpMessage(String state, String message) {
-        StackPane rightFrame = (StackPane) getCurrentScene().lookup("#rightFrame");
+        StackPane tmp = (StackPane) getCurrentScene().lookup("#rightFrame");
+        if (tmp == null) {
+            tmp = (StackPane) getCurrentScene().lookup("#content");
+        }
+        StackPane rightFrame = tmp;
         if (info == null) {
             info = new Notification(message);
             info.getStyleClass().add(Styles.ELEVATED_1);
@@ -39,7 +43,7 @@ public abstract class Notificable {
             info.getStyleClass().remove(Styles.SUCCESS);
         }
         catch (NullPointerException e) {}
-        if (state.equals("ERROR")) {
+        if (state.equals("Error")) {
             info.getStyleClass().add(Styles.WARNING);
             info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
         }

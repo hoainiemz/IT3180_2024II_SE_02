@@ -35,8 +35,7 @@ import java.time.LocalDate;
 
 
 @Component
-public class UserInformationScene {
-
+public class UserInformationScene extends Notificable{
     @Autowired
     private final ProfileController profileController;
 
@@ -47,6 +46,10 @@ public class UserInformationScene {
 
     public UserInformationScene(ProfileController profileController) {
         this.profileController = profileController;
+    }
+
+    protected Scene getCurrentScene() {
+        return scene;
     }
 
     public Scene getScene(Account reprofile, Resident reresident) {
@@ -219,44 +222,5 @@ public class UserInformationScene {
             showPopUpMessage("SUCCESS", "Đã thay đổi thông tin cá nhân!");
         });
         return scene;
-    }
-
-    private void showPopUpMessage(String state, String message) {
-        StackPane content = (StackPane) scene.lookup("#content");
-        if (info == null) {
-            info = new Notification(message);
-            info.getStyleClass().add(Styles.ELEVATED_1);
-            StackPane.setAlignment(info, Pos.BOTTOM_RIGHT);
-            StackPane.setMargin(info, new Insets(10, 10, 30, 10));
-            info.setMaxHeight(100);
-        }
-        else {
-            info.setMessage(message);
-            try {
-                content.getChildren().remove(info);
-            }
-            catch (NullPointerException e) {
-            }
-        }
-        try {
-            info.getStyleClass().remove(Styles.WARNING);
-        }
-        catch (NullPointerException e) {}
-        try {
-            info.getStyleClass().remove(Styles.SUCCESS);
-        }
-        catch (NullPointerException e) {}
-        if (state.equals("Error")) {
-            info.getStyleClass().add(Styles.WARNING);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
-        }
-        else {
-            info.getStyleClass().add(Styles.SUCCESS);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE));
-        }
-        info.setOnClose(event -> {
-            content.getChildren().remove(info);
-        });
-        content.getChildren().add(info);
     }
 }

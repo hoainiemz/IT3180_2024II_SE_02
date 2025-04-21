@@ -38,14 +38,11 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
-public class BillInformationScene{
-
-    @Autowired
-    private DataBaseService dataBaseService;
-    @Autowired
-    private BillRepository billRepository;
+public class BillInformationScene extends Notificable{
     @Autowired
     private BillInformationController billInformationController;
+    @Autowired
+    private DataBaseService dataBaseService;
 
     private Scene scene;
     private Notification info;
@@ -60,8 +57,10 @@ public class BillInformationScene{
     private Map<Integer, SimpleStringProperty> selectedMap;
     private Bill bill;
     private List<Payment> oldData;
-    @Autowired
-    private PaymentRepository paymentRepository;
+
+    protected Scene getCurrentScene() {
+        return scene;
+    }
 
     void reloadTable(Scene scene) {
         String condition = "";
@@ -87,12 +86,6 @@ public class BillInformationScene{
             }
             condition = condition + "a.role = '" + roleFilter.getValue() + "'";
         }
-//        if (groupFilter.getValue() != null && !groupFilter.getValue().isEmpty()) {
-//            if (!condition.isEmpty()) {
-//                condition += " and ";
-//            }
-//            condition = condition + "groupId = '" + groupFilter.getValue() + "'";
-//        }
         if (searchFilter.getText() != null && !searchFilter.getText().isEmpty()) {
             if (!condition.isEmpty()) {
                 condition += " and ";
@@ -106,7 +99,7 @@ public class BillInformationScene{
         query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
 //        table.getItems().clear();
-        masterData = FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+        masterData = billInformationController.residentQuery(query); //FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
         resetPagination();
 //        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
     }
@@ -120,7 +113,7 @@ public class BillInformationScene{
     }
 
     public Scene getScene(Integer billId) {
-        bill = billRepository.findBillsByBillId(billId).get();
+        bill = billInformationController.findBillByBillId(billId);
         reset();
         scene = JavaFxApplication.getCurrentScene();
         HBox container = (HBox) scene.lookup("#container");
@@ -205,7 +198,7 @@ public class BillInformationScene{
 
 //        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150));
 //        filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(billInformationController.getProfile(), billInformationController.getResident())), true, 100, "houseIdFilter"));
+        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", billInformationController.getAllHouseIds(), true, 100, "houseIdFilter"));
         filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Theo nhóm: ", FXCollections.observableArrayList(), true, 100, "groupFilter"));
         if (billInformationController.getProfile().getRole() != AccountType.Resident) {
@@ -337,7 +330,7 @@ public class BillInformationScene{
 
         selectedMapUpdater = new TreeMap<>();
         selectedMap = new TreeMap<>();
-        oldData = paymentRepository.findPaymentByBillId(bill.getBillId());
+        oldData = billInformationController.getPayments(bill.getBillId());
         for (int i = 0; i < oldData.size(); i++) {
 //            selectedMap.
             selectedMap.computeIfAbsent(oldData.get(i).getResidentId(), k -> new SimpleStringProperty("Phải đóng"));
@@ -446,45 +439,6 @@ public class BillInformationScene{
                 return new Label(); // This label is not used visually
             }
         });
-    }
-
-    private void showPopUpMessage(String state, String message) {
-        StackPane content = (StackPane) scene.lookup("#content");
-        if (info == null) {
-            info = new Notification(message);
-            info.getStyleClass().add(Styles.ELEVATED_1);
-            StackPane.setAlignment(info, Pos.BOTTOM_RIGHT);
-            StackPane.setMargin(info, new Insets(10, 10, 30, 10));
-            info.setMaxHeight(100);
-        }
-        else {
-            info.setMessage(message);
-            try {
-                content.getChildren().remove(info);
-            }
-            catch (NullPointerException e) {
-            }
-        }
-        try {
-            info.getStyleClass().remove(Styles.WARNING);
-        }
-        catch (NullPointerException e) {}
-        try {
-            info.getStyleClass().remove(Styles.SUCCESS);
-        }
-        catch (NullPointerException e) {}
-        if (state.equals("Error")) {
-            info.getStyleClass().add(Styles.WARNING);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
-        }
-        else {
-            info.getStyleClass().add(Styles.SUCCESS);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE));
-        }
-        info.setOnClose(event -> {
-            content.getChildren().remove(info);
-        });
-        content.getChildren().add(info);
     }
 
     private void updateTable(int pageIndex) {

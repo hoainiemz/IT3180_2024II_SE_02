@@ -43,7 +43,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Component
-public class NotificationCreationScene implements ThemeScene {
+public class NotificationCreationScene extends Notificable implements ThemeScene {
     @Autowired
     private NotificationCreationController notificationCreationController;
     @Autowired
@@ -60,6 +60,10 @@ public class NotificationCreationScene implements ThemeScene {
     private ScrollPane scrollPane;
     private Map<Integer, SimpleBooleanProperty> selectedMapUpdater;
     private Map<Integer, SimpleStringProperty> selectedMap;
+
+    protected Scene getCurrentScene() {
+        return scene;
+    }
 
     void reset() {
         masterData = null;
@@ -403,45 +407,6 @@ public class NotificationCreationScene implements ThemeScene {
                 return new Label(); // This label is not used visually
             }
         });
-    }
-
-    private void showPopUpMessage(String state, String message) {
-        StackPane content = (StackPane) scene.lookup("#content");
-        if (info == null) {
-            info = new Notification(message);
-            info.getStyleClass().add(Styles.ELEVATED_1);
-            StackPane.setAlignment(info, Pos.BOTTOM_RIGHT);
-            StackPane.setMargin(info, new Insets(10, 10, 30, 10));
-            info.setMaxHeight(100);
-        }
-        else {
-            info.setMessage(message);
-            try {
-                content.getChildren().remove(info);
-            }
-            catch (NullPointerException e) {
-            }
-        }
-        try {
-            info.getStyleClass().remove(Styles.WARNING);
-        }
-        catch (NullPointerException e) {}
-        try {
-            info.getStyleClass().remove(Styles.SUCCESS);
-        }
-        catch (NullPointerException e) {}
-        if (state.equals("Error")) {
-            info.getStyleClass().add(Styles.WARNING);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
-        }
-        else {
-            info.getStyleClass().add(Styles.SUCCESS);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE));
-        }
-        info.setOnClose(event -> {
-            content.getChildren().remove(info);
-        });
-        content.getChildren().add(info);
     }
 
     private void updateTable(int pageIndex) {

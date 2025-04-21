@@ -126,7 +126,7 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
             String email = ((TextField) leftFrame.lookup("#email-field")).getText();
             String response = emailValidator.emailCheck(email);
             if (!response.equals("OK!")) {
-                showPopUpMessage("ERROR", response);
+                showPopUpMessage("Error", response);
                 return;
             }
             try {
@@ -134,7 +134,7 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
                 showPopUpMessage("Kiểm tra email của bạn!", "Vui lòng kiểm tra địa chỉ email " + email + " để lấy mã xác nhận");
                 nextStep();
             } catch (Exception ex) {
-                showPopUpMessage("ERROR", "Có lỗi xảy ra trong quá trình gửi mail");
+                showPopUpMessage("Error", "Có lỗi xảy ra trong quá trình gửi mail");
             }
         });
 //        buttonContainer.setStyle("-fx-background-color: red;");
@@ -211,7 +211,7 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
                final_step();
            }
            else {
-               showPopUpMessage("ERROR", "Mã xác nhận không chính xác");
+               showPopUpMessage("Error", "Mã xác nhận không chính xác");
            }
         });
     }
@@ -221,7 +221,6 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
         ((TextField) loginForm.lookup("#email-field")).setDisable(true);
         VBox leftFrame = (VBox) scene.lookup("#leftFrame");
         MyFun iconTextFieldMaker = new MyFun() {
-
             public VBox func(String imgUrl, String Prompt, boolean password, String id) {
                 VBox vBox = new VBox();
                 HBox textFieldContainer = new HBox();
@@ -276,7 +275,7 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
                 sendResetEmailButton.setDisable(true);
             }
             catch (Exception e) {
-                showPopUpMessage("ERROR", "Có lỗi xảy ra");
+                showPopUpMessage("Error", "Có lỗi xảy ra");
             }
         });
     }

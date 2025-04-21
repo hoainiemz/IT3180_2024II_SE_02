@@ -49,7 +49,6 @@ public class SignUpScene extends Notificable implements ThemeScene {
         welcomeText2.getStyleClass().add("welcomeText2");
         welcomeFrame.getChildren().addAll(welcomeText, welcomeText2);
 
-//        welcomeFrame.setAlignment(Pos.CENTER);
         welcomeFrame.setPadding(new Insets(0, leftFrame.getPrefWidth() * 0.2, 0, leftFrame.getPrefWidth() * 0.2));
         welcomeFrame.setSpacing(5);
         leftFrame.setSpacing(30);

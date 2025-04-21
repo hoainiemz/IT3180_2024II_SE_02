@@ -340,7 +340,6 @@ public class HomeScene implements ThemeScene {
         RadioButton tmp = (RadioButton) menuButtonList.get(0);
         tmp.setSelected(true);
         resetMenuBar(scene);
-//        menuContainer.setSpacing(10);
         return scene;
     }
 

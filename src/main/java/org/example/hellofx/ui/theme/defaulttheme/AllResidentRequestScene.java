@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AllResidentRequestScene implements ThemeScene {
+public class AllResidentRequestScene extends Notificable implements ThemeScene {
     @Autowired
     AllResidentRequestController allResidentRequestController;
     @Autowired
@@ -44,6 +44,11 @@ public class AllResidentRequestScene implements ThemeScene {
     private VBox mainContent;
     private Scene scene;
     private Notification info;
+
+    @Override
+    protected Scene getCurrentScene() {
+        return null;
+    }
 
     public void reset() {
         masterData = null;
@@ -222,44 +227,5 @@ public class AllResidentRequestScene implements ThemeScene {
                 masterData.subList(fromIndex, toIndex));
 
         table.setItems(pageData);
-    }
-
-    private void showPopUpMessage(String state, String message) {
-        StackPane content = (StackPane) scene.lookup("#content");
-        if (info == null) {
-            info = new Notification(message);
-            info.getStyleClass().add(Styles.ELEVATED_1);
-            StackPane.setAlignment(info, Pos.BOTTOM_RIGHT);
-            StackPane.setMargin(info, new Insets(10, 10, 30, 10));
-            info.setMaxHeight(100);
-        }
-        else {
-            info.setMessage(message);
-            try {
-                content.getChildren().remove(info);
-            }
-            catch (NullPointerException e) {
-            }
-        }
-        try {
-            info.getStyleClass().remove(Styles.WARNING);
-        }
-        catch (NullPointerException e) {}
-        try {
-            info.getStyleClass().remove(Styles.SUCCESS);
-        }
-        catch (NullPointerException e) {}
-        if (state.equals("Error changing password")) {
-            info.getStyleClass().add(Styles.WARNING);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
-        }
-        else {
-            info.getStyleClass().add(Styles.SUCCESS);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE));
-        }
-        info.setOnClose(event -> {
-            content.getChildren().remove(info);
-        });
-        content.getChildren().add(info);
     }
 }

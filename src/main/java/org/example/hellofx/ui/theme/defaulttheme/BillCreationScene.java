@@ -39,11 +39,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Component
-public class BillCreationScene implements ThemeScene {
+public class BillCreationScene extends Notificable implements ThemeScene {
     @Autowired
     private BillCreationController billCreationController;
-    @Autowired
-    private DataBaseService dataBaseService;
 
     private Scene scene;
     private Notification info;
@@ -56,6 +54,10 @@ public class BillCreationScene implements ThemeScene {
     private ScrollPane scrollPane;
     private Map<Integer, SimpleBooleanProperty> selectedMapUpdater;
     private Map<Integer, SimpleStringProperty> selectedMap;
+
+    protected Scene getCurrentScene() {
+        return scene;
+    }
 
     public void reset() {
         masterData = null;
@@ -109,9 +111,8 @@ public class BillCreationScene implements ThemeScene {
         query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
 //        table.getItems().clear();
-        masterData = FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+        masterData = billCreationController.residentQuery(query);
         resetPagination();
-//        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
     }
 
 
@@ -199,7 +200,7 @@ public class BillCreationScene implements ThemeScene {
 
 //        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150));
 //        filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(billCreationController.getProfile(), billCreationController.getResident())), true, 100, "houseIdFilter"));
+        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", billCreationController.getAllHouseIds(), true, 100, "houseIdFilter"));
         filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Theo nhóm: ", FXCollections.observableArrayList(), true, 100, "groupFilter"));
         if (billCreationController.getProfile().getRole() != AccountType.Resident) {
@@ -424,45 +425,6 @@ public class BillCreationScene implements ThemeScene {
                 return new Label(); // This label is not used visually
             }
         });
-    }
-
-    private void showPopUpMessage(String state, String message) {
-        StackPane content = (StackPane) scene.lookup("#content");
-        if (info == null) {
-            info = new Notification(message);
-            info.getStyleClass().add(Styles.ELEVATED_1);
-            StackPane.setAlignment(info, Pos.BOTTOM_RIGHT);
-            StackPane.setMargin(info, new Insets(10, 10, 30, 10));
-            info.setMaxHeight(100);
-        }
-        else {
-            info.setMessage(message);
-            try {
-                content.getChildren().remove(info);
-            }
-            catch (NullPointerException e) {
-            }
-        }
-        try {
-            info.getStyleClass().remove(Styles.WARNING);
-        }
-        catch (NullPointerException e) {}
-        try {
-            info.getStyleClass().remove(Styles.SUCCESS);
-        }
-        catch (NullPointerException e) {}
-        if (state.equals("Error")) {
-            info.getStyleClass().add(Styles.WARNING);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
-        }
-        else {
-            info.getStyleClass().add(Styles.SUCCESS);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE));
-        }
-        info.setOnClose(event -> {
-            content.getChildren().remove(info);
-        });
-        content.getChildren().add(info);
     }
 
     private void updateTable(int pageIndex) {

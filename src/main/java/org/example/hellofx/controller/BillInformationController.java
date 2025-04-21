@@ -1,10 +1,14 @@
 package org.example.hellofx.controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Payment;
 import org.example.hellofx.model.Resident;
+import org.example.hellofx.service.BillService;
 import org.example.hellofx.service.DataBaseService;
+import org.example.hellofx.service.PaymentService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +22,10 @@ public class BillInformationController{
     private ProfileController profileController;
     @Autowired
     private DataBaseService dataBaseService;
+    @Autowired
+    private BillService billService;
+    @Autowired
+    private PaymentService paymentService;
 
     public Resident getResident() {
         return profileController.getResident();
@@ -51,5 +59,21 @@ public class BillInformationController{
 
     public void reset(Bill bill) {
         JavaFxApplication.showBillInformationScene(bill.getBillId());
+    }
+
+    public ObservableList<Resident> residentQuery(String query) {
+        return FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+    }
+
+    public Bill findBillByBillId(Integer billId) {
+        return billService.findBillByBillId(billId);
+    }
+
+    public ObservableList<String> getAllHouseIds(){
+        return FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(getProfile(), getResident()));
+    }
+
+    public List<Payment> getPayments(Integer billId) {
+        return paymentService.findPaymentByBillId(billId);
     }
 }

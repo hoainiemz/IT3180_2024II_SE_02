@@ -25,13 +25,15 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class PasswordChangeScene implements ThemeScene {
-//    @Autowired
-//    private ProfileController profileController;
+public class PasswordChangeScene extends Notificable implements ThemeScene {
     @Autowired
     private PasswordChangeController passwordChangeController;
     private Scene scene;
     private Notification info;
+
+    protected Scene getCurrentScene() {
+        return scene;
+    }
 
     public Scene getScene() {
         scene = JavaFxApplication.getCurrentScene();
@@ -126,9 +128,8 @@ public class PasswordChangeScene implements ThemeScene {
             child.setText(state);
             if (state.equals("Password changed successfully!")) {
                 child.setFill(Color.valueOf("#549159"));
-                showPopUpMessage( "Password changed", "Your password has been changed successfully!");
-            }
-            else {
+                showPopUpMessage("Password changed", "Your password has been changed successfully!");
+            } else {
                 child.setFill(Color.RED);
                 showPopUpMessage("Error changing password", "There was an error processing your password reset!");
             }
@@ -156,45 +157,5 @@ public class PasswordChangeScene implements ThemeScene {
         mainContent.setSpacing(20);
 
         return scene;
-    }
-
-
-    private void showPopUpMessage(String state, String message) {
-        StackPane content = (StackPane) scene.lookup("#content");
-        if (info == null) {
-            info = new Notification(message);
-            info.getStyleClass().add(Styles.ELEVATED_1);
-            StackPane.setAlignment(info, Pos.BOTTOM_RIGHT);
-            StackPane.setMargin(info, new Insets(10, 10, 30, 10));
-            info.setMaxHeight(100);
-        }
-        else {
-            info.setMessage(message);
-            try {
-                content.getChildren().remove(info);
-            }
-            catch (NullPointerException e) {
-            }
-        }
-        try {
-            info.getStyleClass().remove(Styles.WARNING);
-        }
-        catch (NullPointerException e) {}
-        try {
-            info.getStyleClass().remove(Styles.SUCCESS);
-        }
-        catch (NullPointerException e) {}
-        if (state.equals("Error changing password")) {
-            info.getStyleClass().add(Styles.WARNING);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
-        }
-        else {
-            info.getStyleClass().add(Styles.SUCCESS);
-            info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE));
-        }
-        info.setOnClose(event -> {
-            content.getChildren().remove(info);
-        });
-        content.getChildren().add(info);
     }
 }
