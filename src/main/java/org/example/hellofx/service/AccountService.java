@@ -2,6 +2,7 @@ package org.example.hellofx.service;
 
 import org.example.hellofx.model.Account;
 import org.example.hellofx.repository.AccountRepository;
+import org.example.hellofx.repository.RepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

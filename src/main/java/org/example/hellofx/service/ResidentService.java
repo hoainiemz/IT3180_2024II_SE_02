@@ -3,6 +3,7 @@ package org.example.hellofx.service;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.model.enums.AccountType;
+import org.example.hellofx.repository.RepositoryImpl;
 import org.example.hellofx.repository.ResidentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

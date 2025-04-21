@@ -1,4 +1,4 @@
-package org.example.hellofx.service;
+package org.example.hellofx.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
