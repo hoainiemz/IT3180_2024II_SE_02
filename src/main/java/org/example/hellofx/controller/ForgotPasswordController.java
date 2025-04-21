@@ -6,6 +6,7 @@ import org.example.hellofx.service.EmailService;
 import org.example.hellofx.service.Generator;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.LoginScene;
+import org.example.hellofx.validator.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,8 @@ public class ForgotPasswordController {
     Generator generator;
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    private EmailValidator emailValidator;
 
     public void loginClicked() {
         JavaFxApplication.showThemeScene(LoginScene.class);
@@ -39,5 +42,9 @@ public class ForgotPasswordController {
                 accountRepository.save(account);
             }
         }
+    }
+
+    public String emailCheck(String email) {
+        return emailValidator.emailCheck(email);
     }
 }

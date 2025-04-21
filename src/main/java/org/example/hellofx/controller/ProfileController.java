@@ -48,7 +48,7 @@ public class ProfileController{
     }
 
     public String passwordChangeRequest(String currentPassword, String newPassword, String confirmPassword) {
-        assert isLoggedIn() == true;
+        assert isLoggedIn();
         if (newPassword.equals(confirmPassword) == false) {
             return "New password do not match!";
         }

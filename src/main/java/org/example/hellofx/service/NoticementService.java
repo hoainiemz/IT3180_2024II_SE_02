@@ -15,4 +15,8 @@ public class NoticementService {
     public List<Noticement> findAllByNotificationId(Integer id) {
         return noticementRepository.findAllByNotificationId(id);
     }
+
+    public void markAsWatched(Integer notificationId, Integer residentId) {
+        noticementRepository.markAsWatched(notificationId, residentId);
+    }
 }

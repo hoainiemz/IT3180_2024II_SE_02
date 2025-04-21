@@ -1,10 +1,13 @@
 package org.example.hellofx.controller;
 
+import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Noticement;
 import org.example.hellofx.model.NotificationItem;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.NoticementRepository;
 import org.example.hellofx.repository.NotificationItemRepository;
+import org.example.hellofx.service.NoticementService;
+import org.example.hellofx.service.NotificationService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +20,11 @@ import java.util.List;
 public class HomeController{
     @Autowired
     private ProfileController profileController;
+
     @Autowired
-    private NotificationItemRepository notificationItemRepository;
+    private NotificationService notificationService;
     @Autowired
-    private NoticementRepository noticementRepository;
+    private NoticementService noticementService;
 
     private static final int NUM_NOTIES = 20;
 
@@ -66,10 +70,14 @@ public class HomeController{
     }
 
     public List<NotificationItem> getNotificationList(Integer residentId, boolean unReadOnly) {
-//        for (int i = 0; i < 10; i++) {
-//
-//        }
-        return notificationItemRepository.findTopByResidentIdAndWatchedStatusOrderByCreatedAtDesc(residentId, unReadOnly, PageRequest.of(0, 20));
+        for (int i = 0; i < 10; i++) {
+            try {
+                return notificationService.findTopByResidentIdAndWatchedStatusOrderByCreatedAtDesc(residentId, unReadOnly, PageRequest.of(0, 20));
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return null;
     }
 
     public Resident getResident() {
@@ -79,12 +87,20 @@ public class HomeController{
     public void noticementClicked(Noticement notice) {
         for (int i = 0; i < 10; i++) {
             try {
-                noticementRepository.markAsWatched(notice.getNotificationId(), notice.getResidentId());
+                noticementService.markAsWatched(notice.getNotificationId(), notice.getResidentId());
                 break;
             }
             catch (Exception e) {
                 continue;
             }
         }
+    }
+
+    public Account getProfile() {
+        return profileController.getProfile();
+    }
+
+    public String getProfileNameRequest() {
+        return profileController.getProfileNameRequest();
     }
 }

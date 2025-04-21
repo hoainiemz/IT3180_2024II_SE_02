@@ -46,8 +46,6 @@ import java.util.List;
 public class HomeScene implements ThemeScene {
     @Autowired
     HomeController homeController;
-    @Autowired
-    ProfileController profileController;
 
     private Scene scene;
     private List menuButtonList;
@@ -126,11 +124,11 @@ public class HomeScene implements ThemeScene {
         topProfile.setAlignment(Pos.CENTER_RIGHT);
         profileContainer.setAlignment(Pos.CENTER_RIGHT);
         Text welcome = null;
-        if (profileController.getResident().getFirstName() != null) {
-            welcome = new Text("Chào mừng bạn, " + profileController.getResident().getFirstName());
+        if (homeController.getResident().getFirstName() != null) {
+            welcome = new Text("Chào mừng bạn, " + homeController.getResident().getFirstName());
         }
         else {
-            welcome = new Text("Chào mừng bạn, " + profileController.getProfileNameRequest());
+            welcome = new Text("Chào mừng bạn, " + homeController.getProfileNameRequest());
         }
         Image userIcon = new Image("images/user-icon.jpg");
         welcome.setId("welcome");
@@ -145,7 +143,7 @@ public class HomeScene implements ThemeScene {
         profileDropDownContent.setAlignment(Pos.CENTER);
         profileDropDownContent.setPadding(new Insets(10, 0, 10, 0));
         profileDropDownContent.getChildren().addAll(
-                new TextFlow(new Text(profileController.getProfileNameRequest())),
+                new TextFlow(new Text(homeController.getProfileNameRequest())),
                 new TextFlow(new Text("Đổi mật khẩu")),
                 new TextFlow(new Text("Đăng xuất")),
                 new TextFlow(new Text("Đóng ứng dụng"))
@@ -239,7 +237,7 @@ public class HomeScene implements ThemeScene {
         Button hienThiCacYeuCau = new Button("Các yêu cầu tham gia");
         hienThiCacYeuCau.getStyleClass().add("menu-sub-button");
         danCuContainer.getChildren().addAll(danCu, nhom, danhSachDanCu);
-        if (profileController.getProfile().getRole() != AccountType.Resident) {
+        if (homeController.getProfile().getRole() != AccountType.Resident) {
             danCuContainer.getChildren().addAll(hienThiCacYeuCau);
         }
         danhSachDanCu.setOnAction(event -> {
@@ -260,7 +258,7 @@ public class HomeScene implements ThemeScene {
         Button quanLyKhoanThu = new Button("Quản lý khoản thu");
         quanLyKhoanThu.getStyleClass().add("menu-sub-button");
         khoanThuContainer.getChildren().addAll(khoanThu);
-        if (profileController.getProfile().getRole() != AccountType.Resident) {
+        if (homeController.getProfile().getRole() != AccountType.Resident) {
             khoanThuContainer.getChildren().addAll(taoKhoanThu, quanLyKhoanThu);
         }
         else {
@@ -313,7 +311,7 @@ public class HomeScene implements ThemeScene {
         ToggleGroup menuToggleGroup = new ToggleGroup();
 
         menuContainer.getChildren().addAll(dashBoardContainer, danCuContainer, khoanThuContainer);
-        if (profileController.getProfile().getRole() != AccountType.Resident) {
+        if (homeController.getProfile().getRole() != AccountType.Resident) {
             menuContainer.getChildren().add(thongBaoContainer);
         }
         menuContainer.getChildren().add(myProfileContainer);

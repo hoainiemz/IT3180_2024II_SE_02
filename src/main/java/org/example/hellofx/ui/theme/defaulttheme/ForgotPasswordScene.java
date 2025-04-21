@@ -24,8 +24,6 @@ import org.springframework.stereotype.Component;
 public class ForgotPasswordScene extends Notificable implements ThemeScene {
     @Autowired
     ForgotPasswordController forgotPasswordController;
-    @Autowired
-    private EmailValidator emailValidator;
 
     private Scene scene;
 
@@ -124,7 +122,7 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
         buttonContainer.getChildren().addAll(sendResetEmailButton);
         sendResetEmailButton.setOnAction(e -> {
             String email = ((TextField) leftFrame.lookup("#email-field")).getText();
-            String response = emailValidator.emailCheck(email);
+            String response = forgotPasswordController.emailCheck(email);
             if (!response.equals("OK!")) {
                 showPopUpMessage("Error", response);
                 return;

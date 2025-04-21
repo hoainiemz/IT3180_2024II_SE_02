@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 public class PasswordChangeScene extends Notificable implements ThemeScene {
     @Autowired
     private PasswordChangeController passwordChangeController;
+
     private Scene scene;
 
     protected Scene getCurrentScene() {
