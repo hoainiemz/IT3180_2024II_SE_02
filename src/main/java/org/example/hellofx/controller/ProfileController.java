@@ -18,6 +18,7 @@ public class ProfileController{
     private ResidentService residentService;
     @Autowired
     private AccountService accountService;
+
     private Account profile;
     private Resident resident;
 

@@ -11,9 +11,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoginController {
     @Autowired
-    AccountService accountService;
-    @Autowired
     ProfileController profileController;
+
+    @Autowired
+    AccountService accountService;
 
     public String loginButtonClicked(String username, String password) {
         Account response = accountService.findAccountByUsernameAndPassword(username, password);

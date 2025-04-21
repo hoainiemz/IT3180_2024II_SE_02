@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class BillManagerController{
     @Autowired
     private ProfileController profileController;
+
     @Autowired
     private BillService billService;
 

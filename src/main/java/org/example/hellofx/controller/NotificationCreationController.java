@@ -8,6 +8,8 @@ import org.example.hellofx.model.NotificationItem;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.NoticementRepository;
 import org.example.hellofx.repository.NotificationItemRepository;
+import org.example.hellofx.service.NoticementService;
+import org.example.hellofx.service.NotificationService;
 import org.example.hellofx.service.ResidentService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.NotificationCreationScene;
@@ -22,10 +24,11 @@ import java.util.stream.Collectors;
 public class NotificationCreationController{
     @Autowired
     private ProfileController profileController;
+
     @Autowired
-    private NotificationItemRepository notificationItemRepository;
+    private NotificationService notificationService;
     @Autowired
-    private NoticementRepository noticementRepository;
+    private NoticementService noticementService;
     @Autowired
     private ResidentService residentService;
 
@@ -48,7 +51,7 @@ public class NotificationCreationController{
         NotificationItem noti = null;
         for (int i = 0; i < numTries; i++) {
             try {
-                noti = notificationItemRepository.save(notification);
+                noti = notificationService.save(notification);
                 break;
             }
             catch (Exception e) {
@@ -62,7 +65,7 @@ public class NotificationCreationController{
                 .collect(Collectors.toList());
         for (int i = 0; i < 10; i++) {
             try {
-                noticementRepository.saveAll(noticements);
+                noticementService.saveAll(noticements);
                 return;
             }
             catch (Exception e) {

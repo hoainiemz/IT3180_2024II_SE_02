@@ -23,10 +23,7 @@ import java.util.stream.Collectors;
 public class NotificationInformationController{
     @Autowired
     private ProfileController profileController;
-    @Autowired
-    private NoticementRepository noticementRepository;
-    @Autowired
-    private NotificationItemRepository notificationItemRepository;
+
     @Autowired
     private NoticementService noticementService;
     @Autowired
@@ -45,7 +42,7 @@ public class NotificationInformationController{
     @Transactional
     public void saveButtonClicked(NotificationItem oldNoti, NotificationItem newNoti, List<Integer> dsIn, List<Integer> dsOut) {
         if (!oldNoti.equals(newNoti)) {
-            notificationItemRepository.save(newNoti);
+            notificationService.save(newNoti);
         }
 
         Integer notiId = oldNoti.getId();
@@ -58,10 +55,10 @@ public class NotificationInformationController{
             notice.setNoticementId(null);
         }
         if (!noticements.isEmpty()) {
-            noticementRepository.saveAll(noticements);
+            noticementService.saveAll(noticements);
         }
         if (!dsOut.isEmpty()) {
-            noticementRepository.deleteNoticementsByNoticementId(dsOut);
+            noticementService.deleteNoticementsByNoticementId(dsOut);
         }
     }
 

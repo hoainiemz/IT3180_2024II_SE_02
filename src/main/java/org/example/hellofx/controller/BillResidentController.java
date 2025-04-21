@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class BillResidentController {
     @Autowired
     private ProfileController profileController;
+
     @Autowired
     private PaymentService paymentService;
 

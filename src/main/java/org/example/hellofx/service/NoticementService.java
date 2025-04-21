@@ -19,4 +19,12 @@ public class NoticementService {
     public void markAsWatched(Integer notificationId, Integer residentId) {
         noticementRepository.markAsWatched(notificationId, residentId);
     }
+
+    public void saveAll(List<Noticement> noticements) {
+        noticementRepository.saveAll(noticements);
+    }
+
+    public void deleteNoticementsByNoticementId(List<Integer> dsout) {
+        noticementRepository.deleteNoticementsByNoticementId(dsout);
+    }
 }

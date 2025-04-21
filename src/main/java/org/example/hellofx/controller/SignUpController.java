@@ -19,7 +19,7 @@ public class SignUpController{
 
     @Autowired
     private EmailValidator emailValidator;
-
+    
     public void backToSignInClicked() {
         JavaFxApplication.showThemeScene(LoginScene.class);
     }

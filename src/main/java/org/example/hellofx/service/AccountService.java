@@ -75,4 +75,12 @@ public class AccountService {
     public List<Account> nativeAccountQuery(String query) {
         return repositoryImpl.executeRawSql(query, Account.class);
     }
+
+    public Optional<Account> findByEmail(String email) {
+        return accountRepository.findByEmail(email);
+    }
+
+    public void save(Account account) {
+        accountRepository.save(account);
+    }
 }

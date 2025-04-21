@@ -7,6 +7,7 @@ import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.ResidentRepository;
 import org.example.hellofx.service.AccountService;
+import org.example.hellofx.service.ResidentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +15,9 @@ import org.springframework.stereotype.Component;
 public class AllResidentRequestController{
     @Autowired
     private ProfileController profileController;
+
     @Autowired
-    ResidentRepository residentRepository;
+    private ResidentService residentService;
     @Autowired
     private AccountService accountService;
 
@@ -28,7 +30,7 @@ public class AllResidentRequestController{
     }
 
     public void acceptButtonClicked(Resident newResident) {
-        residentRepository.save(newResident);
+        residentService.save(newResident);
     }
 
     public ObservableList<Account> accountsQuery(String query) {

@@ -15,9 +15,10 @@ import java.util.List;
 @Component
 public class ResidentController {
     @Autowired
-    private ResidentService residentService;
-    @Autowired
     private ProfileController profileController;
+
+    @Autowired
+    private ResidentService residentService;
     @Autowired
     private AccountService accountService;
 

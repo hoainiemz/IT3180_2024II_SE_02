@@ -69,4 +69,8 @@ public class ResidentService {
                 resident.getMoveInDate()
         );
     }
+
+    public void save(Resident resident) {
+        residentRepository.save(resident);
+    }
 }

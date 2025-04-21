@@ -25,4 +25,8 @@ public class NotificationService {
     public List<NotificationItem> findTopByResidentIdAndWatchedStatusOrderByCreatedAtDesc(Integer residentId, Boolean unReadOnly, Pageable pageable) {
         return notificationItemRepository.findTopByResidentIdAndWatchedStatusOrderByCreatedAtDesc(residentId, unReadOnly, PageRequest.of(0, 20));
     }
+
+    public NotificationItem save(NotificationItem notificationItem) {
+        return notificationItemRepository.save(notificationItem);
+    }
 }

@@ -2,6 +2,7 @@ package org.example.hellofx.controller;
 
 import org.example.hellofx.model.Account;
 import org.example.hellofx.repository.AccountRepository;
+import org.example.hellofx.service.AccountService;
 import org.example.hellofx.service.EmailService;
 import org.example.hellofx.service.Generator;
 import org.example.hellofx.ui.JavaFxApplication;
@@ -15,13 +16,14 @@ import java.util.Optional;
 @Component
 public class ForgotPasswordController {
     @Autowired
+    AccountService accountService;
+    @Autowired
     EmailService emailService;
-    @Autowired
-    Generator generator;
-    @Autowired
-    AccountRepository accountRepository;
+
     @Autowired
     private EmailValidator emailValidator;
+    @Autowired
+    Generator generator;
 
     public void loginClicked() {
         JavaFxApplication.showThemeScene(LoginScene.class);
@@ -34,12 +36,12 @@ public class ForgotPasswordController {
     }
 
     public void resetRequest(String email, String password) {
-        Optional<Account> response = accountRepository.findByEmail(email);
+        Optional<Account> response = accountService.findByEmail(email);
         if (response.isPresent()) {
             Account account = response.get();
             account.setPasswordHash(password);
             for (int i = 0; i < 10; i++) {
-                accountRepository.save(account);
+                accountService.save(account);
             }
         }
     }
