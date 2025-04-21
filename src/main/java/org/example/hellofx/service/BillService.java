@@ -4,6 +4,7 @@ import org.example.hellofx.model.Bill;
 import org.example.hellofx.repository.BillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,5 +23,18 @@ public class BillService {
 
     public List<Bill> findBillsByFilters(int requireFilter, int dueFilter, String searchFilter) {
         return billRepository.findBillsWithFilters(requireFilter, dueFilter, searchFilter);
+    }
+
+    @Transactional
+    public void updateBill(Bill bill) {
+        int d = 10;
+        while (d --> 0) {
+            try {
+                billRepository.save(bill);
+                return;
+            } catch (Exception e) {
+                continue;
+            }
+        }
     }
 }

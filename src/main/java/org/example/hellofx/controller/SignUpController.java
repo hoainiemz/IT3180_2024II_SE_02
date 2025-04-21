@@ -1,7 +1,7 @@
 package org.example.hellofx.controller;
 
 
-import org.example.hellofx.service.DataBaseService;
+import org.example.hellofx.service.AccountService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.ForgotPasswordScene;
 import org.example.hellofx.ui.theme.defaulttheme.LoginScene;
@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 public class SignUpController{
     @Autowired
-    private DataBaseService dataBaseService;
+    private AccountService accountService;
 
     @Autowired
     private EmailValidator emailValidator;
@@ -28,7 +28,7 @@ public class SignUpController{
         if (value == null || value.isEmpty()) {
             return "Tên tài khoản không được bỏ trống!";
         }
-        if (dataBaseService.checkAccountExistByUsername(value)) {
+        if (accountService.checkAccountExistByUsername(value)) {
             return "Tên tài khoản đã được sử dụng!";
         }
         return "OK!";
@@ -45,7 +45,7 @@ public class SignUpController{
         if (value == null || value.isEmpty()) {
             return "Số điện thoại không được để trống!";
         }
-        if (dataBaseService.checkAccountExistByPhone(value)) {
+        if (accountService.checkAccountExistByPhone(value)) {
             return "Số điện thoại đã được sử dụng cho tài khoản khác!";
         }
         return "OK!";
@@ -64,7 +64,7 @@ public class SignUpController{
             }
         }
         if (kt) {
-            dataBaseService.createAccount(username, password, email, phone);
+            accountService.createAccount(username, password, email, phone);
         }
         return res;
     }

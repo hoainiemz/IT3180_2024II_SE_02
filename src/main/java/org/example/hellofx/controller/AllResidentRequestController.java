@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.ResidentRepository;
-import org.example.hellofx.service.DataBaseService;
+import org.example.hellofx.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public class AllResidentRequestController{
     @Autowired
     ResidentRepository residentRepository;
     @Autowired
-    private DataBaseService dataBaseService;
+    private AccountService accountService;
 
     public Account getProfile() {
         return profileController.getProfile();
@@ -32,6 +32,6 @@ public class AllResidentRequestController{
     }
 
     public ObservableList<Account> accountsQuery(String query) {
-        return FXCollections.observableArrayList(dataBaseService.nativeAccountQuery(query));
+        return FXCollections.observableArrayList(accountService.nativeAccountQuery(query));
     }
 }

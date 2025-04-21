@@ -7,8 +7,8 @@ import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Payment;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.service.BillService;
-import org.example.hellofx.service.DataBaseService;
 import org.example.hellofx.service.PaymentService;
+import org.example.hellofx.service.ResidentService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,11 +21,11 @@ public class BillInformationController{
     @Autowired
     private ProfileController profileController;
     @Autowired
-    private DataBaseService dataBaseService;
-    @Autowired
     private BillService billService;
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private ResidentService residentService;
 
     public Resident getResident() {
         return profileController.getResident();
@@ -37,7 +37,7 @@ public class BillInformationController{
 
     public void saveButtonClicked(Bill oldBill, Bill bill, List<Integer> dsIn, List<Integer> dsOut) {
         if (!bill.equals(oldBill)) {
-            dataBaseService.updateBill(bill);
+            billService.updateBill(bill);
         }
         Integer billId = bill.getBillId();
         List<Payment> payments = dsIn.stream()
@@ -48,10 +48,10 @@ public class BillInformationController{
             p.setPaymentId(null); // Ensure new inserts
         }
         if (!payments.isEmpty()) {
-            dataBaseService.saveAllPayments(payments);
+            paymentService.saveAllPayments(payments);
         }
         if (!dsOut.isEmpty()) {
-            dataBaseService.deletePayments(dsOut);
+            paymentService.deletePayments(dsOut);
         }
 
         System.out.println("save button clicked");
@@ -62,7 +62,7 @@ public class BillInformationController{
     }
 
     public ObservableList<Resident> residentQuery(String query) {
-        return FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+        return FXCollections.observableArrayList(residentService.nativeResidentQuery(query));
     }
 
     public Bill findBillByBillId(Integer billId) {
@@ -70,7 +70,7 @@ public class BillInformationController{
     }
 
     public ObservableList<String> getAllHouseIds(){
-        return FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(getProfile(), getResident()));
+        return FXCollections.observableArrayList(residentService.findDistinctNonNullHouseId(getProfile(), getResident()));
     }
 
     public List<Payment> getPayments(Integer billId) {

@@ -3,8 +3,8 @@ package org.example.hellofx.controller;
 import org.example.hellofx.SpringBootFxApplication;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
-import org.example.hellofx.repository.AccountRepository;
-import org.example.hellofx.service.DataBaseService;
+import org.example.hellofx.service.AccountService;
+import org.example.hellofx.service.ResidentService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.HomeScene;
 import org.example.hellofx.ui.theme.defaulttheme.LoginScene;
@@ -15,19 +15,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProfileController{
     @Autowired
-    private DataBaseService dataBaseHandler;
+    private ResidentService residentService;
+    @Autowired
+    private AccountService accountService;
     private Account profile;
     private Resident resident;
-    @Autowired
-    private AccountRepository accountRepository;
 
-//    public DefaultProfileController(DataBaseHandler dataBaseHandler) {
-//        this.dataBaseHandler = dataBaseHandler;
+//    public DefaultProfileController(DataBaseHandler residentService) {
+//        this.residentService = residentService;
 //    }
 
     public void logInRequest (Account profile) {
         this.profile = profile;
-        resident = dataBaseHandler.findResidentByAccount(profile);
+        resident = residentService.findResidentByAccount(profile);
 //        System.out.println("Logged in with profile: " + profile);
         JavaFxApplication.showThemeScene(HomeScene.class);
     }
@@ -55,7 +55,7 @@ public class ProfileController{
         if (getCurrentPassword().equals(currentPassword) == false) {
             return "Current password do not match!";
         }
-        int cnt = dataBaseHandler.passwordChangeQuery(profile, newPassword);
+        int cnt = accountService.passwordChangeQuery(profile, newPassword);
         if (cnt == 0) {
             return "Failed to change password, please try again later!";
         }
@@ -76,8 +76,8 @@ public class ProfileController{
     }
 
     public void residentProfileUpdateRequest(Resident resident) {
-        dataBaseHandler.updateResident(resident);
-        this.resident = dataBaseHandler.findResidentByAccount(profile);
+        residentService.updateResident(resident);
+        this.resident = residentService.findResidentByAccount(profile);
     }
 
     public Account getProfile() {
@@ -85,29 +85,29 @@ public class ProfileController{
     }
 
     public boolean checkIdentityCardValidity(String identityCard) {
-        return dataBaseHandler.checkResidentExistByIdentityCard(identityCard);
+        return residentService.checkResidentExistByIdentityCard(identityCard);
     }
 
     public boolean checkEmailValidity(String email) {
-        return accountRepository.existsByEmail(email);
+        return accountService.existsByEmail(email);
     }
 
     public boolean checkPhoneValidity(String phone) {
-        return accountRepository.existsByPhone(phone);
+        return accountService.existsByPhone(phone);
     }
 
     public void accountProfileUpdateRequest(Account account) {
-        dataBaseHandler.updateAccount(account);
+        accountService.updateAccount(account);
         if (profile.getUserId().equals(account.getUserId())) {
-            profile = accountRepository.findByUserId(account.getUserId()).get();
+            profile = accountService.findAccountByUserId(account.getUserId());
         }
     }
 
     public Account findAccountByUserId(int userId) {
-        return dataBaseHandler.findAccountByUserId(userId);
+        return accountService.findAccountByUserId(userId);
     }
 
     public Resident findResidentByUserId(int userId) {
-        return dataBaseHandler.findResidentByUserId(userId);
+        return residentService.findResidentByUserId(userId);
     }
 }

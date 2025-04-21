@@ -8,7 +8,7 @@ import org.example.hellofx.model.NotificationItem;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.NoticementRepository;
 import org.example.hellofx.repository.NotificationItemRepository;
-import org.example.hellofx.service.DataBaseService;
+import org.example.hellofx.service.ResidentService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.NotificationCreationScene;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class NotificationCreationController{
     @Autowired
     private NoticementRepository noticementRepository;
     @Autowired
-    private DataBaseService dataBaseService;
+    private ResidentService residentService;
 
     public Resident getResident() {
         return profileController.getResident();
@@ -71,10 +71,10 @@ public class NotificationCreationController{
         }
     }
     public ObservableList<Resident> residentQuery(String query) {
-        return FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+        return FXCollections.observableArrayList(residentService.nativeResidentQuery(query));
     }
 
     public ObservableList<String> getAllHouseIds(){
-        return FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(getProfile(), getResident()));
+        return FXCollections.observableArrayList(residentService.findDistinctNonNullHouseId(getProfile(), getResident()));
     }
 }

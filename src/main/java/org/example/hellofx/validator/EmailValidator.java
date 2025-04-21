@@ -1,13 +1,13 @@
 package org.example.hellofx.validator;
 
-import org.example.hellofx.service.DataBaseService;
+import org.example.hellofx.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EmailValidator {
     @Autowired
-    private DataBaseService dataBaseService;
+    private AccountService accountService;
 
     public String emailSignupCheck(String value) {
         if (value == null || value.isEmpty()) {
@@ -16,7 +16,7 @@ public class EmailValidator {
         if (!org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(value)) {
             return "Email không đúng định dạng!";
         }
-        if (dataBaseService.checkAccountExistByEmail(value)) {
+        if (accountService.checkAccountExistByEmail(value)) {
             return "Địa chỉ email đã được sử dụng cho tài khoản khác!";
         }
         return "OK!";

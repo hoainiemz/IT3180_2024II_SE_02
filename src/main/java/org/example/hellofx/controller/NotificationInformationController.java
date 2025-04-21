@@ -8,9 +8,9 @@ import org.example.hellofx.model.NotificationItem;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.repository.NoticementRepository;
 import org.example.hellofx.repository.NotificationItemRepository;
-import org.example.hellofx.service.DataBaseService;
 import org.example.hellofx.service.NoticementService;
 import org.example.hellofx.service.NotificationService;
+import org.example.hellofx.service.ResidentService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,11 +28,11 @@ public class NotificationInformationController{
     @Autowired
     private NotificationItemRepository notificationItemRepository;
     @Autowired
-    private DataBaseService dataBaseService;
-    @Autowired
     private NoticementService noticementService;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private ResidentService residentService;
 
     public Account getProfile() {
         return profileController.getProfile();
@@ -70,11 +70,11 @@ public class NotificationInformationController{
     }
 
     public ObservableList<Resident> residentQuery(String query) {
-        return FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+        return FXCollections.observableArrayList(residentService.nativeResidentQuery(query));
     }
 
     public ObservableList<String> getAllHouseIds(){
-        return FXCollections.observableArrayList(dataBaseService.findDistinctNonNullHouseId(getProfile(), getResident()));
+        return FXCollections.observableArrayList(residentService.findDistinctNonNullHouseId(getProfile(), getResident()));
     }
 
     public List<Noticement> getNoticementsById(Integer notiId) {
