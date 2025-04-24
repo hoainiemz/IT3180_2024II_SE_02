@@ -199,6 +199,15 @@ public class BillManagementScene implements ThemeScene {
             masterData = FXCollections.observableArrayList();
         }
         table.getColumns().setAll(col0, col1, col2, col3);
+        table.setPrefWidth(mainContent.getPrefWidth());
+        col0.setPrefWidth(table.getPrefWidth() * 0.2);
+        col1.setPrefWidth(table.getPrefWidth() * 0.1);
+        col2.setPrefWidth(table.getPrefWidth() * 0.55);
+        col3.setPrefWidth(table.getPrefWidth() * 0.15);
+        col0.setMaxWidth(table.getPrefWidth() * 0.2);
+        col1.setMaxWidth(table.getPrefWidth() * 0.1);
+        col2.setMaxWidth(table.getPrefWidth() * 0.55);
+        col3.setMaxWidth(table.getPrefWidth() * 0.15);
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );

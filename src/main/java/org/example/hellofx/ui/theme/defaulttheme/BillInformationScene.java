@@ -56,7 +56,6 @@ public class BillInformationScene extends Notificable{
     void reloadTable(Scene scene) {
         String condition = "";
         ComboBox<String> houseIdFilter = ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter"));
-        ComboBox<String> groupFilter = ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#groupFilter"));
         ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#roleFilter"));
         TextField searchFilter = ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField();
         if (houseIdFilter.getValue() != null && !houseIdFilter.getValue().isEmpty()) {
@@ -195,8 +194,6 @@ public class BillInformationScene extends Notificable{
 //        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150));
 //        filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", billInformationController.getAllHouseIds(), true, 100, "houseIdFilter"));
-        filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextComboBox<String>("Theo nhóm: ", FXCollections.observableArrayList(), true, 100, "groupFilter"));
         if (billInformationController.getProfile().getRole() != AccountType.Resident) {
             TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.values()), false, 140, "roleFilter", true);
             role.getComboBox().setValue(AccountType.Resident);
@@ -211,10 +208,6 @@ public class BillInformationScene extends Notificable{
 
 
         ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter")).setOnAction(event -> {
-            reloadTable(scene);
-        });
-
-        ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#groupFilter")).setOnAction(event -> {
             reloadTable(scene);
         });
 

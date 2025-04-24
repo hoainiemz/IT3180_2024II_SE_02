@@ -257,8 +257,10 @@ public class HomeScene implements ThemeScene {
             canHoContainer.getChildren().addAll(themCanHo);
         }
         danhSachCanHo.setOnAction(event -> {
+            homeController.danhSachCanHoClicked();
         });
         themCanHo.setOnAction(event -> {
+            homeController.themCanHoClicked();
         });
         // khoan thu
         VBox khoanThuContainer = new VBox();

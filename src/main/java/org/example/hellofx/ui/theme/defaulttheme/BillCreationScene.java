@@ -66,7 +66,6 @@ public class BillCreationScene extends Notificable implements ThemeScene {
     void reloadTable(Scene scene) {
         String condition = "";
         ComboBox<String> houseIdFilter = ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter"));
-        ComboBox<String> groupFilter = ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#groupFilter"));
         ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#roleFilter"));
         TextField searchFilter = ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField();
         if (houseIdFilter.getValue() != null && !houseIdFilter.getValue().isEmpty()) {
@@ -87,12 +86,6 @@ public class BillCreationScene extends Notificable implements ThemeScene {
             }
             condition = condition + "a.role = '" + roleFilter.getValue() + "'";
         }
-//        if (groupFilter.getValue() != null && !groupFilter.getValue().isEmpty()) {
-//            if (!condition.isEmpty()) {
-//                condition += " and ";
-//            }
-//            condition = condition + "groupId = '" + groupFilter.getValue() + "'";
-//        }
         if (searchFilter.getText() != null && !searchFilter.getText().isEmpty()) {
             if (!condition.isEmpty()) {
                 condition += " and ";
@@ -105,7 +98,6 @@ public class BillCreationScene extends Notificable implements ThemeScene {
         }
         query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
-//        table.getItems().clear();
         masterData = billCreationController.residentQuery(query);
         resetPagination();
     }
@@ -193,11 +185,7 @@ public class BillCreationScene extends Notificable implements ThemeScene {
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
 
-//        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150));
-//        filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", billCreationController.getAllHouseIds(), true, 100, "houseIdFilter"));
-        filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextComboBox<String>("Theo nhóm: ", FXCollections.observableArrayList(), true, 100, "groupFilter"));
         if (billCreationController.getProfile().getRole() != AccountType.Resident) {
             TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.values()), false, 140, "roleFilter", true);
             role.getComboBox().setValue(AccountType.Resident);
@@ -212,10 +200,6 @@ public class BillCreationScene extends Notificable implements ThemeScene {
 
 
         ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter")).setOnAction(event -> {
-            reloadTable(scene);
-        });
-
-        ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#groupFilter")).setOnAction(event -> {
             reloadTable(scene);
         });
 
@@ -309,7 +293,6 @@ public class BillCreationScene extends Notificable implements ThemeScene {
         });
         return scene;
     }
-
 
     private void createTable () {
         var selectAll = new CheckBox();

@@ -53,7 +53,6 @@ public class ResidentScene implements ThemeScene {
     void reloadTable(Scene scene) {
         String condition = "";
         ComboBox<String> houseIdFilter = ((ComboBox<String>) scene.lookup("#houseIdFilter"));
-        ComboBox<String> groupFilter = ((ComboBox<String>) scene.lookup("#groupFilter"));
         ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) scene.lookup("#roleFilter"));
         TextField searchFilter = ((TextAndTextField) scene.lookup("#searchFilter")).getTextField();
         if (houseIdFilter.getValue() != null && !houseIdFilter.getValue().isEmpty()) {
@@ -74,12 +73,6 @@ public class ResidentScene implements ThemeScene {
             }
             condition = condition + "a.role = '" + roleFilter.getValue() + "'";
         }
-//        if (groupFilter.getValue() != null && !groupFilter.getValue().isEmpty()) {
-//            if (!condition.isEmpty()) {
-//                condition += " and ";
-//            }
-//            condition = condition + "groupId = '" + groupFilter.getValue() + "'";
-//        }
         if (searchFilter.getText() != null && !searchFilter.getText().isEmpty()) {
             if (!condition.isEmpty()) {
                 condition += " and ";
@@ -148,8 +141,6 @@ public class ResidentScene implements ThemeScene {
 //        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150));
 //        filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", residentController.getAllHouseIds(), true, 100, "houseIdFilter"));
-        filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextComboBox<String>("Theo nhóm: ", FXCollections.observableArrayList(), true, 100, "groupFilter"));
         if (residentController.getProfile().getRole() != AccountType.Resident) {
             TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.Client, AccountType.Resident), false, 140, "roleFilter");
             role.getComboBox().setValue(AccountType.Resident);

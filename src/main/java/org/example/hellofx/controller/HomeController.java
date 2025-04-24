@@ -103,4 +103,12 @@ public class HomeController{
     public String getProfileNameRequest() {
         return profileController.getProfileNameRequest();
     }
+
+    public void themCanHoClicked() {
+        JavaFxApplication.showThemeScene(ApartmentCreationScene.class);
+    }
+
+    public void danhSachCanHoClicked() {
+        JavaFxApplication.showThemeScene(ApartmentScene.class);
+    }
 }

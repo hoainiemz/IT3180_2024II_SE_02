@@ -1,7 +1,7 @@
 package org.example.hellofx.ui.theme.defaulttheme;
 
 import atlantafx.base.theme.Styles;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -10,46 +10,39 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
-import org.example.hellofx.controller.NotificationManagementController;
-import org.example.hellofx.model.NotificationItem;
+import org.example.hellofx.controller.ApartmentController;
+import org.example.hellofx.controller.ResidentController;
+import org.example.hellofx.dto.ApartmentCountProjection;
+import org.example.hellofx.model.Resident;
+import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
-import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.Badge;
-import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.BadgeCell;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextComboBox;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 
 @Component
-public class NotificationManagementScene implements ThemeScene {
+public class ApartmentScene implements ThemeScene {
     @Autowired
-    private NotificationManagementController notificationManagementController;
-
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    ApartmentController controller;
 
     private static final int ITEMS_PER_PAGE = 9;
-    private ObservableList<NotificationItem> masterData;
-    private TableView<NotificationItem> table;
+    private ObservableList<ApartmentCountProjection> masterData;
+    private TableView<ApartmentCountProjection> table;
     private Pagination pagination;
     private VBox mainContent;
-
 
     public void reset() {
         masterData = null;
@@ -59,10 +52,10 @@ public class NotificationManagementScene implements ThemeScene {
     }
 
     void reloadTable(Scene scene) {
-        ComboBox<Badge> typeFilter = ((ComboBox<Badge>) scene.lookup("#type-filter"));
         TextField searchFilter = ((TextAndTextField) scene.lookup("#searchFilter")).getTextField();
-        table.getItems().clear();
-        masterData = notificationManagementController.getNotifications(typeFilter.getValue().text(), searchFilter.getText());
+
+        TableView<Resident> table = (TableView) scene.lookup("#resident-table");
+        masterData = controller.getApartmentsAndResidentCount(searchFilter.getText());
         resetPagination();
     }
 
@@ -91,17 +84,16 @@ public class NotificationManagementScene implements ThemeScene {
         mainContent.getChildren().clear();
         mainContent.getStyleClass().clear();
         mainContent.getStyleClass().add("doi-mat-khau");
-        HBox searchBar = new HBox(new TextFlow(new Text("Danh sách các thông báo:")));
+        HBox searchBar = new HBox(new TextFlow(new Text("Danh sách căn hộ:")));
         searchBar.getStyleClass().add("big-text");
         mainContent.setPadding(new Insets(20, 50, 10, 50));
-//        HBox mainContent = new HBox();
         searchBar.setMaxHeight(container.getPrefHeight() * 0.1);
         mainContent.getChildren().addAll(searchBar);
         ((TextFlow) searchBar.getChildren().get(0)).setPrefWidth(mainContent.getPrefWidth() * 0.7);
 
         HBox filter = new HBox();
         filter.setId("filter");
-        Text boLoc = new Text("Bộ lọc:");
+        Text boLoc = new Text("BỘ LỌC");
         boLoc.setStyle("-fx-font-weight: bold;");
         filter.getChildren().addAll(boLoc, new Separator(Orientation.VERTICAL));
         mainContent.getChildren().add(filter);
@@ -110,33 +102,15 @@ public class NotificationManagementScene implements ThemeScene {
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
 
-        List<Badge> badges = new ArrayList<>();
-        badges.add(new Badge("All", MaterialDesignF.FLAG_OUTLINE, Color.BLACK));
-        badges.add(new Badge("Info", MaterialDesignI.INFORMATION_OUTLINE, Color.valueOf("#0969da")));
-        badges.add(new Badge("Success", MaterialDesignC.CHECK_CIRCLE_OUTLINE, Color.valueOf("#1f823b")));
-        badges.add(new Badge("Warning", MaterialDesignA.ALERT_OUTLINE, Color.valueOf("#9a6801")));
-        badges.add(new Badge("Danger", MaterialDesignA.ALERT_CIRCLE_OUTLINE, Color.valueOf("#d2313c")));
-        ComboBox<Badge> notiType = new ComboBox<>(FXCollections.observableArrayList(badges));
-        notiType.setButtonCell(new BadgeCell()); // Set button appearance
-        notiType.setCellFactory(c -> new BadgeCell()); // Set dropdown appearance
-        notiType.getSelectionModel().selectFirst(); // Default selection
-        filter.getChildren().add(new TextComboBox<Badge>("Loại: ", notiType, false, "type-filter", false));
-//        filter.getChildren().add(new TextComboBox<String>("Loại: ", FXCollections.observableArrayList("Tất cả", "Info", "Success", "Warning", "Danger"), false, 200, "type-filter", false, "Tất cả"));
-        filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextAndTextField("Theo từ khóa: ", null, "Enter the search keyword", "searchFilter", true));
 
-
-        ((ComboBox<String>) scene.lookup("#type-filter")).setOnAction(event -> {
-            reloadTable(scene);
-        });
-
         ((TextAndTextField) scene.lookup("#searchFilter")).getTextField().setOnAction(event -> {
-           reloadTable(scene);
+            reloadTable(scene);
         });
 
         createTable();
         reloadTable(scene);
-//
+
         mainContent.getChildren().addAll(table, pagination);
 
         return scene;
@@ -145,69 +119,61 @@ public class NotificationManagementScene implements ThemeScene {
     private void createTable () {
         var selectAll = new CheckBox();
 
-        var col0 = new TableColumn<NotificationItem, String>("Thời điểm tạo(yyyy-MM-dd HH:mm)");
+        Map<String, SimpleBooleanProperty> selectedMap = new TreeMap<>();
+        var col0 = new TableColumn<ApartmentCountProjection, Boolean>();
+        col0.setGraphic(selectAll);
+        col0.setSortable(false);
+        col0.setCellValueFactory(celldata -> {
+            String id = celldata.getValue().getApartmentId();
+            return selectedMap.computeIfAbsent(id, k -> new SimpleBooleanProperty(false));
+        });
+        col0.setCellFactory(CheckBoxTableCell.forTableColumn(col0));
+        col0.setEditable(true);
+        col0.setPrefWidth(60);
+        col0.setMaxWidth(60);
 
-        col0.setCellValueFactory(c ->
-                new SimpleStringProperty(
-                        c.getValue().getCreatedAt() != null ? c.getValue().getCreatedAt().format(formatter) : ""
-                )
-        );
-
-
-        var col1 = new TableColumn<NotificationItem, String>("Loại");
+        var col1 = new TableColumn<ApartmentCountProjection, String>("Tên căn hộ");
         col1.setCellValueFactory(
-                c -> {
-                    return new SimpleStringProperty(c.getValue().getType());
-                }
+                c -> new SimpleStringProperty(c.getValue().getApartmentId())
         );
 
-        var col2 = new TableColumn<NotificationItem, String>("Tiêu đề");
-        col2.setCellValueFactory(
-                c -> {
-                    return new SimpleStringProperty(c.getValue().getTitle());
-                }
-        );
-
-        var col3 = new TableColumn<NotificationItem, String>("Nội dung");
-        col3.setCellValueFactory(
-                c -> {
-                    if (c.getValue().getMessage() == null) {
-                        return null;
-                    }
-                    return new SimpleStringProperty(c.getValue().getMessage());
-                }
-        );
+        var col2 = new TableColumn<ApartmentCountProjection, Long>("Số dân");
+        col2.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().getResidentCount()));
 
         if (table == null) {
-            table = new TableView<NotificationItem>();
+            table = new TableView<ApartmentCountProjection>();
             pagination = new Pagination();
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3);
-        table.setPrefWidth(mainContent.getPrefWidth() * 0.9);
-        col0.setPrefWidth(table.getPrefWidth() * 0.2);
-        col1.setPrefWidth(table.getPrefWidth() * 0.1);
-        col2.setPrefWidth(table.getPrefWidth() * 0.35);
-        col3.setPrefWidth(table.getPrefWidth() * 0.45);
-        col0.setMaxWidth(table.getPrefWidth() * 0.2);
-        col1.setMaxWidth(table.getPrefWidth() * 0.1);
-        col2.setMaxWidth(table.getPrefWidth() * 0.35);
-        col3.setMaxWidth(table.getPrefWidth() * 0.45);
-
+        table.getColumns().setAll(col0, col1, col2);
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
+        table.getSelectionModel().selectFirst();
+        table.setId("resident-table");
         table.setRowFactory(tv -> {
-            TableRow<NotificationItem> row = new TableRow<>();
+            TableRow<ApartmentCountProjection> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (!row.isEmpty() && event.getClickCount() == 1) {
-                    NotificationItem clickedNotificationItem = row.getItem();
-                    notificationManagementController.seeNotificationItemInformation(clickedNotificationItem.getId());
+                    ApartmentCountProjection clicked = row.getItem();
+//                    controller.seeMoreInformation(clickedResident.getUserId().intValue());
+//                    System.out.println("Clicked on: " + clickedResident.getFirstName());
                 }
             });
             return row;
         });
         Styles.toggleStyleClass(table, Styles.STRIPED);
+        if (controller.getProfile().getRole() == AccountType.Admin || controller.getProfile().getRole() == AccountType.Client) {
+            table.setEditable(true);
+        }
+        else {
+            selectAll.setDisable(true);
+        }
+        selectAll.setOnAction(event -> {
+            table.getItems().forEach(item -> {
+                selectedMap.get(item.getApartmentId()).set(selectAll.isSelected());
+            });
+        });
     }
 
     void resetPagination() {
@@ -229,7 +195,7 @@ public class NotificationManagementScene implements ThemeScene {
         int toIndex = Math.min(fromIndex + ITEMS_PER_PAGE, masterData.size());
 
         // Create a sublist for the current page
-        ObservableList<NotificationItem> pageData = FXCollections.observableArrayList(
+        ObservableList<ApartmentCountProjection> pageData = FXCollections.observableArrayList(
                 masterData.subList(fromIndex, toIndex));
 
         table.setItems(pageData);

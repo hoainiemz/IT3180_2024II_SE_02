@@ -15,35 +15,32 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
-import org.example.hellofx.controller.NotificationCreationController;
-import org.example.hellofx.model.NotificationItem;
+import org.example.hellofx.controller.ApartmentCreationController;
+import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.model.Validation;
 import org.example.hellofx.model.enums.AccountType;
-import org.example.hellofx.model.enums.NotificationType;
 import org.example.hellofx.model.enums.ValidationState;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.*;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 @Component
-public class NotificationCreationScene extends Notificable implements ThemeScene {
+public class ApartmentCreationScene extends Notificable implements ThemeScene {
     @Autowired
-    private NotificationCreationController notificationCreationController;
+    private ApartmentCreationController controller;
 
     private Scene scene;
 
@@ -60,57 +57,15 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
         return scene;
     }
 
-    void reset() {
+    public void reset() {
         masterData = null;
-        selectedMap = null;
-        selectedMapUpdater = null;
-
         table = null;
         pagination = null;
-        scrollPane = null;
         mainContent = null;
+        selectedMapUpdater = null;
+        selectedMap = null;
     }
 
-    void reloadTable(Scene scene) {
-        String condition = "";
-        ComboBox<String> houseIdFilter = ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter"));
-        ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#roleFilter"));
-        TextField searchFilter = ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField();
-        if (houseIdFilter.getValue() != null && !houseIdFilter.getValue().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + houseIdFilter.getValue() + "'";
-        }
-        if (notificationCreationController.getProfile().getRole() == AccountType.Resident) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + notificationCreationController.getResident().getHouseId() + "'";
-        }
-        if (roleFilter != null && roleFilter.getValue() != null) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "a.role = '" + roleFilter.getValue() + "'";
-        }
-        if (searchFilter.getText() != null && !searchFilter.getText().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "(LOWER(r.first_name) LIKE LOWER('%" + searchFilter.getText() + "%') or LOWER(r.last_name) LIKE LOWER('%" + searchFilter.getText() + "%'))";
-        }
-        String query = "SELECT r.* FROM resident r JOIN account a ON r.user_id = a.user_id";
-        if (!condition.isEmpty()) {
-            query += " WHERE " + condition;
-        }
-        query += ';';
-        TableView<Resident> table = (TableView) scene.lookup("#resident-table");
-//        table.getItems().clear();
-        masterData = notificationCreationController.residentQuery(query);
-        resetPagination();
-//        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
-    }
 
     public Scene getScene() {
         reset();
@@ -127,9 +82,7 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
         mainContent.setPrefWidth(content.getPrefWidth());
         mainContent.setMinWidth(content.getPrefWidth());
         mainContent.setMaxWidth(content.getPrefWidth());
-//        mainContent.setPrefHeight(content.getPrefHeight());
         mainContent.setMinHeight(content.getPrefHeight());
-//        mainContent.setMaxHeight(content.getPrefHeight());
 
         scrollPane.setPrefWidth(content.getPrefWidth());
         scrollPane.setMinWidth(content.getPrefWidth());
@@ -140,42 +93,52 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
 
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setId("main-content");
-        TextFlow section = new TextFlow(new Text("Tạo thông báo:"));
+        TextFlow section = new TextFlow(new Text("Tạo căn hộ mới:"));
         section.getStyleClass().add("big-text");
         mainContent.getChildren().addAll(section);
         mainContent.setPadding(new Insets(20, 20, 10, 20));
 
-        VBox notificationInfo = new VBox();
-        mainContent.getChildren().addAll(notificationInfo);
-//        notificationInfo.setPrefHeight(mainContent.getPrefHeight() * 0.2);
-//        VBox.setVgrow(notificationInfo, Priority.ALWAYS);
-        notificationInfo.setMinWidth(mainContent.getPrefWidth() * 0.9);
-        notificationInfo.setPrefWidth(mainContent.getPrefWidth() * 0.9);
-        notificationInfo.setMaxWidth(mainContent.getPrefWidth() * 0.9);
-        notificationInfo.setAlignment(Pos.CENTER_LEFT);
-        notificationInfo.setPadding(new Insets(20, 50, 20, 50));
-        notificationInfo.getStyleClass().add("public-profile");
+        VBox apartmentInfo = new VBox();
+        mainContent.getChildren().addAll(apartmentInfo);
+        apartmentInfo.setMinWidth(mainContent.getPrefWidth() * 0.9);
+        apartmentInfo.setPrefWidth(mainContent.getPrefWidth() * 0.9);
+        apartmentInfo.setMaxWidth(mainContent.getPrefWidth() * 0.9);
+        apartmentInfo.setAlignment(Pos.CENTER_LEFT);
+        apartmentInfo.setPadding(new Insets(20, 50, 20, 50));
+        apartmentInfo.getStyleClass().add("public-profile");
         mainContent.setSpacing(20);
-        notificationInfo.setSpacing(20);
+        apartmentInfo.setSpacing(20);
 
-//        ComboBox<NotificationType> notiType = new ComboBox<>(FXCollections.observableArrayList(NotificationType.values()));
-//        notiType.getSelectionModel().select(NotificationType.Info);
-//        notiType.setEditable(false);
-        List<Badge> badges = new ArrayList<>();
-        badges.add(new Badge("Info", MaterialDesignI.INFORMATION_OUTLINE, Color.valueOf("#0969da")));
-        badges.add(new Badge("Success", MaterialDesignC.CHECK_CIRCLE_OUTLINE, Color.valueOf("#1f823b")));
-        badges.add(new Badge("Warning", MaterialDesignA.ALERT_OUTLINE, Color.valueOf("#9a6801")));
-        badges.add(new Badge("Danger", MaterialDesignA.ALERT_CIRCLE_OUTLINE, Color.valueOf("#d2313c")));
-        ComboBox<Badge> notiType = new ComboBox<>(FXCollections.observableArrayList(badges));
-        notiType.setButtonCell(new BadgeCell()); // Set button appearance
-        notiType.setCellFactory(c -> new BadgeCell()); // Set dropdown appearance
-        notiType.getSelectionModel().selectFirst(); // Default selection
-        notificationInfo.getChildren().add(new VerticleTextAndComboBox("Loại: ", notiType, "Enter the type of notification", "noti-type-info", true));
-        notificationInfo.getChildren().add(new VerticleTextAndTextField("Tiêu đề:", null, "enter the title of the notification", "noti-title-info", true));
-        notificationInfo.getChildren().add(new VerticleTextAndTextArea("Nội dung thông baáo: ", null, "enter the message of the notification", "noti-message-info", true));
+        apartmentInfo.getChildren().add(new VerticleTextAndTextField("Tên căn hộ:", null, "enter the name of the apartment", "apartment-name-info", true));
+
+        HBox doubleTab0 = new HBox();
+        doubleTab0.setPrefWidth(apartmentInfo.getPrefWidth());
+        VBox leftTab0 = new VBox(), rightTab0 = new VBox();
+        doubleTab0.setSpacing(doubleTab0.getPrefWidth() * 0.1);
+        leftTab0.setPrefWidth(doubleTab0.getPrefWidth() * 0.4);
+        rightTab0.setPrefWidth(doubleTab0.getPrefWidth() * 0.4);
+        leftTab0.setAlignment(Pos.TOP_CENTER);
+        rightTab0.setAlignment(Pos.TOP_CENTER);
+        leftTab0.getChildren().add(new VerticleTextAndTextField("Tiền thuê nhà hàng tháng (vnđ): ", null, "enter the amount", "monthly-rent-price", true, true, false));
+        doubleTab0.getChildren().addAll(leftTab0, rightTab0);
+
+        HBox doubleTab = new HBox();
+        apartmentInfo.getChildren().addAll(doubleTab0, doubleTab);
+        doubleTab.setPrefWidth(apartmentInfo.getPrefWidth());
+        VBox leftTab = new VBox(), rightTab = new VBox();
+        doubleTab.getChildren().addAll(leftTab, rightTab);
+        doubleTab.setSpacing(doubleTab.getPrefWidth() * 0.1);
+        leftTab.setPrefWidth(doubleTab.getPrefWidth() * 0.4);
+        rightTab.setPrefWidth(doubleTab.getPrefWidth() * 0.4);
+        leftTab.setAlignment(Pos.TOP_CENTER);
+        rightTab.setAlignment(Pos.TOP_CENTER);
+        leftTab.getChildren().add(new VerticleTextAndTextField("Số điện của tháng gần nhất (vnđ): ", null, "enter the amount", "last-month-electric-index", true, true, true));
+        rightTab.getChildren().add(new VerticleTextAndTextField("Giá mỗi số điện (vnđ): ", null, "enter the amount of money", "electric-unit-price", true, true));
+        leftTab.getChildren().add(new VerticleTextAndTextField("Số nước của tháng gần nhất (vnđ): ", null, "enter the amount", "last-month-water-index", true, true, true));
+        rightTab.getChildren().add(new VerticleTextAndTextField("Giá mỗi số nước (vnđ): ", null, "enter the amount of money", "water-unit-price", true, true));
 
         mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
-        TextFlow section2 = new TextFlow(new Text("Đối tượng được thông báo:"));
+        TextFlow section2 = new TextFlow(new Text("Đối tượng:"));
         section2.getStyleClass().add("big-text");
         mainContent.getChildren().addAll(section2);
 
@@ -191,10 +154,8 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
 
-//        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150, ""));
-//        filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", notificationCreationController.getAllHouseIds(), true, 100, "houseIdFilter"));
-        if (notificationCreationController.getProfile().getRole() != AccountType.Resident) {
+        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", controller.getAllHouseIds(), true, 100, "houseIdFilter"));
+        if (controller.getProfile().getRole() != AccountType.Resident) {
             TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.values()), false, 140, "roleFilter", true);
             role.getComboBox().setValue(AccountType.Resident);
             filter.getChildren().add(new Separator(Orientation.VERTICAL));
@@ -235,13 +196,13 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
         reloadTable(scene);
 
         Styles.toggleStyleClass(table, Styles.STRIPED);
-        table.setPrefWidth(notificationInfo.getPrefWidth());
-        table.setMaxWidth(notificationInfo.getPrefWidth());
-        table.setMinWidth(notificationInfo.getPrefWidth());
+        table.setPrefWidth(apartmentInfo.getPrefWidth());
+        table.setMaxWidth(apartmentInfo.getPrefWidth());
+        table.setMinWidth(apartmentInfo.getPrefWidth());
         mainContent.getChildren().addAll(table, pagination);
 
         HBox createButtonContainer = new HBox();
-        Button savebutton = new Button("Tạo thông báo");
+        Button savebutton = new Button("Tạo căn hộ");
         savebutton.setId("save-button");
         createButtonContainer.getChildren().add(savebutton);
         createButtonContainer.setPrefWidth(mainContent.getPrefWidth() * 0.9);
@@ -250,35 +211,118 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
         savebutton.setStyle("-fx-background-color: #4abc96 !important;");
         mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
         mainContent.getChildren().addAll(createButtonContainer);
-        savebutton.setOnAction(actionEvent -> {
-            String title = ((VerticleTextAndTextField) mainContent.lookup("#noti-title-info")).getTextField().getText();
-            Validation vl = notificationCreationController.titleCheck(title);
-            if (vl.state() == ValidationState.ERROR) {
-                showPopUpMessage(vl.state().toString(), vl.message());
-                return;
-            }
-            String message = ((VerticleTextAndTextArea) mainContent.lookup("#noti-message-info")).getTextArea().getText();
-            vl = notificationCreationController.messageCheck(message);
-            if (vl.state() == ValidationState.ERROR) {
-                showPopUpMessage(vl.state().toString(), vl.message());
-                return;
-            }
-            NotificationType type = NotificationType.valueOf(notiType.getValue().text());
 
-            NotificationItem notification = new NotificationItem(title, message, notiType.getValue().text());
+        savebutton.setOnAction(event -> {
+            String name = ((VerticleTextAndTextField) mainContent.lookup("#apartment-name-info")).getTextField().getText();
+            Validation vl = controller.checkName(name);
+            if (vl.state() == ValidationState.ERROR) {
+                showPopUpMessage(vl.state().toString(), vl.message());
+                return;
+            }
+            BigDecimal electricUnitPrice = null;
+
+            String tmp = ((VerticleTextAndTextField) mainContent.lookup("#electric-unit-price")).getTextField().getText();
+            if (tmp != null) {
+                electricUnitPrice = BigDecimal.valueOf(Double.valueOf(tmp));
+            }
+            else {
+                showPopUpMessage("ERROR", "giá mỗi số điện không được để trống!");
+                return;
+            }
+
+            Integer lastMonthElectricIndex = null;
+            tmp = ((VerticleTextAndTextField) mainContent.lookup("#last-month-electric-index")).getTextField().getText();
+            if (tmp != null) {
+                lastMonthElectricIndex = Integer.valueOf(tmp);
+            }
+            else {
+                showPopUpMessage("ERROR", "Số điện không được để trống!");
+                return;
+            }
+
+            BigDecimal waterUnitPrice = null;
+
+            tmp = ((VerticleTextAndTextField) mainContent.lookup("#water-unit-price")).getTextField().getText();
+            if (tmp != null) {
+                waterUnitPrice = BigDecimal.valueOf(Double.valueOf(tmp));
+            }
+            else {
+                showPopUpMessage("ERROR", "giá mỗi số nước không được để trống!");
+                return;
+            }
+
+            Integer lastMonthWaterIndex = null;
+            tmp = ((VerticleTextAndTextField) mainContent.lookup("#last-month-water-index")).getTextField().getText();
+            if (tmp != null) {
+                lastMonthWaterIndex = Integer.valueOf(tmp);
+            }
+            else {
+                showPopUpMessage("ERROR", "Số nước không được để trống!");
+                return;
+            }
+
+            BigDecimal monthlyRentPrice = null;
+            tmp = ((VerticleTextAndTextField) mainContent.lookup("#monthly-rent-price")).getTextField().getText();
+            if (tmp != null) {
+                monthlyRentPrice = BigDecimal.valueOf(Double.valueOf(tmp));
+            }
+            else {
+                showPopUpMessage("ERROR", "Tiền nhà hàng tháng không được để trống!");
+                return;
+            }
 
             List<Integer> ds = new ArrayList<>();
             selectedMap.forEach((k, v) -> {
-                if (v.getValue().equals("Nhận")) {
+                if (v.getValue().equals("Thuộc căn hộ")) {
                     ds.add(k);
                 }
             });
-            notificationCreationController.createNotificationClicked(notification, ds);
-            reset();
-            notificationCreationController.reset();
-            showPopUpMessage("Thành công", "Tạo thông báo thành công!");
+            controller.save(name, monthlyRentPrice, lastMonthElectricIndex, electricUnitPrice, lastMonthWaterIndex, waterUnitPrice, ds);
+
+            controller.reset();
+            showPopUpMessage(ValidationState.OK.toString(), "Tạo căn hộ thành công!");
         });
         return scene;
+    }
+
+    void reloadTable(Scene scene) {
+        String condition = "";
+        ComboBox<String> houseIdFilter = ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter"));
+        ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#roleFilter"));
+        TextField searchFilter = ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField();
+        if (houseIdFilter.getValue() != null && !houseIdFilter.getValue().isEmpty()) {
+            if (!condition.isEmpty()) {
+                condition += " and ";
+            }
+            condition = condition + "r.house_id = '" + houseIdFilter.getValue() + "'";
+        }
+        if (controller.getProfile().getRole() == AccountType.Resident) {
+            if (!condition.isEmpty()) {
+                condition += " and ";
+            }
+            condition = condition + "r.house_id = '" + controller.getResident().getHouseId() + "'";
+        }
+        if (roleFilter != null && roleFilter.getValue() != null) {
+            if (!condition.isEmpty()) {
+                condition += " and ";
+            }
+            condition = condition + "a.role = '" + roleFilter.getValue() + "'";
+        }
+        if (searchFilter.getText() != null && !searchFilter.getText().isEmpty()) {
+            if (!condition.isEmpty()) {
+                condition += " and ";
+            }
+            condition = condition + "(LOWER(r.first_name) LIKE LOWER('%" + searchFilter.getText() + "%') or LOWER(r.last_name) LIKE LOWER('%" + searchFilter.getText() + "%'))";
+        }
+        String query = "SELECT r.* FROM resident r JOIN account a ON r.user_id = a.user_id";
+        if (!condition.isEmpty()) {
+            query += " WHERE " + condition;
+        }
+        query += ';';
+        TableView<Resident> table = (TableView) scene.lookup("#resident-table");
+//        table.getItems().clear();
+        masterData = controller.residentQuery(query);
+        resetPagination();
     }
 
 
@@ -322,13 +366,11 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
                     return new SimpleStringProperty(c.getValue().getHouseId());
                 }
         );
-        var col4 = new TableColumn<Resident, String>("Thông báo");
+        var col4 = new TableColumn<Resident, String>("Trạng thái");
         col4.setCellValueFactory(celldata -> {
             Integer id = celldata.getValue().getResidentId();
-            return selectedMap.computeIfAbsent(id, k -> new SimpleStringProperty("Không nhận"));
+            return selectedMap.computeIfAbsent(id, k -> new SimpleStringProperty("Không thuộc"));
         });
-//        col4.setCellFactory(CheckBoxTableCell.forTableColumn(col4));
-//        col4.setPrefWidth(60);
 
         if (table == null) {
             table = new TableView<Resident>();
@@ -347,7 +389,7 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
             return row;
         });
 //        Styles.toggleStyleClass(table, Styles.STRIPED);
-        if (notificationCreationController.getProfile().getRole() == AccountType.Admin || notificationCreationController.getProfile().getRole() == AccountType.Client) {
+        if (controller.getProfile().getRole() == AccountType.Admin || controller.getProfile().getRole() == AccountType.Client) {
             table.setEditable(true);
         }
         else {
@@ -361,7 +403,7 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
         ((Button) mainContent.lookup("#add-all-button")).setOnAction(event -> {
             table.getItems().forEach(item -> {
                 if (selectedMapUpdater.get(item.getResidentId()).getValue()) {
-                    selectedMap.get(item.getResidentId()).setValue("Nhận");
+                    selectedMap.get(item.getResidentId()).setValue("Thuộc căn hộ");
                     selectedMapUpdater.get(item.getResidentId()).setValue(false);
                 }
             });
@@ -370,7 +412,7 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
         ((Button) mainContent.lookup("#rm-all-button")).setOnAction(event -> {
             table.getItems().forEach(item -> {
                 if (selectedMapUpdater.get(item.getResidentId()).getValue()) {
-                    selectedMap.get(item.getResidentId()).set("Không nhận");
+                    selectedMap.get(item.getResidentId()).set("Không thuộc");
                     selectedMapUpdater.get(item.getResidentId()).setValue(false);
                 }
             });
