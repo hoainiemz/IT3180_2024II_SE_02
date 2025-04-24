@@ -114,10 +114,7 @@ public class BillManagementScene implements ThemeScene {
 //        HBox mainContent = new HBox();
         searchBar.setMaxHeight(container.getPrefHeight() * 0.1);
         mainContent.getChildren().addAll(searchBar);
-//        searchBar.getChildren().add(new IconTextField("images/search.png", "Tìm kiếm", false, searchBar.getMaxHeight() * 0.5));
         ((TextFlow) searchBar.getChildren().get(0)).setPrefWidth(mainContent.getPrefWidth() * 0.7);
-//        ((HBox) searchBar.getChildren().get(1)).setPrefWidth(mainContent.getPrefWidth() * 0.3);
-//        ((HBox) searchBar.getChildren().get(1)).setAlignment(Pos.CENTER_RIGHT);
 
         HBox filter = new HBox();
         filter.setId("filter");

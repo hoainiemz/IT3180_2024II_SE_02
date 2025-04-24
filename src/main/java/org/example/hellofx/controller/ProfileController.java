@@ -81,18 +81,6 @@ public class ProfileController{
         return profile;
     }
 
-    public boolean checkIdentityCardValidity(String identityCard) {
-        return residentService.checkResidentExistByIdentityCard(identityCard);
-    }
-
-    public boolean checkEmailValidity(String email) {
-        return accountService.existsByEmail(email);
-    }
-
-    public boolean checkPhoneValidity(String phone) {
-        return accountService.existsByPhone(phone);
-    }
-
     public void accountProfileUpdateRequest(Account account) {
         accountService.updateAccount(account);
         if (profile.getUserId().equals(account.getUserId())) {

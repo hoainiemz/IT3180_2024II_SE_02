@@ -13,12 +13,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import org.apache.commons.validator.routines.EmailValidator;
 import org.example.hellofx.controller.ProfileController;
+import org.example.hellofx.controller.UserInformationController;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
+import org.example.hellofx.model.Validation;
 import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.model.enums.GenderType;
+import org.example.hellofx.model.enums.ValidationState;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.VerticleTextAndComboBox;
@@ -32,6 +34,8 @@ import java.time.LocalDate;
 
 @Component
 public class UserInformationScene extends Notificable{
+    @Autowired
+    private UserInformationController userInformationController;
     @Autowired
     private final ProfileController profileController;
 
@@ -62,9 +66,7 @@ public class UserInformationScene extends Notificable{
         mainContent.setPrefWidth(content.getPrefWidth());
         mainContent.setMinWidth(content.getPrefWidth());
         mainContent.setMaxWidth(content.getPrefWidth());
-//        mainContent.setPrefHeight(content.getPrefHeight());
         mainContent.setMinHeight(content.getPrefHeight());
-//        mainContent.setMaxHeight(content.getPrefHeight());
 
         scrollPane.setPrefWidth(content.getPrefWidth());
         scrollPane.setMinWidth(content.getPrefWidth());
@@ -184,23 +186,28 @@ public class UserInformationScene extends Notificable{
             String houseId = ((VerticleTextAndTextField) scene.lookup("#house-info")).getTextField().getText();
             String identityCard = ((VerticleTextAndTextField) scene.lookup("#identity-card-info")).getTextField().getText();
             Resident curResident = new Resident(resident.getUserId(), firstName, lastName, gender, date, identityCard, houseId, resident.getMoveInDate());
-            if (!EmailValidator.getInstance().isValid(email)) {
-                showPopUpMessage("Error", "Lỗi\nEmail không đúng định dạng!");
+
+            Validation vl = userInformationController.emailCheck(email);
+
+            if (!email.equals(profile.getEmail()) && vl.state().equals(ValidationState.ERROR)) {
+                showPopUpMessage(vl.state().toString(), vl.message());
                 return;
             }
 
-            if (email != null && !email.equals(profile.getEmail()) && profileController.checkEmailValidity(email)) {
-                showPopUpMessage("Error", "Lỗi\nEmail bị trùng!");
+            vl = userInformationController.phoneCheck(phone);
+
+            if (!phone.equals(profile.getPhone()) && vl.state().equals(ValidationState.ERROR)) {
+                showPopUpMessage(vl.state().toString(), vl.message());
                 return;
             }
-            if (phone != null && !phone.equals(profile.getPhone()) && profileController.checkPhoneValidity(phone)) {
-                showPopUpMessage("Error", "Lỗi\nEmail bị trùng!");
+
+            vl = userInformationController.identityCardCheck(identityCard);
+            if (!identityCard.equals(resident.getIdentityCard()) && vl.state().equals(ValidationState.ERROR)) {
+                showPopUpMessage(vl.state().toString(), vl.message());
                 return;
             }
-            if (identityCard != null && !identityCard.equals(resident.getIdentityCard()) && profileController.checkIdentityCardValidity(identityCard)) {
-                showPopUpMessage("Error", "Lỗi\nCăn cước công dân bị trùng!");
-                return;
-            }
+
+
             profileController.residentProfileUpdateRequest(curResident);
             profileController.accountProfileUpdateRequest(currAccount);
             ((TextAndTextField) scene.lookup("#top-email")).getTextField().setText(email);

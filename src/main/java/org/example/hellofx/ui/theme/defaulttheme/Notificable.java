@@ -8,16 +8,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
+import org.example.hellofx.model.Validation;
+import org.example.hellofx.model.enums.ValidationState;
 
 public abstract class Notificable {
     private Notification info;
 
     protected abstract Scene getCurrentScene();
     protected void showPopUpMessage(String state, String message) {
-        StackPane tmp = (StackPane) getCurrentScene().lookup("#rightFrame");
-        if (tmp == null) {
-            tmp = (StackPane) getCurrentScene().lookup("#content");
-        }
+        StackPane tmp = (StackPane) getCurrentScene().lookup("StackPane");
         StackPane rightFrame = tmp;
         if (info == null) {
             info = new Notification(message);
@@ -42,7 +41,7 @@ public abstract class Notificable {
             info.getStyleClass().remove(Styles.SUCCESS);
         }
         catch (NullPointerException e) {}
-        if (state.equals("Error")) {
+        if (state.equals(ValidationState.ERROR.toString())) {
             info.getStyleClass().add(Styles.WARNING);
             info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
         }

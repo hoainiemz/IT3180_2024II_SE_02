@@ -15,6 +15,9 @@ public class UsernameValidator {
         if (value == null || value.isEmpty()) {
             return new Validation(ValidationState.ERROR, "Tên tài khoản không được bỏ trống!");
         }
+        if (value.length() > 255) {
+            return new Validation(ValidationState.ERROR, "Tên tài khoản có độ dài không được quá 255 ký tự!");
+        }
         if (accountService.checkAccountExistByUsername(value)) {
             return new Validation(ValidationState.ERROR, "Tên tài khoản đã được sử dụng!");
         }

@@ -258,7 +258,7 @@ public class HomeScene implements ThemeScene {
         }
         danhSachCanHo.setOnAction(event -> {
         });
-        hienThiCacYeuCau.setOnAction(event -> {
+        themCanHo.setOnAction(event -> {
         });
         // khoan thu
         VBox khoanThuContainer = new VBox();

@@ -15,6 +15,9 @@ public class EmailValidator {
         if (value == null || value.isEmpty()) {
             return new Validation(ValidationState.ERROR, "Địa chỉ email không được bỏ trống!");
         }
+        if (value.length() > 255) {
+            return new Validation(ValidationState.ERROR, "Địa chỉ email có độ dài không được quá 255 ký tự!");
+        }
         if (!org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(value)) {
             return new Validation(ValidationState.ERROR, "Email không đúng định dạng!");
         }
@@ -27,6 +30,9 @@ public class EmailValidator {
     public Validation emailCheck(String value) {
         if (value == null || value.isEmpty()) {
             return new Validation(ValidationState.ERROR, "Địa chỉ email không được bỏ trống!");
+        }
+        if (value.length() > 255) {
+            return new Validation(ValidationState.ERROR, "Địa chỉ email có độ dài không được quá 255 ký tự!");
         }
         if (!org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(value)) {
             return new Validation(ValidationState.ERROR, "Email không đúng định dạng!");
