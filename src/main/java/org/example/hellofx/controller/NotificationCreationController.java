@@ -2,10 +2,7 @@ package org.example.hellofx.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.example.hellofx.model.Account;
-import org.example.hellofx.model.Noticement;
-import org.example.hellofx.model.NotificationItem;
-import org.example.hellofx.model.Resident;
+import org.example.hellofx.model.*;
 import org.example.hellofx.repository.NoticementRepository;
 import org.example.hellofx.repository.NotificationItemRepository;
 import org.example.hellofx.service.NoticementService;
@@ -13,6 +10,7 @@ import org.example.hellofx.service.NotificationService;
 import org.example.hellofx.service.ResidentService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.NotificationCreationScene;
+import org.example.hellofx.validator.NotificationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +29,8 @@ public class NotificationCreationController{
     private NoticementService noticementService;
     @Autowired
     private ResidentService residentService;
+    @Autowired
+    private NotificationValidator notificationValidator;
 
     public Resident getResident() {
         return profileController.getResident();
@@ -79,5 +79,13 @@ public class NotificationCreationController{
 
     public ObservableList<String> getAllHouseIds(){
         return FXCollections.observableArrayList(residentService.findDistinctNonNullHouseId(getProfile(), getResident()));
+    }
+
+    public Validation titleCheck(String title) {
+        return notificationValidator.titleCheck(title);
+    }
+
+    public Validation messageCheck(String message) {
+        return notificationValidator.contentCheck(message);
     }
 }

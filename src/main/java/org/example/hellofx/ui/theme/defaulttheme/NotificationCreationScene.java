@@ -22,8 +22,10 @@ import javafx.util.Callback;
 import org.example.hellofx.controller.NotificationCreationController;
 import org.example.hellofx.model.NotificationItem;
 import org.example.hellofx.model.Resident;
+import org.example.hellofx.model.Validation;
 import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.model.enums.NotificationType;
+import org.example.hellofx.model.enums.ValidationState;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.*;
@@ -263,13 +265,15 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
         mainContent.getChildren().addAll(createButtonContainer);
         savebutton.setOnAction(actionEvent -> {
             String title = ((VerticleTextAndTextField) mainContent.lookup("#noti-title-info")).getTextField().getText();
-            if (title == null) {
-                showPopUpMessage("Error", "Tiêu đề thông báo không được để trống!");
+            Validation vl = notificationCreationController.titleCheck(title);
+            if (vl.state() == ValidationState.ERROR) {
+                showPopUpMessage(vl.state().toString(), vl.message());
                 return;
             }
             String message = ((VerticleTextAndTextArea) mainContent.lookup("#noti-message-info")).getTextArea().getText();
-            if (message == null) {
-                showPopUpMessage("Error", "Nội dung thông báo không được để trống!");
+            vl = notificationCreationController.messageCheck(message);
+            if (vl.state() == ValidationState.ERROR) {
+                showPopUpMessage(vl.state().toString(), vl.message());
                 return;
             }
             NotificationType type = NotificationType.valueOf(notiType.getValue().text());

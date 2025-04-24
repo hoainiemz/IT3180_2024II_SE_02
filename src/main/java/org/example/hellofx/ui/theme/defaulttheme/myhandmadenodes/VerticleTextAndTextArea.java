@@ -4,6 +4,8 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -38,6 +40,12 @@ public class VerticleTextAndTextArea extends VBox {
             this.textArea.getStyleClass().add("editable-text-field");
         }
         getChildren().add(new Separator(Orientation.HORIZONTAL));
+        textArea.setWrapText(true);
+        textArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                event.consume();  // chặn xuống dòng
+            }
+        });
         setSpacing(0);
     }
 }
