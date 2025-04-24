@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class NotificationManagementController{
+    @Autowired
     NotificationService notificationService;
 
     public void seeNotificationItemInformation(Integer notiId) {

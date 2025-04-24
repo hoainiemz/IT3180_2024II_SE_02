@@ -49,6 +49,7 @@ public class ResidentService {
         }
         for (int i = 0; i < 10; i++) {
             try {
+                System.out.println(residentRepository.findDistinctNonNullHouseId());
                 return residentRepository.findDistinctNonNullHouseId();
             }
             catch (Exception e) {

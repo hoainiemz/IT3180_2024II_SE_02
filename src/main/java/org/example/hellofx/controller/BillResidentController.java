@@ -25,7 +25,7 @@ public class BillResidentController {
         return profileController.getProfile();
     }
 
-    public ObservableList<ResidentBillPaymentDTO> getPayment(Integer residentId, int stateFilter, int requireFilter, int dueFilter, String searchFilter) {
-        return FXCollections.observableArrayList(paymentService.findPaymentByResidentFilters(residentId, stateFilter, requireFilter, dueFilter, searchFilter));
+    public ObservableList<ResidentBillPaymentDTO> getPayment(int stateFilter, int requireFilter, int dueFilter, String searchFilter) {
+        return FXCollections.observableArrayList(paymentService.findPaymentByResidentFilters(getResident().getResidentId(), stateFilter, requireFilter, dueFilter, searchFilter));
     }
 }

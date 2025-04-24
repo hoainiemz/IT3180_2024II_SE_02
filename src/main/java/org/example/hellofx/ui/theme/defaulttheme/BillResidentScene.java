@@ -31,7 +31,7 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class BillResidentScene implements ThemeScene {
     @Autowired
-    private BillResidentController billController;
+    private BillResidentController billResidentController;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -90,7 +90,7 @@ public class BillResidentScene implements ThemeScene {
                 kt3 = 1;
             }
         }
-        masterData = billController.getPayment(billController.getResident().getResidentId(), kt1, kt2, kt3, searchFilter.getText());
+        masterData = billResidentController.getPayment(kt1, kt2, kt3, searchFilter.getText());
         resetPagination();
     }
 
@@ -122,13 +122,9 @@ public class BillResidentScene implements ThemeScene {
         HBox searchBar = new HBox(new TextFlow(new Text("Danh sách các khoản thu:")));
         searchBar.getStyleClass().add("big-text");
         mainContent.setPadding(new Insets(20, 50, 10, 50));
-//        HBox mainContent = new HBox();
         searchBar.setMaxHeight(container.getPrefHeight() * 0.1);
         mainContent.getChildren().addAll(searchBar);
-//        searchBar.getChildren().add(new IconTextField("images/search.png", "Tìm kiếm", false, searchBar.getMaxHeight() * 0.5));
         ((TextFlow) searchBar.getChildren().get(0)).setPrefWidth(mainContent.getPrefWidth() * 0.7);
-//        ((HBox) searchBar.getChildren().get(1)).setPrefWidth(mainContent.getPrefWidth() * 0.3);
-//        ((HBox) searchBar.getChildren().get(1)).setAlignment(Pos.CENTER_RIGHT);
 
         HBox filter = new HBox();
         filter.setId("filter");
@@ -141,8 +137,6 @@ public class BillResidentScene implements ThemeScene {
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
 
-//        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150));
-//        filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Trạng thái: ", FXCollections.observableArrayList("Tất cả", "Đã đóng", "Chưa đóng"), false, 150, "state-filter", false, "Tất cả"));
         filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Loại: ", FXCollections.observableArrayList("Tất cả", "Bắt buộc", "Không bắt buộc"), false, 200, "require-filter", false, "Tất cả"));

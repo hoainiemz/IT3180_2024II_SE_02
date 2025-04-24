@@ -1,6 +1,7 @@
 package org.example.hellofx.controller;
 
 import org.example.hellofx.model.Account;
+import org.example.hellofx.model.Validation;
 import org.example.hellofx.repository.AccountRepository;
 import org.example.hellofx.service.AccountService;
 import org.example.hellofx.service.EmailService;
@@ -46,7 +47,7 @@ public class ForgotPasswordController {
         }
     }
 
-    public String emailCheck(String email) {
+    public Validation emailCheck(String email) {
         return emailValidator.emailCheck(email);
     }
 }

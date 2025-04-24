@@ -163,7 +163,12 @@ public class BillInformationScene extends Notificable{
         rightTab.setPrefWidth(doubleTab.getPrefWidth() * 0.4);
         leftTab.setAlignment(Pos.TOP_CENTER);
         rightTab.setAlignment(Pos.TOP_CENTER);
-        leftTab.getChildren().add(new VerticleTextAndTextField("Số tiền phải nộp (vnđ): ", (bill.getAmount() != null) ? bill.getAmount().toString() : null, "enter the amount of money", "amount-info", true, true));
+        if (bill.getAmount() != null) {
+            leftTab.getChildren().add(new VerticleTextAndTextField("Số tiền phải nộp (vnđ): ", (bill.getAmount() != null) ? bill.getAmount().toString() : null, "enter the amount of money", "amount-info", true, true));
+        }
+        else {
+            leftTab.getChildren().add(new VerticleTextAndTextField("Số tiền phải nộp (vnđ): ", (bill.getAmount() != null) ? bill.getAmount().toString() : null, "enter the amount of money", "amount-info", false, true));
+        }
         rightTab.getChildren().add(new VerticleTextAndTextField("Phí nộp muộn (vnđ): ", (bill.getLateFee() != null) ? bill.getLateFee().toString() : null, "enter the late fee", "late-fee-info", true, true));
         ComboBox<String> req = new ComboBox<>(FXCollections.observableArrayList("Bắt buộc", "Không bắt buộc"));
         req.setValue(bill.getRequired() ? "Bắt buộc" : "Không bắt buộc");
@@ -261,8 +266,16 @@ public class BillInformationScene extends Notificable{
             String description = ((VerticleTextAndTextArea) mainContent.lookup("#bill-description-info")).getTextArea().getText();
             Double amount = null;
             String tmp = ((VerticleTextAndTextField) mainContent.lookup("#amount-info")).getTextField().getText();
-            if (tmp != null) {
-                amount = Double.valueOf(tmp);
+            if (tmp != null && tmp.isEmpty()) {
+                tmp = null;
+            }
+            if (bill.getAmount() == null || tmp != null) {
+                if (tmp != null) {
+                    amount = Double.valueOf(tmp);
+                }
+                else {
+                    amount = null;
+                }
             }
             else {
                 showPopUpMessage("Error", "Khoản tiền phải đóng không được để trống!");

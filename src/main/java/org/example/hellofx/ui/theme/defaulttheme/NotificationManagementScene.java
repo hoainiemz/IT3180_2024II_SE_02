@@ -62,15 +62,7 @@ public class NotificationManagementScene implements ThemeScene {
         ComboBox<Badge> typeFilter = ((ComboBox<Badge>) scene.lookup("#type-filter"));
         TextField searchFilter = ((TextAndTextField) scene.lookup("#searchFilter")).getTextField();
         table.getItems().clear();
-        for (int i = 0; i < 10; i++) {
-            try {
-                masterData = notificationManagementController.getNotifications(typeFilter.getValue().text(), searchFilter.getText());
-                break;
-            }
-            catch (Exception e) {
-                continue;
-            }
-        }
+        masterData = notificationManagementController.getNotifications(typeFilter.getValue().text(), searchFilter.getText());
         resetPagination();
     }
 

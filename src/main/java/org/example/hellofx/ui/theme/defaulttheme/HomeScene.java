@@ -230,13 +230,11 @@ public class HomeScene implements ThemeScene {
         VBox danCuContainer = new VBox();
         Button danCu = new Button("Dân cư");
         danCu.getStyleClass().add("menu-main-button");
-        Button nhom = new Button("Nhóm dân cư");
-        nhom.getStyleClass().add("menu-sub-button");
         Button danhSachDanCu = new Button("Danh sách dân cư");
         danhSachDanCu.getStyleClass().add("menu-sub-button");
         Button hienThiCacYeuCau = new Button("Các yêu cầu tham gia");
         hienThiCacYeuCau.getStyleClass().add("menu-sub-button");
-        danCuContainer.getChildren().addAll(danCu, nhom, danhSachDanCu);
+        danCuContainer.getChildren().addAll(danCu, danhSachDanCu);
         if (homeController.getProfile().getRole() != AccountType.Resident) {
             danCuContainer.getChildren().addAll(hienThiCacYeuCau);
         }
@@ -245,7 +243,22 @@ public class HomeScene implements ThemeScene {
         });
         hienThiCacYeuCau.setOnAction(event -> {
             homeController.hienThiCacYeuCauClicked();
-//           System.out.println("cacYeuCau");
+        });
+        // Can ho
+        VBox canHoContainer = new VBox();
+        Button canHo = new Button("Căn hộ");
+        canHo.getStyleClass().add("menu-main-button");
+        Button danhSachCanHo = new Button("Danh sách căn hộ");
+        Button themCanHo = new Button("Thêm căn hộ");
+        danhSachCanHo.getStyleClass().add("menu-sub-button");
+        themCanHo.getStyleClass().add("menu-sub-button");
+        canHoContainer.getChildren().addAll(canHo, danhSachCanHo);
+        if (homeController.getProfile().getRole() != AccountType.Resident) {
+            canHoContainer.getChildren().addAll(themCanHo);
+        }
+        danhSachCanHo.setOnAction(event -> {
+        });
+        hienThiCacYeuCau.setOnAction(event -> {
         });
         // khoan thu
         VBox khoanThuContainer = new VBox();
@@ -310,7 +323,7 @@ public class HomeScene implements ThemeScene {
 
         ToggleGroup menuToggleGroup = new ToggleGroup();
 
-        menuContainer.getChildren().addAll(dashBoardContainer, danCuContainer, khoanThuContainer);
+        menuContainer.getChildren().addAll(dashBoardContainer, danCuContainer, canHoContainer, khoanThuContainer);
         if (homeController.getProfile().getRole() != AccountType.Resident) {
             menuContainer.getChildren().add(thongBaoContainer);
         }
@@ -389,13 +402,11 @@ public class HomeScene implements ThemeScene {
         List<NotificationItem> ls = homeController.getNotificationList(homeController.getResident().getResidentId(), unReadNoti.isSelected());
         ls.forEach(item -> {
             var mess = new Message(item.getTitle(), item.getMessage(), null);
-            if (unReadNoti.isSelected()) {
-                mess.setOnMouseClicked(event -> {
-                    Noticement noticement = new Noticement(null, item.getId(), homeController.getResident().getResidentId(), true);
-                    homeController.noticementClicked(noticement);
-                    updateNotificationList();
-                });
-            }
+            mess.setOnMouseClicked(event -> {
+                Noticement noticement = new Noticement(null, item.getId(), homeController.getResident().getResidentId(), true);
+                homeController.noticementClicked(noticement);
+                updateNotificationList();
+            });
             mess.getStyleClass().add("hand-hover");
             switch (item.getType()) {
                 case "Info":

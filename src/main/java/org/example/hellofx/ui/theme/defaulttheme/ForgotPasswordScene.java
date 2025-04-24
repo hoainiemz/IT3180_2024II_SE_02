@@ -13,6 +13,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import org.example.hellofx.controller.ForgotPasswordController;
+import org.example.hellofx.model.Validation;
+import org.example.hellofx.model.enums.ValidationState;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.utils.ScreenUtils;
@@ -122,9 +124,9 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
         buttonContainer.getChildren().addAll(sendResetEmailButton);
         sendResetEmailButton.setOnAction(e -> {
             String email = ((TextField) leftFrame.lookup("#email-field")).getText();
-            String response = forgotPasswordController.emailCheck(email);
-            if (!response.equals("OK!")) {
-                showPopUpMessage("Error", response);
+            Validation response = forgotPasswordController.emailCheck(email);
+            if (!response.equals(ValidationState.OK)) {
+                showPopUpMessage("Error", response.message());
                 return;
             }
             try {

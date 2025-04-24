@@ -1,6 +1,8 @@
 package org.example.hellofx;
 
 import javafx.application.Application;
+import org.example.hellofx.model.Resident;
+import org.example.hellofx.service.ResidentService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

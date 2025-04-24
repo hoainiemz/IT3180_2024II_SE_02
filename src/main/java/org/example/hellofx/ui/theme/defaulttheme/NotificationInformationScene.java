@@ -257,7 +257,7 @@ public class NotificationInformationScene extends Notificable{
         mainContent.getChildren().addAll(table, pagination);
 
         HBox createButtonContainer = new HBox();
-        Button savebutton = new Button("Tạo thông báo");
+        Button savebutton = new Button("Lưu thông báo");
         savebutton.setId("save-button");
         createButtonContainer.getChildren().add(savebutton);
         createButtonContainer.setPrefWidth(mainContent.getPrefWidth() * 0.9);
