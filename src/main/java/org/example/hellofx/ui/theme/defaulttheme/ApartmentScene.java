@@ -119,36 +119,40 @@ public class ApartmentScene implements ThemeScene {
     private void createTable () {
         var selectAll = new CheckBox();
 
-        Map<String, SimpleBooleanProperty> selectedMap = new TreeMap<>();
+        Map<Integer, SimpleBooleanProperty> selectedMap = new TreeMap<>();
         var col0 = new TableColumn<ApartmentCountProjection, Boolean>();
         col0.setGraphic(selectAll);
         col0.setSortable(false);
         col0.setCellValueFactory(celldata -> {
-            String id = celldata.getValue().getApartmentId();
+            Integer id = celldata.getValue().getApartmentId();
             return selectedMap.computeIfAbsent(id, k -> new SimpleBooleanProperty(false));
         });
         col0.setCellFactory(CheckBoxTableCell.forTableColumn(col0));
         col0.setEditable(true);
-        col0.setPrefWidth(60);
-        col0.setMaxWidth(60);
 
-        var col1 = new TableColumn<ApartmentCountProjection, String>("Tên căn hộ");
-        col1.setCellValueFactory(
-                c -> new SimpleStringProperty(c.getValue().getApartmentId())
+        var col1 = new TableColumn<ApartmentCountProjection, Integer>("Id căn hộ");
+        col1.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().getApartmentId()));
+
+        var col2 = new TableColumn<ApartmentCountProjection, String>("Tên căn hộ");
+        col2.setCellValueFactory(
+                c -> new SimpleStringProperty(c.getValue().getApartmentName())
         );
 
-        var col2 = new TableColumn<ApartmentCountProjection, Long>("Số dân");
-        col2.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().getResidentCount()));
+        var col3 = new TableColumn<ApartmentCountProjection, Long>("Số dân");
+        col3.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().getResidentCount()));
 
         if (table == null) {
             table = new TableView<ApartmentCountProjection>();
             pagination = new Pagination();
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2);
+        table.getColumns().setAll(col0, col1, col2, col3);
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
+        table.setPrefWidth(mainContent.getPrefWidth() * 0.9);
+        col0.setPrefWidth(table.getPrefWidth() * 0.05);
+        col0.setMaxWidth(table.getPrefWidth() * 0.05);
         table.getSelectionModel().selectFirst();
         table.setId("resident-table");
         table.setRowFactory(tv -> {
@@ -156,7 +160,7 @@ public class ApartmentScene implements ThemeScene {
             row.setOnMouseClicked(event -> {
                 if (!row.isEmpty() && event.getClickCount() == 1) {
                     ApartmentCountProjection clicked = row.getItem();
-//                    controller.seeMoreInformation(clickedResident.getUserId().intValue());
+                    controller.seeMoreInformation(clicked.getApartmentId());
 //                    System.out.println("Clicked on: " + clickedResident.getFirstName());
                 }
             });

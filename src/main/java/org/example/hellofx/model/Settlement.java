@@ -15,12 +15,12 @@ public class Settlement {
     private Integer residentId;
 
     @Column(name = "apartment_id", nullable = false)
-    private String apartmentId;
+    private Integer apartmentId;
 
     // Constructors
     public Settlement() {}
 
-    public Settlement(Integer residentId, String apartmentId) {
+    public Settlement(Integer residentId, Integer apartmentId) {
         this.residentId = residentId;
         this.apartmentId = apartmentId;
     }
@@ -42,11 +42,11 @@ public class Settlement {
         this.residentId = residentId;
     }
 
-    public String getApartmentId() {
+    public Integer getApartmentId() {
         return apartmentId;
     }
 
-    public void setApartmentId(String apartmentId) {
+    public void setApartmentId(Integer apartmentId) {
         this.apartmentId = apartmentId;
     }
 

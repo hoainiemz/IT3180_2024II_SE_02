@@ -19,9 +19,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 import org.example.hellofx.controller.ApartmentCreationController;
-import org.example.hellofx.model.Bill;
-import org.example.hellofx.model.Resident;
-import org.example.hellofx.model.Validation;
+import org.example.hellofx.controller.ApartmentInformationController;
+import org.example.hellofx.model.*;
 import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.model.enums.ValidationState;
 import org.example.hellofx.ui.JavaFxApplication;
@@ -32,15 +31,12 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Component
-public class ApartmentCreationScene extends Notificable implements ThemeScene {
+public class ApartmentInformationScene extends Notificable implements ThemeScene {
     @Autowired
-    private ApartmentCreationController controller;
+    private ApartmentInformationController controller;
 
     private Scene scene;
 
@@ -52,6 +48,8 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
     private ScrollPane scrollPane;
     private Map<Integer, SimpleBooleanProperty> selectedMapUpdater;
     private Map<Integer, SimpleStringProperty> selectedMap;
+    private Apartment apartment;
+    private List<Settlement> oldData;
 
     protected Scene getCurrentScene() {
         return scene;
@@ -64,11 +62,13 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
         mainContent = null;
         selectedMapUpdater = null;
         selectedMap = null;
+        oldData = null;
     }
 
 
     public Scene getScene() {
         reset();
+        apartment = controller.getApartment();
         scene = JavaFxApplication.getCurrentScene();
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
@@ -93,7 +93,7 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
 
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setId("main-content");
-        TextFlow section = new TextFlow(new Text("Tạo căn hộ mới:"));
+        TextFlow section = new TextFlow(new Text("Thông tin căn hộ:"));
         section.getStyleClass().add("big-text");
         mainContent.getChildren().addAll(section);
         mainContent.setPadding(new Insets(20, 20, 10, 20));
@@ -107,9 +107,11 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
         apartmentInfo.setPadding(new Insets(20, 50, 20, 50));
         apartmentInfo.getStyleClass().add("public-profile");
         mainContent.setSpacing(20);
+
+
         apartmentInfo.setSpacing(20);
 
-        apartmentInfo.getChildren().add(new VerticleTextAndTextField("Tên căn hộ:", null, "enter the name of the apartment", "apartment-name-info", true));
+        apartmentInfo.getChildren().add(new VerticleTextAndTextField("Tên căn hộ:", apartment.getApartmentName().toString(), "enter the name of the apartment", "apartment-name-info", controller.getProfile().getRole() != AccountType.Resident));
 
         HBox doubleTab0 = new HBox();
         doubleTab0.setPrefWidth(apartmentInfo.getPrefWidth());
@@ -119,7 +121,7 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
         rightTab0.setPrefWidth(doubleTab0.getPrefWidth() * 0.4);
         leftTab0.setAlignment(Pos.TOP_CENTER);
         rightTab0.setAlignment(Pos.TOP_CENTER);
-        leftTab0.getChildren().add(new VerticleTextAndTextField("Tiền thuê nhà hàng tháng (vnđ): ", null, "enter the amount", "monthly-rent-price", true, true, false));
+        leftTab0.getChildren().add(new VerticleTextAndTextField("Tiền thuê nhà hàng tháng (vnđ): ", apartment.getMonthlyRentPrice().toString(), "enter the amount", "monthly-rent-price", controller.getProfile().getRole() != AccountType.Resident, true, false));
         doubleTab0.getChildren().addAll(leftTab0, rightTab0);
 
         HBox doubleTab = new HBox();
@@ -132,16 +134,19 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
         rightTab.setPrefWidth(doubleTab.getPrefWidth() * 0.4);
         leftTab.setAlignment(Pos.TOP_CENTER);
         rightTab.setAlignment(Pos.TOP_CENTER);
-        leftTab.getChildren().add(new VerticleTextAndTextField("Số điện của tháng gần nhất (vnđ): ", null, "enter the amount", "last-month-electric-index", true, true, true));
-        rightTab.getChildren().add(new VerticleTextAndTextField("Giá mỗi số điện (vnđ): ", null, "enter the amount of money", "electric-unit-price", true, true));
-        leftTab.getChildren().add(new VerticleTextAndTextField("Số nước của tháng gần nhất (vnđ): ", null, "enter the amount", "last-month-water-index", true, true, true));
-        rightTab.getChildren().add(new VerticleTextAndTextField("Giá mỗi số nước (vnđ): ", null, "enter the amount of money", "water-unit-price", true, true));
+        leftTab.getChildren().add(new VerticleTextAndTextField("Số điện của tháng gần nhất (vnđ): ", apartment.getLastMonthElectricIndex().toString(), "enter the amount", "last-month-electric-index", controller.getProfile().getRole() != AccountType.Resident, true, true));
+        rightTab.getChildren().add(new VerticleTextAndTextField("Giá mỗi số điện (vnđ): ", apartment.getElectricUnitPrice().toString(), "enter the amount of money", "electric-unit-price", controller.getProfile().getRole() != AccountType.Resident, true));
+        leftTab.getChildren().add(new VerticleTextAndTextField("Số nước của tháng gần nhất (vnđ): ", apartment.getLastMonthWaterIndex().toString(), "enter the amount", "last-month-water-index", controller.getProfile().getRole() != AccountType.Resident, true, true));
+        rightTab.getChildren().add(new VerticleTextAndTextField("Giá mỗi số nước (vnđ): ", apartment.getWaterUnitPrice().toString(), "enter the amount of money", "water-unit-price", controller.getProfile().getRole() != AccountType.Resident, true));
+
+        if (controller.getProfile().getRole() == AccountType.Resident) {
+            return scene;
+        }
 
         mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
         TextFlow section2 = new TextFlow(new Text("Đối tượng:"));
         section2.getStyleClass().add("big-text");
         mainContent.getChildren().addAll(section2);
-
 
         HBox filter = new HBox();
         filter.setId("filter");
@@ -153,6 +158,7 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
         filter.setAlignment(Pos.CENTER_LEFT);
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
+
         if (controller.getProfile().getRole() != AccountType.Resident) {
             TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.values()), false, 140, "roleFilter", true);
             role.getComboBox().setValue(AccountType.Resident);
@@ -162,6 +168,7 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
             });
             filter.getChildren().add(new Separator(Orientation.VERTICAL));
         }
+
         filter.getChildren().add(new TextAndTextField("Theo từ khóa: ", null, "Enter the search keyword", "searchFilter", true));
 
         ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField().setOnAction(event -> {
@@ -194,7 +201,7 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
         mainContent.getChildren().addAll(table, pagination);
 
         HBox createButtonContainer = new HBox();
-        Button savebutton = new Button("Tạo căn hộ");
+        Button savebutton = new Button("Lưu");
         savebutton.setId("save-button");
         createButtonContainer.getChildren().add(savebutton);
         createButtonContainer.setPrefWidth(mainContent.getPrefWidth() * 0.9);
@@ -207,9 +214,11 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
         savebutton.setOnAction(event -> {
             String name = ((VerticleTextAndTextField) mainContent.lookup("#apartment-name-info")).getTextField().getText();
             Validation vl = controller.checkName(name);
-            if (vl.state() == ValidationState.ERROR) {
-                showPopUpMessage(vl.state().toString(), vl.message());
-                return;
+            if (!name.equals(apartment.getApartmentName())) {
+                if (vl.state() == ValidationState.ERROR) {
+                    showPopUpMessage(vl.state().toString(), vl.message());
+                    return;
+                }
             }
             BigDecimal electricUnitPrice = null;
 
@@ -263,16 +272,30 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
                 return;
             }
 
-            List<Integer> ds = new ArrayList<>();
+            List<Integer> dsIn = new ArrayList<>();
+            List<Integer> dsOut = new ArrayList<>();
+            TreeSet<Integer> lonn = new TreeSet<>();
+            for (Settlement settlement : oldData) {
+                lonn.add(settlement.getResidentId());
+            }
             selectedMap.forEach((k, v) -> {
                 if (v.getValue().equals("Thuộc căn hộ")) {
-                    ds.add(k);
+                    if (!lonn.contains(k)) {
+                        dsIn.add(k);
+                    }
                 }
             });
-            controller.save(name, monthlyRentPrice, lastMonthElectricIndex, electricUnitPrice, lastMonthWaterIndex, waterUnitPrice, ds);
+            for (Settlement settlement : oldData) {
+                Integer residentId = settlement.getResidentId();
+                if (!selectedMap.get(residentId).getValue().equals("Thuộc căn hộ")) {
+                    dsOut.add(Integer.valueOf(settlement.getSettlementId().intValue()));
+                }
+            }
+
+            controller.save(name, monthlyRentPrice, lastMonthElectricIndex, electricUnitPrice, lastMonthWaterIndex, waterUnitPrice, dsIn, dsOut);
 
             controller.reset();
-            showPopUpMessage(ValidationState.OK.toString(), "Tạo căn hộ thành công!");
+            showPopUpMessage(ValidationState.OK.toString(), "Lưu thành công!");
         });
         return scene;
     }
@@ -305,7 +328,6 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
         }
         query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
-//        table.getItems().clear();
         masterData = controller.residentQuery(query);
         resetPagination();
     }
@@ -316,6 +338,12 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
 
         selectedMapUpdater = new TreeMap<>();
         selectedMap = new TreeMap<>();
+        oldData = controller.getSettlementsByApartmentId(apartment.getApartmentId());
+
+        for (int i = 0; i < oldData.size(); i++) {
+            selectedMap.computeIfAbsent(oldData.get(i).getResidentId(), k -> new SimpleStringProperty("Thuộc căn hộ"));
+        }
+
         var col0 = new TableColumn<Resident, Boolean>();
         col0.setGraphic(selectAll);
         col0.setSortable(false);

@@ -54,8 +54,6 @@ public class BillInformationController{
         if (!dsOut.isEmpty()) {
             paymentService.deletePayments(dsOut);
         }
-
-        System.out.println("save button clicked");
     }
 
     public void reset(Bill bill) {

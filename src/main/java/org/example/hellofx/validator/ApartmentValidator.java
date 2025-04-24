@@ -18,7 +18,7 @@ public class ApartmentValidator {
         if (value.length() > 255) {
             return new Validation(ValidationState.ERROR, "Tên căn hộ có độ dài không quá 255 ký tự");
         }
-        if (apartmentService.checkExistsByApartmentId(value)) {
+        if (apartmentService.checkExistsByApartmentName(value)) {
             return new Validation(ValidationState.ERROR, "Đã có căn hộ trùng tên");
         }
         return new Validation(ValidationState.OK, "OK!");

@@ -10,8 +10,8 @@ public class ApartmentService {
     @Autowired
     private ApartmentRepository apartmentRepository;
 
-    public boolean checkExistsByApartmentId(String s) {
-        return apartmentRepository.existsByApartmentId(s);
+    public boolean checkExistsByApartmentName(String s) {
+        return apartmentRepository.existsByApartmentName(s);
     }
 
     public Apartment save(Apartment apartment) {
@@ -23,6 +23,10 @@ public class ApartmentService {
                 continue;
             }
         }
-        return null;
+        return apartmentRepository.save(apartment);
+    }
+
+    public Apartment getByApartmentId(Integer apartmentId) {
+        return apartmentRepository.findByApartmentId(apartmentId);
     }
 }

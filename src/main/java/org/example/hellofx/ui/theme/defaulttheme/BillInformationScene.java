@@ -329,7 +329,6 @@ public class BillInformationScene extends Notificable{
         selectedMap = new TreeMap<>();
         oldData = billInformationController.getPayments(bill.getBillId());
         for (int i = 0; i < oldData.size(); i++) {
-//            selectedMap.
             selectedMap.computeIfAbsent(oldData.get(i).getResidentId(), k -> new SimpleStringProperty("Phải đóng"));
         }
         var col0 = new TableColumn<Resident, Boolean>();

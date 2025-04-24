@@ -8,6 +8,7 @@ import org.example.hellofx.model.Resident;
 import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.repository.SettlementRepository;
 import org.example.hellofx.service.SettlementService;
+import org.example.hellofx.ui.JavaFxApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,5 +34,9 @@ public class ApartmentController {
             return FXCollections.observableArrayList(settlementService.getApartmentsAndResidentCount(getResident().getResidentId(), s));
         }
         return FXCollections.observableArrayList(settlementService.getApartmentsAndResidentCount(s));
+    }
+
+    public void seeMoreInformation(Integer apartmentId) {
+        JavaFxApplication.showApartmentInformationScene(apartmentId);
     }
 }

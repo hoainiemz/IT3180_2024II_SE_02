@@ -6,14 +6,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.example.hellofx.SpringBootFxApplication;
+import org.example.hellofx.controller.ApartmentInformationController;
 import org.example.hellofx.controller.ProfileController;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.ui.theme.ThemeScene;
-import org.example.hellofx.ui.theme.defaulttheme.BillInformationScene;
-import org.example.hellofx.ui.theme.defaulttheme.LoginScene;
-import org.example.hellofx.ui.theme.defaulttheme.NotificationInformationScene;
-import org.example.hellofx.ui.theme.defaulttheme.UserInformationScene;
+import org.example.hellofx.ui.theme.defaulttheme.*;
 import org.example.hellofx.utils.ScreenUtils;
 
 public class JavaFxApplication extends Application {
@@ -71,5 +69,13 @@ public class JavaFxApplication extends Application {
     public static void showNotificationInformationScene(Integer notiId) {
         NotificationInformationScene theme = SpringBootFxApplication.context.getBean(NotificationInformationScene.class);
         currentStage.setScene(theme.getScene(notiId));
+    }
+
+    public static void showApartmentInformationScene(Integer apartmentId) {
+        ApartmentInformationController controller = SpringBootFxApplication.context.getBean(ApartmentInformationController.class);
+        controller.setApartmentId(apartmentId);
+        ApartmentInformationScene theme = SpringBootFxApplication.context.getBean(ApartmentInformationScene.class);
+        currentStage.setScene(theme.getScene());
+
     }
 }

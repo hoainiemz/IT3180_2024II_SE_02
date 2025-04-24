@@ -55,6 +55,7 @@ public class ApartmentCreationController {
 
     public void save(String name, BigDecimal monthlyRentPrice, Integer lastMonthElectricIndex, BigDecimal electricUnitPrice, Integer lastMonthWaterIndex, BigDecimal waterUnitPrice, List<Integer>ds) {
         Apartment apartment = new Apartment(name, monthlyRentPrice, lastMonthElectricIndex, electricUnitPrice, lastMonthWaterIndex, waterUnitPrice);
+        apartment.setApartmentId(null);
         Apartment app = apartmentService.save(apartment);
         List<Settlement> settlements = ds.stream()
                 .map(d -> new Settlement(d, app.getApartmentId()))  // Create a Payment object

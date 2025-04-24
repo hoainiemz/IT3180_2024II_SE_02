@@ -158,10 +158,6 @@ public class ResidentScene implements ThemeScene {
             reloadTable(scene);
         });
 
-        ((ComboBox<String>) scene.lookup("#groupFilter")).setOnAction(event -> {
-            reloadTable(scene);
-        });
-
         ((TextAndTextField) scene.lookup("#searchFilter")).getTextField().setOnAction(event -> {
             reloadTable(scene);
         });
