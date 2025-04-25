@@ -34,7 +34,7 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class BillResidentScene implements ThemeScene {
     @Autowired
-    private BillResidentController billResidentController;
+    private BillResidentController controller;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -93,7 +93,7 @@ public class BillResidentScene implements ThemeScene {
                 kt3 = 1;
             }
         }
-        masterData = billResidentController.getPaymentByResidentFilters(kt1, kt2, kt3, searchFilter.getText());
+        masterData = controller.getPaymentByResidentFilters(kt1, kt2, kt3, searchFilter.getText());
         resetPagination();
     }
 
@@ -146,7 +146,7 @@ public class BillResidentScene implements ThemeScene {
         filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Hạn: ", FXCollections.observableArrayList("Tất cả", "Đã quá hạn", "Chưa quá hạn"), false, 180, "due-filter", false, "Tất cả"));
         filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextAndTextField("Theo từ khóa: ", null, "Enter the search keyword", "searchFilter", true));
+        filter.getChildren().add(new TextAndTextField("Theo từ khóa: ", "", "Enter the search keyword", "searchFilter", true));
 
 
         ((ComboBox<String>) scene.lookup("#state-filter")).setOnAction(event -> {
@@ -184,8 +184,16 @@ public class BillResidentScene implements ThemeScene {
                 )
         );
 
-        var col1 = new TableColumn<PaymentProjection, String>("Loại");
-        col1.setCellValueFactory(
+        var col1 = new TableColumn<PaymentProjection, String>("Phòng");
+
+        col1.setCellValueFactory(c ->
+                new SimpleStringProperty(
+                        c.getValue().getDueDate() != null ? c.getValue().getApartmentName() : ""
+                )
+        );
+
+        var col2 = new TableColumn<PaymentProjection, String>("Loại");
+        col2.setCellValueFactory(
                 c -> {
                     if (c.getValue().getRequired().booleanValue()) {
                         return new SimpleStringProperty("Bắt buộc");
@@ -194,22 +202,22 @@ public class BillResidentScene implements ThemeScene {
                 }
         );
 
-        var col2 = new TableColumn<PaymentProjection, String>("Nội dung khoản thu");
-        col2.setCellValueFactory(
+        var col3 = new TableColumn<PaymentProjection, String>("Nội dung khoản thu");
+        col3.setCellValueFactory(
                 c -> {
                     return new SimpleStringProperty(c.getValue().getContent());
                 }
         );
 
-        var col3 = new TableColumn<PaymentProjection, BigDecimal>("Số tiền(vnđ)");
-        col3.setCellValueFactory(
+        var col4 = new TableColumn<PaymentProjection, BigDecimal>("Số tiền(vnđ)");
+        col4.setCellValueFactory(
                 c -> {
                     return new SimpleObjectProperty<>(c.getValue().getAmount());
                 }
         );
 
-        var col4 = new TableColumn<PaymentProjection, String>("Trạng thái");
-        col4.setCellValueFactory(
+        var col5 = new TableColumn<PaymentProjection, String>("Trạng thái");
+        col5.setCellValueFactory(
                 c -> {
                     if (c.getValue().getPayTime() == null) {
                         return new SimpleStringProperty("Chưa đóng");
@@ -224,7 +232,7 @@ public class BillResidentScene implements ThemeScene {
             //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3, col4);
+        table.getColumns().setAll(col0, col1, col2, col3, col4, col5);
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );

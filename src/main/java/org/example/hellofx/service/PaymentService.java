@@ -46,6 +46,6 @@ public class PaymentService {
     }
 
     public List<PaymentProjection> getPaymentProjectionByResidentIdAndFilters(Integer residentId, int stateFilter, int requireFilter, int dueFilter, String searchFilter) {
-        return paymentRepository.findPaymentsByResidentAndFilters(residentId, stateFilter, requireFilter, searchFilter);
+        return paymentRepository.findPaymentsByResidentAndFilters(residentId, stateFilter, requireFilter, dueFilter, searchFilter);
     }
 }

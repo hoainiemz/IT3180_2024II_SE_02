@@ -23,7 +23,7 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
     JOIN settlement s1 ON a.apartment_id = s1.apartment_id
     LEFT JOIN settlement s2 ON a.apartment_id = s2.apartment_id
     WHERE s1.resident_id = :residentId
-      AND CAST(a.apartment_id AS TEXT) ILIKE CONCAT('%', :search, '%')
+      AND a.apartment_name ILIKE CONCAT('%', :search, '%')
     GROUP BY a.apartment_id, a.apartment_name
     """, nativeQuery = true)
     List<ApartmentCountProjection> findFilteredApartmentCountsByResidentId(
@@ -38,7 +38,7 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
            COUNT(s.resident_id) AS residentCount
     FROM apartment a
     LEFT JOIN settlement s ON a.apartment_id = s.apartment_id
-    WHERE CAST(a.apartment_id AS TEXT) ILIKE CONCAT('%', :search, '%')
+    WHERE a.apartment_name ILIKE CONCAT('%', :search, '%')
     GROUP BY a.apartment_id, a.apartment_name
     """, nativeQuery = true)
     List<ApartmentCountProjection> findApartmentCountsBySearch(

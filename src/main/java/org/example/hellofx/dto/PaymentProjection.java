@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 
 public interface PaymentProjection {
-    LocalDate getDueDate();
+    LocalDateTime getDueDate();
     Boolean getRequired();
     String getContent();
     BigDecimal getAmount();

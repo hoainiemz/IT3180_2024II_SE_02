@@ -12,38 +12,31 @@ import java.util.List;
 
 public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
-
     @Query("""
-    SELECT 
-        p.bill.dueDate AS dueDate,
-        p.bill.required AS required,
-        p.bill.content AS content,
-        p.bill.amount AS amount,
-        p.payTime AS payTime,
-        p.apartment.apartmentName AS apartmentName
-    FROM Payment p
-    JOIN Settlement s ON s.apartmentId = p.apartment.apartmentId
-    WHERE s.residentId = :residentId
-      AND (
-        :stateFilter = 0 OR 
-        (:stateFilter = 1 AND p.bill.dueDate < CURRENT_TIMESTAMP) OR 
-        (:stateFilter = -1 AND p.bill.dueDate >= CURRENT_TIMESTAMP)
-      )
-      AND (
-        :requireFilter = 0 OR 
-        (:requireFilter = 1 AND p.bill.required = true) OR 
-        (:requireFilter = -1 AND p.bill.required = false)
-      )
-      AND (
-        :searchFilter IS NULL OR 
-        LOWER(p.bill.content) LIKE LOWER(CONCAT('%', :searchFilter, '%')) OR 
-        LOWER(p.bill.description) LIKE LOWER(CONCAT('%', :searchFilter, '%'))
-      )
+        SELECT DISTINCT
+            b.dueDate AS dueDate,
+            b.required AS required,
+            b.content AS content,
+            b.amount AS amount,
+            p.payTime AS payTime,
+            a.apartmentName AS apartmentName
+        FROM Payment p
+        JOIN p.bill b
+        JOIN p.apartment a
+        JOIN Settlement s ON s.apartmentId = a.apartmentId
+        WHERE s.residentId = :residentId
+            AND (:stateFilter = 0 OR (:stateFilter = 1 AND p.payTime IS NOT NULL) OR (:stateFilter = -1 AND p.payTime IS NULL))
+            AND (:requireFilter = 0 OR (:requireFilter = 1 AND b.required = true) OR (:requireFilter = -1 AND b.required = false))
+            AND (:dueFilter = 0 OR (:dueFilter = 1 AND b.dueDate < CURRENT_TIMESTAMP) OR (:dueFilter = -1 AND b.dueDate >= CURRENT_TIMESTAMP))
+            AND (:searchFilter IS NULL 
+                 OR b.content ILIKE CONCAT('%', :searchFilter, '%') 
+                 OR b.description LIKE CONCAT('%', :searchFilter, '%'))
     """)
     List<PaymentProjection> findPaymentsByResidentAndFilters(
             @Param("residentId") Integer residentId,
             @Param("stateFilter") int stateFilter,
             @Param("requireFilter") int requireFilter,
+            @Param("dueFilter") int dueFilter,
             @Param("searchFilter") String searchFilter
     );
 
