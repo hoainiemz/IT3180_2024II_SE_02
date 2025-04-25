@@ -55,38 +55,9 @@ public class ResidentScene implements ThemeScene {
         ComboBox<String> houseIdFilter = ((ComboBox<String>) scene.lookup("#houseIdFilter"));
         ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) scene.lookup("#roleFilter"));
         TextField searchFilter = ((TextAndTextField) scene.lookup("#searchFilter")).getTextField();
-        if (houseIdFilter.getValue() != null && !houseIdFilter.getValue().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + houseIdFilter.getValue() + "'";
-        }
-        if (residentController.getProfile().getRole() == AccountType.Resident) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + residentController.getResident().getHouseId() + "'";
-        }
-        if (roleFilter != null && roleFilter.getValue() != null) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "a.role = '" + roleFilter.getValue() + "'";
-        }
-        if (searchFilter.getText() != null && !searchFilter.getText().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "(LOWER(r.first_name) LIKE LOWER('%" + searchFilter.getText() + "%') or LOWER(r.last_name) LIKE LOWER('%" + searchFilter.getText() + "%'))";
-        }
-        String query = "SELECT r.* FROM resident r JOIN account a ON r.user_id = a.user_id";
-        if (!condition.isEmpty()) {
-            query += " WHERE " + condition;
-        }
-        query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
 //        table.getItems().clear();
-        masterData = residentController.residentQuery(query);
+        masterData = residentController.getResidentsByFilters(houseIdFilter.getValue(), roleFilter.getValue().toString(), searchFilter.getText());
         resetPagination();
 //        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
     }
@@ -122,10 +93,7 @@ public class ResidentScene implements ThemeScene {
 //        HBox mainContent = new HBox();
         searchBar.setMaxHeight(container.getPrefHeight() * 0.1);
         mainContent.getChildren().addAll(searchBar);
-//        searchBar.getChildren().add(new IconTextField("images/search.png", "Tìm kiếm", false, searchBar.getMaxHeight() * 0.5));
         ((TextFlow) searchBar.getChildren().get(0)).setPrefWidth(mainContent.getPrefWidth() * 0.7);
-//        ((HBox) searchBar.getChildren().get(1)).setPrefWidth(mainContent.getPrefWidth() * 0.3);
-//        ((HBox) searchBar.getChildren().get(1)).setAlignment(Pos.CENTER_RIGHT);
 
         HBox filter = new HBox();
         filter.setId("filter");
@@ -138,18 +106,16 @@ public class ResidentScene implements ThemeScene {
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
 
-//        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150));
-//        filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", residentController.getAllHouseIds(), true, 100, "houseIdFilter"));
-        if (residentController.getProfile().getRole() != AccountType.Resident) {
-            TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.Client, AccountType.Resident), false, 140, "roleFilter");
+//        if (residentController.getProfile().getRole() != AccountType.Resident) {
+            TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.Client, AccountType.Resident), false, 140, "roleFilter", (residentController.getProfile().getRole() != AccountType.Resident) ? false : true);
             role.getComboBox().setValue(AccountType.Resident);
             filter.getChildren().add(new Separator(Orientation.VERTICAL));
             filter.getChildren().add(role);
             ((ComboBox<String>) scene.lookup("#roleFilter")).setOnAction(event -> {
                 reloadTable(scene);
             });
-        }
+//        }
         filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextAndTextField("Theo từ khóa: ", null, "Enter the search keyword", "searchFilter", true));
 
@@ -220,23 +186,13 @@ public class ResidentScene implements ThemeScene {
                 }
         );
 
-        var col5 = new TableColumn<Resident, String>("Phòng");
-        col5.setCellValueFactory(
-                c -> {
-                    if (c.getValue().getHouseId() == null) {
-                        return null;
-                    }
-                    return new SimpleStringProperty(c.getValue().getHouseId());
-                }
-        );
-
         if (table == null) {
             table = new TableView<Resident>();
             pagination = new Pagination();
             //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3, col4, col5);
+        table.getColumns().setAll(col0, col1, col2, col3, col4);
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );

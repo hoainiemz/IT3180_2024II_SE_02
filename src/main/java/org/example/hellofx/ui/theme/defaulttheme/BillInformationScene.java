@@ -34,7 +34,7 @@ import java.util.*;
 @Component
 public class BillInformationScene extends Notificable{
     @Autowired
-    private BillInformationController billInformationController;
+    private BillInformationController controller;
 
     private Scene scene;
 
@@ -58,40 +58,9 @@ public class BillInformationScene extends Notificable{
         ComboBox<String> houseIdFilter = ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter"));
         ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#roleFilter"));
         TextField searchFilter = ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField();
-        if (houseIdFilter.getValue() != null && !houseIdFilter.getValue().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + houseIdFilter.getValue() + "'";
-        }
-        if (billInformationController.getProfile().getRole() == AccountType.Resident) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + billInformationController.getResident().getHouseId() + "'";
-        }
-        if (roleFilter != null && roleFilter.getValue() != null) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "a.role = '" + roleFilter.getValue() + "'";
-        }
-        if (searchFilter.getText() != null && !searchFilter.getText().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "(LOWER(r.first_name) LIKE LOWER('%" + searchFilter.getText() + "%') or LOWER(r.last_name) LIKE LOWER('%" + searchFilter.getText() + "%'))";
-        }
-        String query = "SELECT r.* FROM resident r JOIN account a ON r.user_id = a.user_id";
-        if (!condition.isEmpty()) {
-            query += " WHERE " + condition;
-        }
-        query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
-//        table.getItems().clear();
-        masterData = billInformationController.residentQuery(query); //FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query));
+        masterData = controller.getResidentsByFilters(houseIdFilter.getValue(), roleFilter.getValue().toString(), searchFilter.getText());
         resetPagination();
-//        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
     }
     public void reset() {
         masterData = null;
@@ -103,7 +72,7 @@ public class BillInformationScene extends Notificable{
     }
 
     public Scene getScene(Integer billId) {
-        bill = billInformationController.findBillByBillId(billId);
+        bill = controller.findBillByBillId(billId);
         reset();
         scene = JavaFxApplication.getCurrentScene();
         HBox container = (HBox) scene.lookup("#container");
@@ -193,8 +162,8 @@ public class BillInformationScene extends Notificable{
 
 //        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150));
 //        filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", billInformationController.getAllHouseIds(), true, 100, "houseIdFilter"));
-        if (billInformationController.getProfile().getRole() != AccountType.Resident) {
+        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", controller.getAllHouseIds(), true, 100, "houseIdFilter"));
+        if (controller.getProfile().getRole() != AccountType.Resident) {
             TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.values()), false, 140, "roleFilter", true);
             role.getComboBox().setValue(AccountType.Resident);
             filter.getChildren().add(new Separator(Orientation.VERTICAL));
@@ -315,8 +284,8 @@ public class BillInformationScene extends Notificable{
                     dsOut.add(payment.getPaymentId());
                 }
             }
-            billInformationController.saveButtonClicked(bill, newBill, dsIn, dsOut);
-            billInformationController.reset(newBill);
+            controller.saveButtonClicked(bill, newBill, dsIn, dsOut);
+            controller.reset(newBill);
             showPopUpMessage("Thành công", "Lưu khoản thu thành công!");
         });
         return scene;
@@ -327,7 +296,7 @@ public class BillInformationScene extends Notificable{
 
         selectedMapUpdater = new TreeMap<>();
         selectedMap = new TreeMap<>();
-        oldData = billInformationController.getPayments(bill.getBillId());
+        oldData = controller.getPayments(bill.getBillId());
         for (int i = 0; i < oldData.size(); i++) {
             selectedMap.computeIfAbsent(oldData.get(i).getResidentId(), k -> new SimpleStringProperty("Phải đóng"));
         }
@@ -357,22 +326,11 @@ public class BillInformationScene extends Notificable{
                 }
         );
 
-        var col3 = new TableColumn<Resident, String>("Phòng");
-        col3.setCellValueFactory(
-                c -> {
-                    if (c.getValue().getHouseId() == null) {
-                        return null;
-                    }
-                    return new SimpleStringProperty(c.getValue().getHouseId());
-                }
-        );
-        var col4 = new TableColumn<Resident, String>("Yêu Cầu Đóng Phí ");
-        col4.setCellValueFactory(celldata -> {
+        var col3 = new TableColumn<Resident, String>("Yêu Cầu Đóng Phí ");
+        col3.setCellValueFactory(celldata -> {
             Integer id = celldata.getValue().getResidentId();
             return selectedMap.computeIfAbsent(id, k -> new SimpleStringProperty("Không phải đóng"));
         });
-//        col4.setCellFactory(CheckBoxTableCell.forTableColumn(col4));
-//        col4.setPrefWidth(60);
 
         if (table == null) {
             table = new TableView<Resident>();
@@ -380,7 +338,7 @@ public class BillInformationScene extends Notificable{
             //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3, col4);
+        table.getColumns().setAll(col0, col1, col2, col3);
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
@@ -391,7 +349,7 @@ public class BillInformationScene extends Notificable{
             return row;
         });
 //        Styles.toggleStyleClass(table, Styles.STRIPED);
-        if (billInformationController.getProfile().getRole() == AccountType.Admin || billInformationController.getProfile().getRole() == AccountType.Client) {
+        if (controller.getProfile().getRole() == AccountType.Admin || controller.getProfile().getRole() == AccountType.Client) {
             table.setEditable(true);
         }
         else {

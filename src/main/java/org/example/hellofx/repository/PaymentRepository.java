@@ -18,7 +18,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 //            "WHERE r.residentId = :residentId")
 //    List<Object[]> findResidentBillsWithPayments(@Param("residentId") Integer residentId);
     @Query("SELECT r.residentId, r.userId, r.firstName, r.lastName, r.gender, r.dateOfBirth, " +
-            "r.identityCard, r.houseId, r.moveInDate, " +
+            "r.identityCard, r.moveInDate, " +
             "b.billId, b.amount, b.lateFee, b.dueDate, b.content, b.description, b.required, " +
             "p.payTime " +
             "FROM Resident r " +
@@ -30,7 +30,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
 @Query("SELECT new org.example.hellofx.dto.ResidentBillPaymentDTO(" +
         "r.residentId, r.userId, r.firstName, r.lastName, r.gender, r.dateOfBirth, " +
-        "r.identityCard, r.houseId, r.moveInDate, " +
+        "r.identityCard, r.moveInDate, " +
         "b.billId, b.amount, b.lateFee, b.dueDate, b.content, b.description, b.required, " +
         "p.payTime) " +
         "FROM Resident r " +
@@ -51,7 +51,7 @@ List<ResidentBillPaymentDTO> findResidentBillsWithResidentFilters(
 
     @Query("SELECT new org.example.hellofx.dto.ResidentBillPaymentDTO(" +
             "r.residentId, r.userId, r.firstName, r.lastName, r.gender, r.dateOfBirth, " +
-            "r.identityCard, r.houseId, r.moveInDate, " +
+            "r.identityCard, r.moveInDate, " +
             "b.billId, b.amount, b.lateFee, b.dueDate, b.content, b.description, b.required, " +
             "p.payTime) " +
             "FROM Resident r " +

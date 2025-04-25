@@ -40,7 +40,7 @@ public class AllResidentRequestScene extends Notificable implements ThemeScene {
 
     @Override
     protected Scene getCurrentScene() {
-        return null;
+        return scene;
     }
 
     public void reset() {

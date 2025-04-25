@@ -156,11 +156,10 @@ public class UserInformationScene extends Notificable{
         leftTab.getChildren().add(new VerticleTextAndComboBox("Giới tính: ", genderComboBox, "Enter your gender", "gender-info", true));
         rightTab.getChildren().add(new VerticleTextAndDateTimePicker("Ngày sinh(mm/dd/yyyy): ", resident.getDateOfBirth(), "Enter your birthday", "birthday-info", true));
         rightTab.getChildren().add(new VerticleTextAndTextField("Họ: ", resident.getLastName(), "Enter your last name", "last-name-info", true));
-        rightTab.getChildren().add(new VerticleTextAndTextField("Phòng: ", resident.getHouseId(), "Enter your house", "house-info", profileController.getProfile().getRole() != AccountType.Resident ? true : false));
 
-        privateProfile.getChildren().add(new VerticleTextAndTextField("Số ăn cước công dân: ", resident.getIdentityCard(), "Enter your identity card", "identity-card-info", true));
+        privateProfile.getChildren().add(new VerticleTextAndTextField("Số căn cước công dân: ", resident.getIdentityCard(), "Enter your identity card", "identity-card-info", true));
         privateProfile.getChildren().add(new VerticleTextAndTextField("Email cá nhân: ", profile.getEmail(), "Enter your email", "email-info", true));
-        privateProfile.getChildren().add(new VerticleTextAndTextField("Số điện thoại: ", profile.getPhone(), "Enter your phone number", "phone-info", true, true));
+        privateProfile.getChildren().add(new VerticleTextAndTextField("Số điện thoại: ", profile.getPhone(), "Enter your phone number", "phone-info", true, false));
 //        mainContent.setStyle("-fx-background-color: red");
 
         HBox buttonContainer = new HBox();
@@ -183,9 +182,8 @@ public class UserInformationScene extends Notificable{
             String firstName = ((VerticleTextAndTextField) scene.lookup("#first-name-info")).getTextField().getText();
             String lastName = ((VerticleTextAndTextField) scene.lookup("#last-name-info")).getTextField().getText();
             GenderType gender = (GenderType) ((VerticleTextAndComboBox) scene.lookup("#gender-info")).getComboBox().getValue();
-            String houseId = ((VerticleTextAndTextField) scene.lookup("#house-info")).getTextField().getText();
             String identityCard = ((VerticleTextAndTextField) scene.lookup("#identity-card-info")).getTextField().getText();
-            Resident curResident = new Resident(resident.getUserId(), firstName, lastName, gender, date, identityCard, houseId, resident.getMoveInDate());
+            Resident curResident = new Resident(resident.getUserId(), firstName, lastName, gender, date, identityCard, resident.getMoveInDate());
 
             Validation vl = userInformationController.emailCheck(email);
 
@@ -202,7 +200,7 @@ public class UserInformationScene extends Notificable{
             }
 
             vl = userInformationController.identityCardCheck(identityCard);
-            if (!identityCard.equals(resident.getIdentityCard()) && vl.state().equals(ValidationState.ERROR)) {
+            if (identityCard == null || identityCard.isEmpty() || (!identityCard.equals(resident.getIdentityCard()) && vl.state().equals(ValidationState.ERROR))) {
                 showPopUpMessage(vl.state().toString(), vl.message());
                 return;
             }

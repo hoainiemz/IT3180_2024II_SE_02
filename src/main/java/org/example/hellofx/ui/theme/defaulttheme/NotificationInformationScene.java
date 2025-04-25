@@ -41,7 +41,7 @@ import java.util.*;
 @Component
 public class NotificationInformationScene extends Notificable{
     @Autowired
-    private NotificationInformationController notificationInformationController;
+    private NotificationInformationController controller;
 
     private Scene scene;
 
@@ -77,46 +77,15 @@ public class NotificationInformationScene extends Notificable{
         ComboBox<String> houseIdFilter = ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter"));
         ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#roleFilter"));
         TextField searchFilter = ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField();
-        if (houseIdFilter.getValue() != null && !houseIdFilter.getValue().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + houseIdFilter.getValue() + "'";
-        }
-        if (notificationInformationController.getProfile().getRole() == AccountType.Resident) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + notificationInformationController.getResident().getHouseId() + "'";
-        }
-        if (roleFilter != null && roleFilter.getValue() != null) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "a.role = '" + roleFilter.getValue() + "'";
-        }
-        if (searchFilter.getText() != null && !searchFilter.getText().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "(LOWER(r.first_name) LIKE LOWER('%" + searchFilter.getText() + "%') or LOWER(r.last_name) LIKE LOWER('%" + searchFilter.getText() + "%'))";
-        }
-        String query = "SELECT r.* FROM resident r JOIN account a ON r.user_id = a.user_id";
-        if (!condition.isEmpty()) {
-            query += " WHERE " + condition;
-        }
-        query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
-//        table.getItems().clear();
-        masterData = notificationInformationController.residentQuery(query);
+        masterData = controller.getResidentsByFilters(houseIdFilter.getValue(), roleFilter.getValue().toString(), searchFilter.getText());
         resetPagination();
-//        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
     }
 
     @Transactional
     public Scene getScene(Integer notiId) {
         reset();
-        noti = notificationInformationController.getNotificationItemById(notiId);
+        noti = controller.getNotificationItemById(notiId);
         scene = JavaFxApplication.getCurrentScene();
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
@@ -198,8 +167,8 @@ public class NotificationInformationScene extends Notificable{
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
 
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", notificationInformationController.getAllHouseIds(), true, 100, "houseIdFilter"));
-        if (notificationInformationController.getProfile().getRole() != AccountType.Resident) {
+        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", controller.getAllHouseIds(), true, 100, "houseIdFilter"));
+        if (controller.getProfile().getRole() != AccountType.Resident) {
             TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.values()), false, 140, "roleFilter", true);
             role.getComboBox().setValue(AccountType.Resident);
             filter.getChildren().add(new Separator(Orientation.VERTICAL));
@@ -257,13 +226,13 @@ public class NotificationInformationScene extends Notificable{
         mainContent.getChildren().addAll(createButtonContainer);
         savebutton.setOnAction(actionEvent -> {
             String title = ((VerticleTextAndTextField) mainContent.lookup("#noti-title-info")).getTextField().getText();
-            Validation vl = notificationInformationController.titleCheck(title);
+            Validation vl = controller.titleCheck(title);
             if (vl.state() == ValidationState.ERROR) {
                 showPopUpMessage(vl.state().toString(), vl.message());
                 return;
             }
             String message = ((VerticleTextAndTextArea) mainContent.lookup("#noti-message-info")).getTextArea().getText();
-            vl = notificationInformationController.messageCheck(message);
+            vl = controller.messageCheck(message);
             if (vl.state() == ValidationState.ERROR) {
                 showPopUpMessage(vl.state().toString(), vl.message());
                 return;
@@ -295,10 +264,10 @@ public class NotificationInformationScene extends Notificable{
                 }
             }
 
-            notificationInformationController.saveButtonClicked(noti, newNoti, dsIn, dsOut);
+            controller.saveButtonClicked(noti, newNoti, dsIn, dsOut);
 
             reset();
-            notificationInformationController.reset(noti.getId());
+            controller.reset(noti.getId());
             showPopUpMessage("Thành công", "Cập nhật thông báo thành công!");
         });
         return scene;
@@ -310,7 +279,7 @@ public class NotificationInformationScene extends Notificable{
 
         selectedMapUpdater = new TreeMap<>();
         selectedMap = new TreeMap<>();
-        oldData = notificationInformationController.getNoticementsById(noti.getId());
+        oldData = controller.getNoticementsById(noti.getId());
 
 
         for (int i = 0; i < oldData.size(); i++) {
@@ -342,17 +311,8 @@ public class NotificationInformationScene extends Notificable{
                 }
         );
 
-        var col3 = new TableColumn<Resident, String>("Phòng");
-        col3.setCellValueFactory(
-                c -> {
-                    if (c.getValue().getHouseId() == null) {
-                        return null;
-                    }
-                    return new SimpleStringProperty(c.getValue().getHouseId());
-                }
-        );
-        var col4 = new TableColumn<Resident, String>("Thông báo");
-        col4.setCellValueFactory(celldata -> {
+        var col3 = new TableColumn<Resident, String>("Thông báo");
+        col3.setCellValueFactory(celldata -> {
             Integer id = celldata.getValue().getResidentId();
             return selectedMap.computeIfAbsent(id, k -> new SimpleStringProperty("Không nhận"));
         });
@@ -365,7 +325,7 @@ public class NotificationInformationScene extends Notificable{
             //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3, col4);
+        table.getColumns().setAll(col0, col1, col2, col3);
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
@@ -376,7 +336,7 @@ public class NotificationInformationScene extends Notificable{
             return row;
         });
 //        Styles.toggleStyleClass(table, Styles.STRIPED);
-        if (notificationInformationController.getProfile().getRole() == AccountType.Admin || notificationInformationController.getProfile().getRole() == AccountType.Client) {
+        if (controller.getProfile().getRole() == AccountType.Admin || controller.getProfile().getRole() == AccountType.Client) {
             table.setEditable(true);
         }
         else {

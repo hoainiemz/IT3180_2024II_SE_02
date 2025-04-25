@@ -37,7 +37,7 @@ import java.util.TreeMap;
 @Component
 public class BillCreationScene extends Notificable implements ThemeScene {
     @Autowired
-    private BillCreationController billCreationController;
+    private BillCreationController controller;
 
     private Scene scene;
 
@@ -68,37 +68,8 @@ public class BillCreationScene extends Notificable implements ThemeScene {
         ComboBox<String> houseIdFilter = ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter"));
         ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#roleFilter"));
         TextField searchFilter = ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField();
-        if (houseIdFilter.getValue() != null && !houseIdFilter.getValue().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + houseIdFilter.getValue() + "'";
-        }
-        if (billCreationController.getProfile().getRole() == AccountType.Resident) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + billCreationController.getResident().getHouseId() + "'";
-        }
-        if (roleFilter != null && roleFilter.getValue() != null) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "a.role = '" + roleFilter.getValue() + "'";
-        }
-        if (searchFilter.getText() != null && !searchFilter.getText().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "(LOWER(r.first_name) LIKE LOWER('%" + searchFilter.getText() + "%') or LOWER(r.last_name) LIKE LOWER('%" + searchFilter.getText() + "%'))";
-        }
-        String query = "SELECT r.* FROM resident r JOIN account a ON r.user_id = a.user_id";
-        if (!condition.isEmpty()) {
-            query += " WHERE " + condition;
-        }
-        query += ';';
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
-        masterData = billCreationController.residentQuery(query);
+        masterData = controller.getResidentsByFilters(houseIdFilter.getValue(), roleFilter.getValue().toString(), searchFilter.getText());
         resetPagination();
     }
 
@@ -185,8 +156,8 @@ public class BillCreationScene extends Notificable implements ThemeScene {
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
 
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", billCreationController.getAllHouseIds(), true, 100, "houseIdFilter"));
-        if (billCreationController.getProfile().getRole() != AccountType.Resident) {
+        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", controller.getAllHouseIds(), true, 100, "houseIdFilter"));
+        if (controller.getProfile().getRole() != AccountType.Resident) {
             TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.values()), false, 140, "roleFilter", true);
             role.getComboBox().setValue(AccountType.Resident);
             filter.getChildren().add(new Separator(Orientation.VERTICAL));
@@ -286,9 +257,9 @@ public class BillCreationScene extends Notificable implements ThemeScene {
                     ds.add(k);
                 }
             });
-            billCreationController.createButtonClicked(newBill, ds);
+            controller.createButtonClicked(newBill, ds);
 
-            billCreationController.reset();
+            controller.reset();
             showPopUpMessage("Thành công", "Tạo khoản thu thành công!");
         });
         return scene;
@@ -325,17 +296,8 @@ public class BillCreationScene extends Notificable implements ThemeScene {
                 }
         );
 
-        var col3 = new TableColumn<Resident, String>("Phòng");
-        col3.setCellValueFactory(
-                c -> {
-                    if (c.getValue().getHouseId() == null) {
-                        return null;
-                    }
-                    return new SimpleStringProperty(c.getValue().getHouseId());
-                }
-        );
-        var col4 = new TableColumn<Resident, String>("Yêu Cầu Đóng Phí ");
-        col4.setCellValueFactory(celldata -> {
+        var col3 = new TableColumn<Resident, String>("Yêu Cầu Đóng Phí ");
+        col3.setCellValueFactory(celldata -> {
             Integer id = celldata.getValue().getResidentId();
             return selectedMap.computeIfAbsent(id, k -> new SimpleStringProperty("Không phải đóng"));
         });
@@ -348,7 +310,7 @@ public class BillCreationScene extends Notificable implements ThemeScene {
             //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3, col4);
+        table.getColumns().setAll(col0, col1, col2, col3);
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
@@ -359,7 +321,7 @@ public class BillCreationScene extends Notificable implements ThemeScene {
             return row;
         });
 //        Styles.toggleStyleClass(table, Styles.STRIPED);
-        if (billCreationController.getProfile().getRole() == AccountType.Admin || billCreationController.getProfile().getRole() == AccountType.Client) {
+        if (controller.getProfile().getRole() == AccountType.Admin || controller.getProfile().getRole() == AccountType.Client) {
             table.setEditable(true);
         }
         else {

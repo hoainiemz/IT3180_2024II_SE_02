@@ -66,4 +66,8 @@ public class ApartmentCreationController {
 
         settlementService.saveAll(settlements);
     }
+
+    public ObservableList<Resident> getResidentsByFilters(String houseNameFilter, String roleFilter, String searchFilter) {
+        return FXCollections.observableArrayList(residentService.findResidentsByFilters(houseNameFilter, roleFilter, searchFilter));
+    }
 }

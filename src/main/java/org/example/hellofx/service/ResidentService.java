@@ -2,32 +2,31 @@ package org.example.hellofx.service;
 
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
+import org.example.hellofx.model.Settlement;
 import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.repository.RepositoryImpl;
 import org.example.hellofx.repository.ResidentRepository;
+import org.example.hellofx.repository.SettlementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ResidentService {
     @Autowired
-    ResidentRepository residentRepository;
+    private ResidentRepository residentRepository;
     @Autowired
-    RepositoryImpl repositoryImpl;
+    private RepositoryImpl repositoryImpl;
+    @Autowired
+    private SettlementRepository settlementRepository;
 
     public List<Resident> nativeResidentQuery(String query) {
         return repositoryImpl.executeRawSql(query, Resident.class);
-    }
-
-    public List<Resident> residentsQuery(Account profile, Resident resident) {
-        if (profile.getRole() == AccountType.Admin || profile.getRole() == AccountType.Client) {
-            return residentRepository.findAll();
-        }
-        return residentRepository.findByHouseId(resident.getHouseId());
     }
 
     public Resident findResidentByUserId(int id) {
@@ -42,15 +41,17 @@ public class ResidentService {
         return residentRepository.findByUserId(profile.getUserId()).get();
     }
 
+
+
+
     @Transactional
     public List<String> findDistinctNonNullHouseId(Account profile, Resident resident) {
-        if (profile.getRole() == AccountType.Resident) {
-            return Arrays.asList(resident.getHouseId());
-        }
         for (int i = 0; i < 10; i++) {
             try {
-                System.out.println(residentRepository.findDistinctNonNullHouseId());
-                return residentRepository.findDistinctNonNullHouseId();
+                if (profile.getRole() == AccountType.Resident) {
+                    return settlementRepository.findApartmentNamesByResidentId(resident.getResidentId());
+                }
+                return settlementRepository.findAllApartmentNames();
             }
             catch (Exception e) {
                 continue;
@@ -66,7 +67,6 @@ public class ResidentService {
                 resident.getLastName(),
                 resident.getDateOfBirth(),
                 resident.getGender(),
-                resident.getHouseId(),
                 resident.getIdentityCard(),
                 resident.getMoveInDate()
         );
@@ -74,5 +74,9 @@ public class ResidentService {
 
     public void save(Resident resident) {
         residentRepository.save(resident);
+    }
+
+    public List<Resident> findResidentsByFilters(String houseNameFilter, String roleFilter, String searchFilter) {
+        return residentRepository.findResidentsByFilters(houseNameFilter, roleFilter, searchFilter);
     }
 }

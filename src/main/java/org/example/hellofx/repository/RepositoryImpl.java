@@ -32,16 +32,15 @@ public class RepositoryImpl<T>{
                 row[4] != null ? GenderType.valueOf((String) row[4]) : null, // ✅ Convert String to GenderType
                 row[5] != null ? ((java.sql.Date) row[5]).toLocalDate() : null, // Convert SQL Date to LocalDate
                 (String) row[6],   // identityCard
-                (String) row[7],   // houseId
-                row[8] != null ? ((java.sql.Date) row[8]).toLocalDate() : null, // Convert SQL Date to LocalDate
-                (Integer) row[9],  // billId
-                (Double) row[10],  // amount
-                (Double) row[11],  // lateFee
-                (LocalDateTime) row[12], // dueDate
-                (String) row[13],  // content
-                (String) row[14],  // description
-                (Boolean) row[15], // required
-                (LocalDateTime) row[16] // payTime
+                row[7] != null ? ((java.sql.Date) row[7]).toLocalDate() : null, // Convert SQL Date to LocalDate
+                (Integer) row[8],  // billId
+                (Double) row[9],  // amount
+                (Double) row[10],  // lateFee
+                (LocalDateTime) row[11], // dueDate
+                (String) row[12],  // content
+                (String) row[13],  // description
+                (Boolean) row[14], // required
+                (LocalDateTime) row[15] // payTime
         )).collect(Collectors.toList());
     }
 

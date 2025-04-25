@@ -281,32 +281,7 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
         String condition = "";
         ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#roleFilter"));
         TextField searchFilter = ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField();
-        if (controller.getProfile().getRole() == AccountType.Resident) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "r.house_id = '" + controller.getResident().getHouseId() + "'";
-        }
-        if (roleFilter != null && roleFilter.getValue() != null) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "a.role = '" + roleFilter.getValue() + "'";
-        }
-        if (searchFilter.getText() != null && !searchFilter.getText().isEmpty()) {
-            if (!condition.isEmpty()) {
-                condition += " and ";
-            }
-            condition = condition + "(LOWER(r.first_name) LIKE LOWER('%" + searchFilter.getText() + "%') or LOWER(r.last_name) LIKE LOWER('%" + searchFilter.getText() + "%'))";
-        }
-        String query = "SELECT r.* FROM resident r JOIN account a ON r.user_id = a.user_id";
-        if (!condition.isEmpty()) {
-            query += " WHERE " + condition;
-        }
-        query += ';';
-        TableView<Resident> table = (TableView) scene.lookup("#resident-table");
-//        table.getItems().clear();
-        masterData = controller.residentQuery(query);
+        masterData = controller.getResidentsByFilters(null, roleFilter.getValue().toString(), searchFilter.getText());
         resetPagination();
     }
 
@@ -342,17 +317,8 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
                 }
         );
 
-        var col3 = new TableColumn<Resident, String>("Phòng");
-        col3.setCellValueFactory(
-                c -> {
-                    if (c.getValue().getHouseId() == null) {
-                        return null;
-                    }
-                    return new SimpleStringProperty(c.getValue().getHouseId());
-                }
-        );
-        var col4 = new TableColumn<Resident, String>("Trạng thái");
-        col4.setCellValueFactory(celldata -> {
+        var col3 = new TableColumn<Resident, String>("Trạng thái");
+        col3.setCellValueFactory(celldata -> {
             Integer id = celldata.getValue().getResidentId();
             return selectedMap.computeIfAbsent(id, k -> new SimpleStringProperty("Không thuộc"));
         });
@@ -363,7 +329,7 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
             //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3, col4);
+        table.getColumns().setAll(col0, col1, col2, col3);
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );

@@ -67,4 +67,8 @@ public class BillCreationController{
     public ObservableList<String> getAllHouseIds(){
         return FXCollections.observableArrayList(residentService.findDistinctNonNullHouseId(getProfile(), getResident()));
     }
+
+    public ObservableList<Resident> getResidentsByFilters(String houseNameFilter, String roleFilter, String searchFilter) {
+        return FXCollections.observableArrayList(residentService.findResidentsByFilters(houseNameFilter, roleFilter, searchFilter));
+    }
 }

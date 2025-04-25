@@ -38,16 +38,15 @@ public class PaymentService {
                 (GenderType) row[4],   // gender (should be GenderType if applicable)
                 (LocalDate) row[5], // dateOfBirth
                 (String) row[6],   // identityCard
-                (String) row[7],   // houseId
-                (LocalDate) row[8], // moveInDate
-                (Integer) row[9],  // billId
-                (Double) row[10],  // amount
-                (Double) row[11],  // lateFee
-                (LocalDateTime) row[12], // dueDate
-                (String) row[13],  // content
-                (String) row[14],  // description
-                (Boolean) row[15], // required
-                (LocalDateTime) row[16] // payTime
+                (LocalDate) row[7], // moveInDate
+                (Integer) row[8],  // billId
+                (Double) row[9],  // amount
+                (Double) row[10],  // lateFee
+                (LocalDateTime) row[11], // dueDate
+                (String) row[12],  // content
+                (String) row[13],  // description
+                (Boolean) row[14], // required
+                (LocalDateTime) row[15] // payTime
         )).collect(Collectors.toList());
     }
 

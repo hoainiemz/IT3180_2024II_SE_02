@@ -75,4 +75,8 @@ public class BillInformationController{
     public List<Payment> getPayments(Integer billId) {
         return paymentService.findPaymentByBillId(billId);
     }
+
+    public ObservableList<Resident> getResidentsByFilters(String houseNameFilter, String roleFilter, String searchFilter) {
+        return FXCollections.observableArrayList(residentService.findResidentsByFilters(houseNameFilter, roleFilter, searchFilter));
+    }
 }

@@ -81,4 +81,8 @@ public class ApartmentInformationController {
     public List<Settlement> getSettlementsByApartmentId(Integer id) {
         return settlementService.getSettlementsByApartmentId(id);
     }
+
+    public ObservableList<Resident> getResidentsByFilters(String houseNameFilter, String roleFilter, String searchFilter) {
+        return FXCollections.observableArrayList(residentService.findResidentsByFilters(houseNameFilter, roleFilter, searchFilter));
+    }
 }

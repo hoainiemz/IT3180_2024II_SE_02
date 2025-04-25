@@ -17,7 +17,6 @@ public class ResidentBillPaymentDTO {
     private GenderType gender;
     private LocalDate dateOfBirth;
     private String identityCard;
-    private String houseId;
     private LocalDate moveInDate;
     private Integer billId;
     private Double amount;
@@ -29,7 +28,7 @@ public class ResidentBillPaymentDTO {
 
     // ✅ Constructor with 17 parameters
     public ResidentBillPaymentDTO(Integer residentId, Integer userId, String firstName, String lastName,
-                                  GenderType gender, LocalDate dateOfBirth, String identityCard, String houseId,
+                                  GenderType gender, LocalDate dateOfBirth, String identityCard,
                                   LocalDate moveInDate, Integer billId, Double amount, Double lateFee,
                                   LocalDateTime dueDate, String content, String description, Boolean required,
                                   LocalDateTime payTime) {
@@ -40,7 +39,6 @@ public class ResidentBillPaymentDTO {
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.identityCard = identityCard;
-        this.houseId = houseId;
         this.moveInDate = moveInDate;
         this.billId = billId;
         this.amount = amount;
@@ -82,10 +80,6 @@ public class ResidentBillPaymentDTO {
 
     public String getIdentityCard() {
         return identityCard;
-    }
-
-    public String getHouseId() {
-        return houseId;
     }
 
     public LocalDate getMoveInDate() {

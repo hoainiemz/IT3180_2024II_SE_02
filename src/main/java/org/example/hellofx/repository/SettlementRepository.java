@@ -51,4 +51,21 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
     @Transactional
     @Query("DELETE FROM Settlement s WHERE s.settlementId IN :ids")
     void deleteSettlementsBySettlementId(@Param("ids") List<Integer> ids);
+
+    List<Settlement> findSettlementsByResidentId(Integer residentId);
+
+    @Query(value = """
+        SELECT a.apartment_name
+        FROM apartment a
+        JOIN settlement s ON a.apartment_id = s.apartment_id
+        WHERE s.resident_id = :residentId
+    """, nativeQuery = true)
+    List<String> findApartmentNamesByResidentId(@Param("residentId") Integer residentId);
+
+    @Query(value = """
+    SELECT DISTINCT a.apartment_name
+    FROM apartment a
+    LEFT JOIN settlement s ON a.apartment_id = s.apartment_id
+""", nativeQuery = true)
+    List<String> findAllApartmentNames();
 }

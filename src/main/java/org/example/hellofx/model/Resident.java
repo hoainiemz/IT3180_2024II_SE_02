@@ -33,9 +33,6 @@ public class Resident {
     @Column(name = "identity_card", length = 20, unique = true)
     private String identityCard;
 
-    @Column(name = "house_id", length = 10)
-    private String houseId;
-
     @Column(name = "move_in_date")
     private LocalDate moveInDate;
 
@@ -47,24 +44,22 @@ public class Resident {
         this.gender = null;
         this.dateOfBirth = null;
         this.identityCard = null;
-        this.houseId = null;
         this.moveInDate = LocalDate.now();
     }
 
     public Resident(Integer userId, String firstName, String lastName, GenderType gender, LocalDate dateOfBirth,
-                    String identityCard, String houseId, LocalDate moveInDate) {
+                    String identityCard, LocalDate moveInDate) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.identityCard = identityCard;
-        this.houseId = houseId;
         this.moveInDate = moveInDate;
     }
 
     public Resident(Integer residentId, Integer userId, String firstName, String lastName, GenderType gender, LocalDate dateOfBirth,
-                    String identityCard, String houseId, LocalDate moveInDate) {
+                    String identityCard, LocalDate moveInDate) {
         this.residentId = residentId;
         this.userId = userId;
         this.firstName = firstName;
@@ -72,7 +67,6 @@ public class Resident {
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.identityCard = identityCard;
-        this.houseId = houseId;
         this.moveInDate = moveInDate;
     }
 
@@ -131,14 +125,6 @@ public class Resident {
 
     public void setIdentityCard(String identityCard) {
         this.identityCard = identityCard;
-    }
-
-    public String getHouseId() {
-        return houseId;
-    }
-
-    public void setHouseId(String houseId) {
-        this.houseId = houseId;
     }
 
     public LocalDate getMoveInDate() {

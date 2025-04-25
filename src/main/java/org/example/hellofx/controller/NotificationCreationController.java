@@ -88,4 +88,7 @@ public class NotificationCreationController{
     public Validation messageCheck(String message) {
         return notificationValidator.contentCheck(message);
     }
+    public ObservableList<Resident> getResidentsByFilters(String houseNameFilter, String roleFilter, String searchFilter) {
+        return FXCollections.observableArrayList(residentService.findResidentsByFilters(houseNameFilter, roleFilter, searchFilter));
+    }
 }
