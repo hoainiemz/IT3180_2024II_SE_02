@@ -126,7 +126,7 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
             String email = ((TextField) leftFrame.lookup("#email-field")).getText();
             Validation response = forgotPasswordController.emailCheck(email);
             if (!response.equals(ValidationState.OK)) {
-                showPopUpMessage("Error", response.message());
+                showPopUpMessage("ERROR", response.message());
                 return;
             }
             try {
@@ -134,7 +134,7 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
                 showPopUpMessage("Kiểm tra email của bạn!", "Vui lòng kiểm tra địa chỉ email " + email + " để lấy mã xác nhận");
                 nextStep();
             } catch (Exception ex) {
-                showPopUpMessage("Error", "Có lỗi xảy ra trong quá trình gửi mail");
+                showPopUpMessage("ERROR", "Có lỗi xảy ra trong quá trình gửi mail");
             }
         });
 //        buttonContainer.setStyle("-fx-background-color: red;");
@@ -211,7 +211,7 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
                final_step();
            }
            else {
-               showPopUpMessage("Error", "Mã xác nhận không chính xác");
+               showPopUpMessage("ERROR", "Mã xác nhận không chính xác");
            }
         });
     }
@@ -275,7 +275,7 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
                 sendResetEmailButton.setDisable(true);
             }
             catch (Exception e) {
-                showPopUpMessage("Error", "Có lỗi xảy ra");
+                showPopUpMessage("ERROR", "Có lỗi xảy ra");
             }
         });
     }

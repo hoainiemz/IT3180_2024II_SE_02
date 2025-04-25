@@ -2,13 +2,11 @@ package org.example.hellofx.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.example.hellofx.model.Account;
-import org.example.hellofx.model.Bill;
-import org.example.hellofx.model.Payment;
-import org.example.hellofx.model.Resident;
-import org.example.hellofx.service.BillService;
-import org.example.hellofx.service.PaymentService;
-import org.example.hellofx.service.ResidentService;
+import org.example.hellofx.dto.ApartmentCountProjection;
+import org.example.hellofx.dto.PaymentProjection;
+import org.example.hellofx.model.*;
+import org.example.hellofx.model.enums.AccountType;
+import org.example.hellofx.service.*;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,6 +25,10 @@ public class BillInformationController{
     private PaymentService paymentService;
     @Autowired
     private ResidentService residentService;
+    @Autowired
+    private SettlementService settlementService;
+    @Autowired
+    private ApartmentService apartmentService;
 
     public Resident getResident() {
         return profileController.getResident();
@@ -42,7 +44,7 @@ public class BillInformationController{
         }
         Integer billId = bill.getBillId();
         List<Payment> payments = dsIn.stream()
-                .map(d -> new Payment(null, billId, d, null))  // Create a Payment object
+                .map(d -> new Payment(new Bill(billId), new Apartment(d), null, null))  // Create a Payment object
                 .collect(Collectors.toList());
 
         for (Payment p : payments) {
@@ -78,5 +80,16 @@ public class BillInformationController{
 
     public ObservableList<Resident> getResidentsByFilters(String houseNameFilter, String roleFilter, String searchFilter) {
         return FXCollections.observableArrayList(residentService.findResidentsByFilters(houseNameFilter, roleFilter, searchFilter));
+    }
+
+    public ObservableList<ApartmentCountProjection> getApartmentsAndResidentCount(String s) {
+        if (getProfile().getRole() == AccountType.Resident) {
+            return FXCollections.observableArrayList(settlementService.getApartmentsAndResidentCount(getResident().getResidentId(), s));
+        }
+        return FXCollections.observableArrayList(settlementService.getApartmentsAndResidentCount(s));
+    }
+
+    public ObservableList<Integer> getApartmentIdsByBillId(Integer billId) {
+        return FXCollections.observableArrayList(apartmentService.getApartmentIdsByBillId(billId));
     }
 }

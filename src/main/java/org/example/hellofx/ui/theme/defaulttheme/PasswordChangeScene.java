@@ -127,7 +127,7 @@ public class PasswordChangeScene extends Notificable implements ThemeScene {
                 showPopUpMessage("Password changed", "Your password has been changed successfully!");
             } else {
                 child.setFill(Color.RED);
-                showPopUpMessage("Error changing password", "There was an error processing your password reset!");
+                showPopUpMessage("ERROR", "There was an error processing your password reset!");
             }
             stateText.setVisible(true);
 

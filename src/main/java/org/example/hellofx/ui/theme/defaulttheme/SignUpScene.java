@@ -161,7 +161,7 @@ public class SignUpScene extends Notificable implements ThemeScene {
                 showPopUpMessage("Registration Successfully", "Chúc mừng, tài khoản của bạn đã được đăng ký thành công!");
             }
             else {
-                showPopUpMessage("Error", "Có lỗi xảy ra!");
+                showPopUpMessage("ERROR", "Có lỗi xảy ra!");
             }
         });
 

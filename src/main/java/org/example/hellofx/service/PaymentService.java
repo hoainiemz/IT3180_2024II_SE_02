@@ -1,6 +1,6 @@
 package org.example.hellofx.service;
 
-import org.example.hellofx.dto.ResidentBillPaymentDTO;
+import org.example.hellofx.dto.PaymentProjection;
 import org.example.hellofx.model.Payment;
 import org.example.hellofx.model.enums.GenderType;
 import org.example.hellofx.repository.PaymentRepository;
@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,37 +23,17 @@ public class PaymentService {
         return paymentRepository.findPaymentByBillId(billId);
     }
 
-    public List<ResidentBillPaymentDTO> findPaymentByResidentFilters(Integer residentId, int stateFilter, int requireFilter, int dueFilter, String searchFilter) {
-        return paymentRepository.findResidentBillsWithResidentFilters(residentId, stateFilter, requireFilter, dueFilter, searchFilter);
-    }
-
-
-    public List<ResidentBillPaymentDTO> getResidentPayments(Integer residentId) {
-        List<Object[]> results = paymentRepository.findResidentBillsWithPayments(residentId);
-
-        return results.stream().map(row -> new ResidentBillPaymentDTO(
-                (Integer) row[0],  // residentId
-                (Integer) row[1],  // userId
-                (String) row[2],   // firstName
-                (String) row[3],   // lastName
-                (GenderType) row[4],   // gender (should be GenderType if applicable)
-                (LocalDate) row[5], // dateOfBirth
-                (String) row[6],   // identityCard
-                (LocalDate) row[7], // moveInDate
-                (Integer) row[8],  // billId
-                (Double) row[9],  // amount
-                (Double) row[10],  // lateFee
-                (LocalDateTime) row[11], // dueDate
-                (String) row[12],  // content
-                (String) row[13],  // description
-                (Boolean) row[14], // required
-                (LocalDateTime) row[15] // payTime
-        )).collect(Collectors.toList());
-    }
 
     @Transactional
     public void saveAllPayments(List<Payment> payments) {
-        paymentRepository.saveAll(payments);
+        for (int i = 0; i < 10; i++) {
+            try {
+                paymentRepository.saveAll(payments);
+            }
+            catch (Exception e) {
+                continue;
+            }
+        }
     }
 
 
@@ -62,5 +43,9 @@ public class PaymentService {
             throw new IllegalArgumentException("List of bill IDs cannot be null or empty");
         }
         paymentRepository.deletePaymentsByPaymentId(dsOut);
+    }
+
+    public List<PaymentProjection> getPaymentProjectionByResidentIdAndFilters(Integer residentId, int stateFilter, int requireFilter, int dueFilter, String searchFilter) {
+        return paymentRepository.findPaymentsByResidentAndFilters(residentId, stateFilter, requireFilter, searchFilter);
     }
 }

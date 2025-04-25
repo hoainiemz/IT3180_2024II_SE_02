@@ -138,7 +138,7 @@ public class ApartmentScene implements ThemeScene {
                 c -> new SimpleStringProperty(c.getValue().getApartmentName())
         );
 
-        var col3 = new TableColumn<ApartmentCountProjection, Long>("Số dân");
+        var col3 = new TableColumn<ApartmentCountProjection, Long>("Số thành viên");
         col3.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().getResidentCount()));
 
         if (table == null) {

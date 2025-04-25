@@ -41,7 +41,7 @@ public abstract class Notificable {
             info.getStyleClass().remove(Styles.SUCCESS);
         }
         catch (NullPointerException e) {}
-        if (state.equals(ValidationState.ERROR.toString())) {
+        if (state.toUpperCase().equals(ValidationState.ERROR.toString())) {
             info.getStyleClass().add(Styles.WARNING);
             info.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
         }

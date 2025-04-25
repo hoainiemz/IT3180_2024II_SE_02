@@ -244,7 +244,7 @@ public class LoginScene extends Notificable implements ThemeScene {
                 }
             }
             catch (Exception e) {
-                showPopUpMessage("Error", "Bạn cần phải được chấp nhận là một cư dân trước khi có thể sử dụng ứng dụng");
+                showPopUpMessage("ERROR", "Bạn cần phải được chấp nhận là một cư dân trước khi có thể sử dụng ứng dụng");
             }
         });
         registerButton.setOnMouseClicked(event -> {

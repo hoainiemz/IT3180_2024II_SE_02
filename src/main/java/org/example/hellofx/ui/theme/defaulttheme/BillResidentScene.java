@@ -2,6 +2,7 @@ package org.example.hellofx.ui.theme.defaulttheme;
 
 import atlantafx.base.theme.Styles;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,7 +19,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 import org.example.hellofx.controller.BillResidentController;
-import org.example.hellofx.dto.ResidentBillPaymentDTO;
+import org.example.hellofx.dto.PaymentProjection;
+import org.example.hellofx.model.Payment;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;
@@ -26,6 +28,7 @@ import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextComboBox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 
 @Component
@@ -36,8 +39,8 @@ public class BillResidentScene implements ThemeScene {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     private static final int ITEMS_PER_PAGE = 9;
-    private ObservableList<ResidentBillPaymentDTO> masterData;
-    private TableView<ResidentBillPaymentDTO> table;
+    private ObservableList<PaymentProjection> masterData;
+    private TableView<PaymentProjection> table;
     private Pagination pagination;
     private VBox mainContent;
 
@@ -90,7 +93,7 @@ public class BillResidentScene implements ThemeScene {
                 kt3 = 1;
             }
         }
-        masterData = billResidentController.getPayment(kt1, kt2, kt3, searchFilter.getText());
+        masterData = billResidentController.getPaymentByResidentFilters(kt1, kt2, kt3, searchFilter.getText());
         resetPagination();
     }
 
@@ -173,7 +176,7 @@ public class BillResidentScene implements ThemeScene {
     private void createTable () {
         var selectAll = new CheckBox();
 
-        var col0 = new TableColumn<ResidentBillPaymentDTO, String>("Hạn nộp(yyyy-MM-dd HH:mm)");
+        var col0 = new TableColumn<PaymentProjection, String>("Hạn nộp(yyyy-MM-dd HH:mm)");
 
         col0.setCellValueFactory(c ->
                 new SimpleStringProperty(
@@ -181,7 +184,7 @@ public class BillResidentScene implements ThemeScene {
                 )
         );
 
-        var col1 = new TableColumn<ResidentBillPaymentDTO, String>("Loại");
+        var col1 = new TableColumn<PaymentProjection, String>("Loại");
         col1.setCellValueFactory(
                 c -> {
                     if (c.getValue().getRequired().booleanValue()) {
@@ -191,24 +194,21 @@ public class BillResidentScene implements ThemeScene {
                 }
         );
 
-        var col2 = new TableColumn<ResidentBillPaymentDTO, String>("Nội dung khoản thu");
+        var col2 = new TableColumn<PaymentProjection, String>("Nội dung khoản thu");
         col2.setCellValueFactory(
                 c -> {
                     return new SimpleStringProperty(c.getValue().getContent());
                 }
         );
 
-        var col3 = new TableColumn<ResidentBillPaymentDTO, Double>("Số tiền(vnđ)");
+        var col3 = new TableColumn<PaymentProjection, BigDecimal>("Số tiền(vnđ)");
         col3.setCellValueFactory(
                 c -> {
-                    if (c.getValue().getFee() == null) {
-                        return null;
-                    }
-                    return new SimpleDoubleProperty(c.getValue().getFee()).asObject();
+                    return new SimpleObjectProperty<>(c.getValue().getAmount());
                 }
         );
 
-        var col4 = new TableColumn<ResidentBillPaymentDTO, String>("Trạng thái");
+        var col4 = new TableColumn<PaymentProjection, String>("Trạng thái");
         col4.setCellValueFactory(
                 c -> {
                     if (c.getValue().getPayTime() == null) {
@@ -219,7 +219,7 @@ public class BillResidentScene implements ThemeScene {
         );
 
         if (table == null) {
-            table = new TableView<ResidentBillPaymentDTO>();
+            table = new TableView<PaymentProjection>();
             pagination = new Pagination();
             //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
@@ -250,7 +250,7 @@ public class BillResidentScene implements ThemeScene {
         int toIndex = Math.min(fromIndex + ITEMS_PER_PAGE, masterData.size());
 
         // Create a sublist for the current page
-        ObservableList<ResidentBillPaymentDTO> pageData = FXCollections.observableArrayList(
+        ObservableList<PaymentProjection> pageData = FXCollections.observableArrayList(
                 masterData.subList(fromIndex, toIndex));
 
         table.setItems(pageData);

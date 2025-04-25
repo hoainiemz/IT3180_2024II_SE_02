@@ -44,6 +44,16 @@ public class Bill {
     public Bill() {
     }
 
+    public Bill(Integer billId) {
+        this.billId = billId;
+        this.amount = null;
+        this.lateFee = null;
+        this.dueDate = null;
+        this.content = null;
+        this.description = null;
+        this.required = null;
+    }
+
     public Integer getBillId() {
         return billId;
     }

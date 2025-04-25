@@ -5,6 +5,8 @@ import org.example.hellofx.repository.ApartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ApartmentService {
     @Autowired
@@ -28,5 +30,9 @@ public class ApartmentService {
 
     public Apartment getByApartmentId(Integer apartmentId) {
         return apartmentRepository.findByApartmentId(apartmentId);
+    }
+
+    public List<Integer> getApartmentIdsByBillId(Integer billId) {
+        return apartmentRepository.findApartmentIdsByBillId(billId);
     }
 }

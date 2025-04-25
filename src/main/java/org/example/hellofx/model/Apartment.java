@@ -30,6 +30,15 @@ public class Apartment {
     @Column(name = "water_unit_price", precision = 10, scale = 2)
     private BigDecimal waterUnitPrice;
 
+    public Apartment(Integer apartmentId) {
+        this.apartmentId = apartmentId;
+        this.apartmentName = null;
+        this.monthlyRentPrice = null;
+        this.lastMonthElectricIndex = null;
+        this.electricUnitPrice = null;
+        this.lastMonthWaterIndex = null;
+        this.waterUnitPrice = null;
+    }
     // Constructors
     public Apartment() {}
 

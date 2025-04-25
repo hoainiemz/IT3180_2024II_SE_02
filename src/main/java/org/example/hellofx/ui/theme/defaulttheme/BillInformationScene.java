@@ -2,6 +2,7 @@ package org.example.hellofx.ui.theme.defaulttheme;
 
 import atlantafx.base.theme.Styles;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 import org.example.hellofx.controller.BillInformationController;
+import org.example.hellofx.dto.ApartmentCountProjection;
 import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Payment;
 import org.example.hellofx.model.Resident;
@@ -39,29 +41,28 @@ public class BillInformationScene extends Notificable{
     private Scene scene;
 
     private static final int ITEMS_PER_PAGE = 9;
-    private ObservableList<Resident> masterData;
-    private TableView<Resident> table;
+    private ObservableList<ApartmentCountProjection> masterData;
+    private TableView<ApartmentCountProjection> table;
     private Pagination pagination;
     private VBox mainContent;
     private ScrollPane scrollPane;
     private Map<Integer, SimpleBooleanProperty> selectedMapUpdater;
     private Map<Integer, SimpleStringProperty> selectedMap;
     private Bill bill;
-    private List<Payment> oldData;
+    private List<Integer> oldData;
 
     protected Scene getCurrentScene() {
         return scene;
     }
 
     void reloadTable(Scene scene) {
-        String condition = "";
-        ComboBox<String> houseIdFilter = ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter"));
-        ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#roleFilter"));
         TextField searchFilter = ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField();
-        TableView<Resident> table = (TableView) scene.lookup("#resident-table");
-        masterData = controller.getResidentsByFilters(houseIdFilter.getValue(), roleFilter.getValue().toString(), searchFilter.getText());
+
+        TableView<ApartmentCountProjection> table = (TableView) scene.lookup("#resident-table");
+        masterData = controller.getApartmentsAndResidentCount(searchFilter.getText());
         resetPagination();
     }
+
     public void reset() {
         masterData = null;
         table = null;
@@ -159,26 +160,7 @@ public class BillInformationScene extends Notificable{
         filter.setAlignment(Pos.CENTER_LEFT);
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
-
-//        filter.getChildren().add(new TextComboBox<AccountType>("Theo trạng thái user: ", FXCollections.observableArrayList(AccountType.Admin, AccountType.Client, AccountType.Resident), false, 150));
-//        filter.getChildren().add(new Separator(Orientation.VERTICAL));
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", controller.getAllHouseIds(), true, 100, "houseIdFilter"));
-        if (controller.getProfile().getRole() != AccountType.Resident) {
-            TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.values()), false, 140, "roleFilter", true);
-            role.getComboBox().setValue(AccountType.Resident);
-            filter.getChildren().add(new Separator(Orientation.VERTICAL));
-            filter.getChildren().add(role);
-            ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#roleFilter")).setOnAction(event -> {
-                reloadTable(scene);
-            });
-        }
-        filter.getChildren().add(new Separator(Orientation.VERTICAL));
         filter.getChildren().add(new TextAndTextField("Theo từ khóa: ", null, "Enter the search keyword", "searchFilter", true));
-
-
-        ((ComboBox<String>) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#houseIdFilter")).setOnAction(event -> {
-            reloadTable(scene);
-        });
 
         ((TextAndTextField) ((ScrollPane) scene.lookup("ScrollPane")).getContent().lookup("#searchFilter")).getTextField().setOnAction(event -> {
             reloadTable(scene);
@@ -222,7 +204,7 @@ public class BillInformationScene extends Notificable{
         savebutton.setOnAction(actionEvent -> {
             String name = ((VerticleTextAndTextField) mainContent.lookup("#bill-name-info")).getTextField().getText();
             if (name == null) {
-                showPopUpMessage("Error", "Tên khoản thu không được để trống!");
+                showPopUpMessage("ERROR", "Tên khoản thu không được để trống!");
                 return;
             }
             String description = ((VerticleTextAndTextArea) mainContent.lookup("#bill-description-info")).getTextArea().getText();
@@ -240,7 +222,7 @@ public class BillInformationScene extends Notificable{
                 }
             }
             else {
-                showPopUpMessage("Error", "Khoản tiền phải đóng không được để trống!");
+                showPopUpMessage("ERROR", "Khoản tiền phải đóng không được để trống!");
                 return;
             }
             tmp = ((VerticleTextAndTextField) mainContent.lookup("#late-fee-info")).getTextField().getText();
@@ -249,18 +231,18 @@ public class BillInformationScene extends Notificable{
                 lateFee = Double.valueOf(tmp);
             }
             else {
-                showPopUpMessage("Error", "Phí nộp muộn không được để trống!");
+                showPopUpMessage("ERROR", "Phí nộp muộn không được để trống!");
                 return;
             }
             tmp = (String) ((VerticleTextAndComboBox) mainContent.lookup("#required-info")).getComboBox().getValue();
             if (tmp == null) {
-                showPopUpMessage("Error", "Mục ràng buộc không được để trống!");
+                showPopUpMessage("ERROR", "Mục ràng buộc không được để trống!");
                 return;
             }
             Boolean required = tmp.equals("Bắt buộc");
             LocalDateTime dueDate = ((VerticleTextAndDateTimePicker) mainContent.lookup("#due-info")).getDateTimePicker().getDateTimeValue();
             if (dueDate == null) {
-                showPopUpMessage("Error", "Hạn nộp phí không được để trống!");
+                showPopUpMessage("ERROR", "Hạn nộp phí không được để trống!");
                 return;
             }
             Bill newBill = new Bill(bill.getBillId(), amount, lateFee, dueDate, name, description, required);
@@ -268,8 +250,8 @@ public class BillInformationScene extends Notificable{
             List<Integer> dsIn = new ArrayList<>();
             List<Integer> dsOut = new ArrayList<>();
             TreeSet<Integer> lonn = new TreeSet<>();
-            for (Payment payment : oldData) {
-                lonn.add(payment.getResidentId());
+            for (Integer id : oldData) {
+                lonn.add(id);
             }
             selectedMap.forEach((k, v) -> {
                 if (v.getValue().equals("Phải đóng")) {
@@ -278,10 +260,9 @@ public class BillInformationScene extends Notificable{
                     }
                 }
             });
-            for (Payment payment : oldData) {
-                Integer residentId = payment.getResidentId();
-                if (!selectedMap.get(residentId).getValue().equals("Phải đóng")) {
-                    dsOut.add(payment.getPaymentId());
+            for (Integer id : oldData) {
+                if (!selectedMap.get(id).getValue().equals("Phải đóng")) {
+                    dsOut.add(id);
                 }
             }
             controller.saveButtonClicked(bill, newBill, dsIn, dsOut);
@@ -296,84 +277,72 @@ public class BillInformationScene extends Notificable{
 
         selectedMapUpdater = new TreeMap<>();
         selectedMap = new TreeMap<>();
-        oldData = controller.getPayments(bill.getBillId());
+        oldData = controller.getApartmentIdsByBillId(bill.getBillId());
         for (int i = 0; i < oldData.size(); i++) {
-            selectedMap.computeIfAbsent(oldData.get(i).getResidentId(), k -> new SimpleStringProperty("Phải đóng"));
+            selectedMap.computeIfAbsent(oldData.get(i), k -> new SimpleStringProperty("Phải đóng"));
         }
-        var col0 = new TableColumn<Resident, Boolean>();
+
+        var col0 = new TableColumn<ApartmentCountProjection, Boolean>();
         col0.setGraphic(selectAll);
         col0.setSortable(false);
         col0.setCellValueFactory(celldata -> {
-            Integer id = celldata.getValue().getResidentId();
+            Integer id = celldata.getValue().getApartmentId();
             return selectedMapUpdater.computeIfAbsent(id, k -> new SimpleBooleanProperty(false));
         });
         col0.setCellFactory(CheckBoxTableCell.forTableColumn(col0));
         col0.setEditable(true);
-        col0.setPrefWidth(60);
 
-        var col1 = new TableColumn<Resident, String>("Họ");
+        var col1 = new TableColumn<ApartmentCountProjection, String>("Tên căn hộ");
         col1.setCellValueFactory(
-                c -> new SimpleStringProperty(c.getValue().getLastName())
+                c -> new SimpleStringProperty(c.getValue().getApartmentName())
         );
 
-        var col2 = new TableColumn<Resident, String>("Tên");
-        col2.setCellValueFactory(
-                c -> {
-                    if (c.getValue().getFirstName() == null) {
-                        return null;
-                    }
-                    return new SimpleStringProperty(c.getValue().getFirstName());
-                }
-        );
+        var col2 = new TableColumn<ApartmentCountProjection, Long>("Số thành viên");
+        col2.setCellValueFactory(c -> new SimpleObjectProperty<>(c.getValue().getResidentCount()));
 
-        var col3 = new TableColumn<Resident, String>("Yêu Cầu Đóng Phí ");
+        var col3 = new TableColumn<ApartmentCountProjection, String>("Trạng thái");
         col3.setCellValueFactory(celldata -> {
-            Integer id = celldata.getValue().getResidentId();
+            Integer id = celldata.getValue().getApartmentId();
             return selectedMap.computeIfAbsent(id, k -> new SimpleStringProperty("Không phải đóng"));
         });
 
         if (table == null) {
-            table = new TableView<Resident>();
+            table = new TableView<ApartmentCountProjection>();
             pagination = new Pagination();
-            //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
-        }
-        table.getColumns().setAll(col0, col1, col2, col3);
-        table.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
-        );
-        table.getSelectionModel().selectFirst();
-        table.setId("resident-table");
-        table.setRowFactory(tv -> {
-            TableRow<Resident> row = new TableRow<>();
-            return row;
-        });
-//        Styles.toggleStyleClass(table, Styles.STRIPED);
-        if (controller.getProfile().getRole() == AccountType.Admin || controller.getProfile().getRole() == AccountType.Client) {
             table.setEditable(true);
         }
-        else {
-            selectAll.setDisable(true);
-        }
+        table.getColumns().setAll(col0, col1, col2, col3);
+        table.setPrefWidth(mainContent.getPrefWidth() * 0.9);
+        col0.setPrefWidth(table.getPrefWidth() * 0.1);
+        col0.setMaxWidth(table.getPrefWidth() * 0.1);
+        col1.setPrefWidth(table.getPrefWidth() * 0.3);
+        col1.setMaxWidth(table.getPrefWidth() * 0.3);
+        col2.setPrefWidth(table.getPrefWidth() * 0.3);
+        col2.setMaxWidth(table.getPrefWidth() * 0.3);
+        col3.setPrefWidth(table.getPrefWidth() * 0.2);
+        col3.setMaxWidth(table.getPrefWidth() * 0.2);
+        table.getSelectionModel().selectFirst();
+        table.setId("resident-table");
         selectAll.setOnAction(event -> {
             table.getItems().forEach(item -> {
-                selectedMapUpdater.get(item.getResidentId()).set(selectAll.isSelected());
+                selectedMapUpdater.get(item.getApartmentId()).set(selectAll.isSelected());
             });
         });
         ((Button) mainContent.lookup("#add-all-button")).setOnAction(event -> {
             table.getItems().forEach(item -> {
-                if (selectedMapUpdater.get(item.getResidentId()).getValue()) {
-                    selectedMap.get(item.getResidentId()).setValue("Phải đóng");
-                    selectedMapUpdater.get(item.getResidentId()).setValue(false);
+                if (selectedMapUpdater.get(item.getApartmentId()).getValue()) {
+                    selectedMap.get(item.getApartmentId()).setValue("Phải đóng");
+                    selectedMapUpdater.get(item.getApartmentId()).setValue(false);
                 }
             });
             selectAll.setSelected(false);
         });
         ((Button) mainContent.lookup("#rm-all-button")).setOnAction(event -> {
             table.getItems().forEach(item -> {
-                if (selectedMapUpdater.get(item.getResidentId()).getValue()) {
-                    selectedMap.get(item.getResidentId()).set("Không phải đóng");
-                    selectedMapUpdater.get(item.getResidentId()).setValue(false);
+                if (selectedMapUpdater.get(item.getApartmentId()).getValue()) {
+                    selectedMap.get(item.getApartmentId()).set("Không phải đóng");
+                    selectedMapUpdater.get(item.getApartmentId()).setValue(false);
                 }
             });
             selectAll.setSelected(false);
@@ -400,7 +369,7 @@ public class BillInformationScene extends Notificable{
         int toIndex = Math.min(fromIndex + ITEMS_PER_PAGE, masterData.size());
 
         // Create a sublist for the current page
-        ObservableList<Resident> pageData = FXCollections.observableArrayList(
+        ObservableList<ApartmentCountProjection> pageData = FXCollections.observableArrayList(
                 masterData.subList(fromIndex, toIndex));
 
         table.setItems(pageData);
