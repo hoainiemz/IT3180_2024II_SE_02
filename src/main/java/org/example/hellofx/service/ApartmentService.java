@@ -35,4 +35,8 @@ public class ApartmentService {
     public List<Integer> getApartmentIdsByBillId(Integer billId) {
         return apartmentRepository.findApartmentIdsByBillId(billId);
     }
+
+    public Apartment findApartmentByApartmentName(String name) {
+        return apartmentRepository.findByApartmentName(name);
+    }
 }

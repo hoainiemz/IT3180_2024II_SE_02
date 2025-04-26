@@ -46,7 +46,7 @@ public class ResidentService {
 
     @Transactional
     public List<String> findDistinctNonNullHouseId(Account profile, Resident resident) {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             try {
                 if (profile.getRole() == AccountType.Resident) {
                     return settlementRepository.findApartmentNamesByResidentId(resident.getResidentId());

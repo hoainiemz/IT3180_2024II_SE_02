@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ApartmentRepository extends JpaRepository<Apartment, String> {
@@ -22,4 +23,6 @@ public interface ApartmentRepository extends JpaRepository<Apartment, String> {
     WHERE p.bill.billId = :billId
     """)
     List<Integer> findApartmentIdsByBillId(@Param("billId") Integer billId);
+
+    Apartment findByApartmentName(String apartmentName);
 }

@@ -1,5 +1,6 @@
 package org.example.hellofx.repository;
 
+import org.example.hellofx.dto.VehicleInfo;
 import org.example.hellofx.model.Vehicle;
 import org.example.hellofx.model.enums.VehicleType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -55,4 +56,49 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Integer> {
             @Param("typeFilter")    VehicleType  typeFilter,
             @Param("searchFilter")  String       searchFilter
     );
+
+    @Query("""
+        SELECT 
+          v.vehicleId        AS vehicleId,
+          v.licensePlate     AS licensePlate,
+          v.vehicleType      AS vehicleType,
+          v.registrationDate AS registrationDate,
+          a.apartmentName    AS apartmentName
+        FROM Vehicle v
+        JOIN Apartment a ON v.apartmentId = a.apartmentId
+        WHERE 
+          (:houseIdFilter IS NULL   OR :houseIdFilter = '' OR a.apartmentName = :houseIdFilter)
+          AND (:typeFilter    IS NULL OR v.vehicleType = :typeFilter)
+          AND (:searchFilter  IS NULL OR :searchFilter = '' OR v.licensePlate LIKE CONCAT('%', :searchFilter, '%'))
+    """)
+    List<VehicleInfo> findVehicleInfoByFilters(
+            @Param("houseIdFilter") String      houseIdFilter,
+            @Param("typeFilter")    VehicleType typeFilter,
+            @Param("searchFilter")  String      searchFilter
+    );
+
+    @Query("""
+        SELECT DISTINCT
+          v.vehicleId        AS vehicleId,
+          v.licensePlate     AS licensePlate,
+          v.vehicleType      AS vehicleType,
+          v.registrationDate AS registrationDate,
+          a.apartmentName    AS apartmentName
+        FROM Vehicle v
+        JOIN Apartment a   ON v.apartmentId = a.apartmentId
+        JOIN Settlement s ON s.apartmentId = v.apartmentId
+        WHERE 
+          s.residentId = :residentId
+          AND (:houseIdFilter IS NULL OR :houseIdFilter = '' OR a.apartmentName = :houseIdFilter)
+          AND (:typeFilter     IS NULL OR v.vehicleType = :typeFilter)
+          AND (:searchFilter   IS NULL OR :searchFilter = '' OR v.licensePlate LIKE CONCAT('%', :searchFilter, '%'))
+    """)
+    List<VehicleInfo> findVehicleInfoByResidentAndFilters(
+            @Param("residentId")    Integer      residentId,
+            @Param("houseIdFilter") String       houseIdFilter,
+            @Param("typeFilter")    VehicleType  typeFilter,
+            @Param("searchFilter")  String       searchFilter
+    );
+
+    boolean existsByLicensePlate(String licensePlate);
 }

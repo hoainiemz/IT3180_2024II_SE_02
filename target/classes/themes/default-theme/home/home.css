@@ -485,3 +485,45 @@ VerticleTextAndTextArea .editable-text-field {
 .addnew-button:pressed {
     -fx-background-color: #4487f9; /* Darker purple for pressed state */
 }
+
+.login-button {
+    -fx-background-color: #1a8cff; /* Bright blue color */
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 30px;
+    -fx-background-radius: 30px; /* Rounded corners */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+    -fx-cursor: hand;
+    -fx-translate-y: 20px;
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+.login-button:hover {
+    -fx-background-color: #0066cc; /* Darker blue on hover */
+}
+
+.login-button:pressed {
+    -fx-background-color: #0052a3; /* Even darker when pressed */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 3, 0, 0, 1);
+}
+
+.register-button {
+    -fx-background-color: transparent; /* Bright blue color */
+    -fx-text-fill: #9ab0c2;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 30px;
+    -fx-background-radius: 30px; /* Rounded corners */
+    /*-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);*/
+    -fx-translate-y: 20px;
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease-in-out;
+}
+.register-button:hover {
+    -fx-text-fill: #1a8cff;
+    -fx-underline: true;
+}
+.register-button:pressed {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 3, 0, 0, 1);
+}
