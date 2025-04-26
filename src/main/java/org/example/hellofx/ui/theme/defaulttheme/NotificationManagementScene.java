@@ -39,8 +39,7 @@ import java.util.List;
 @Component
 public class NotificationManagementScene implements ThemeScene {
     @Autowired
-    private NotificationManagementController notificationManagementController;
-
+    private NotificationManagementController controller;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -62,7 +61,7 @@ public class NotificationManagementScene implements ThemeScene {
         ComboBox<Badge> typeFilter = ((ComboBox<Badge>) scene.lookup("#type-filter"));
         TextField searchFilter = ((TextAndTextField) scene.lookup("#searchFilter")).getTextField();
         table.getItems().clear();
-        masterData = notificationManagementController.getNotifications(typeFilter.getValue().text(), searchFilter.getText());
+        masterData = controller.getNotifications(typeFilter.getValue().text(), searchFilter.getText());
         resetPagination();
     }
 
@@ -202,7 +201,7 @@ public class NotificationManagementScene implements ThemeScene {
             row.setOnMouseClicked(event -> {
                 if (!row.isEmpty() && event.getClickCount() == 1) {
                     NotificationItem clickedNotificationItem = row.getItem();
-                    notificationManagementController.seeNotificationItemInformation(clickedNotificationItem.getId());
+                    controller.seeNotificationItemInformation(clickedNotificationItem.getId());
                 }
             });
             return row;

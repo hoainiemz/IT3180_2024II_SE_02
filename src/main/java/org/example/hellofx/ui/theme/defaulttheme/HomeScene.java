@@ -45,7 +45,7 @@ import java.util.List;
 @Component
 public class HomeScene implements ThemeScene {
     @Autowired
-    HomeController homeController;
+    HomeController controller;
 
     private Scene scene;
     private List menuButtonList;
@@ -124,11 +124,11 @@ public class HomeScene implements ThemeScene {
         topProfile.setAlignment(Pos.CENTER_RIGHT);
         profileContainer.setAlignment(Pos.CENTER_RIGHT);
         Text welcome = null;
-        if (homeController.getResident().getFirstName() != null) {
-            welcome = new Text("Chào mừng bạn, " + homeController.getResident().getFirstName());
+        if (controller.getResident().getFirstName() != null) {
+            welcome = new Text("Chào mừng bạn, " + controller.getResident().getFirstName());
         }
         else {
-            welcome = new Text("Chào mừng bạn, " + homeController.getProfileNameRequest());
+            welcome = new Text("Chào mừng bạn, " + controller.getProfileNameRequest());
         }
         Image userIcon = new Image("images/user-icon.jpg");
         welcome.setId("welcome");
@@ -143,7 +143,7 @@ public class HomeScene implements ThemeScene {
         profileDropDownContent.setAlignment(Pos.CENTER);
         profileDropDownContent.setPadding(new Insets(10, 0, 10, 0));
         profileDropDownContent.getChildren().addAll(
-                new TextFlow(new Text(homeController.getProfileNameRequest())),
+                new TextFlow(new Text(controller.getProfileNameRequest())),
                 new TextFlow(new Text("Đổi mật khẩu")),
                 new TextFlow(new Text("Đăng xuất")),
                 new TextFlow(new Text("Đóng ứng dụng"))
@@ -177,11 +177,11 @@ public class HomeScene implements ThemeScene {
         });
         profileDropDownContent.getChildren().get(2).setOnMouseClicked(event -> {
             popup.hide();
-            homeController.logoutButtonClicked();
+            controller.logoutButtonClicked();
         });
         profileDropDownContent.getChildren().get(1).setOnMouseClicked(event -> {
             popup.hide();
-            homeController.passwordChangeButtonClicked();
+            controller.passwordChangeButtonClicked();
         });
         notificationButton.setOnAction(event -> {
             if (notiPopup.isShowing()) {
@@ -235,14 +235,14 @@ public class HomeScene implements ThemeScene {
         Button hienThiCacYeuCau = new Button("Các yêu cầu tham gia");
         hienThiCacYeuCau.getStyleClass().add("menu-sub-button");
         danCuContainer.getChildren().addAll(danCu, danhSachDanCu);
-        if (homeController.getProfile().getRole() != AccountType.Resident) {
+        if (controller.getProfile().getRole() != AccountType.Resident) {
             danCuContainer.getChildren().addAll(hienThiCacYeuCau);
         }
         danhSachDanCu.setOnAction(event -> {
-            homeController.danhSachDanCuClicked();
+            controller.danhSachDanCuClicked();
         });
         hienThiCacYeuCau.setOnAction(event -> {
-            homeController.hienThiCacYeuCauClicked();
+            controller.hienThiCacYeuCauClicked();
         });
         // Can ho
         VBox canHoContainer = new VBox();
@@ -253,14 +253,14 @@ public class HomeScene implements ThemeScene {
         danhSachCanHo.getStyleClass().add("menu-sub-button");
         themCanHo.getStyleClass().add("menu-sub-button");
         canHoContainer.getChildren().addAll(canHo, danhSachCanHo);
-        if (homeController.getProfile().getRole() != AccountType.Resident) {
+        if (controller.getProfile().getRole() != AccountType.Resident) {
             canHoContainer.getChildren().addAll(themCanHo);
         }
         danhSachCanHo.setOnAction(event -> {
-            homeController.danhSachCanHoClicked();
+            controller.danhSachCanHoClicked();
         });
         themCanHo.setOnAction(event -> {
-            homeController.themCanHoClicked();
+            controller.themCanHoClicked();
         });
         // khoan thu
         VBox khoanThuContainer = new VBox();
@@ -273,20 +273,20 @@ public class HomeScene implements ThemeScene {
         Button quanLyKhoanThu = new Button("Quản lý khoản thu");
         quanLyKhoanThu.getStyleClass().add("menu-sub-button");
         khoanThuContainer.getChildren().addAll(khoanThu);
-        if (homeController.getProfile().getRole() != AccountType.Resident) {
+        if (controller.getProfile().getRole() != AccountType.Resident) {
             khoanThuContainer.getChildren().addAll(taoKhoanThu, quanLyKhoanThu);
         }
         else {
             khoanThuContainer.getChildren().addAll(danhSachKhoanThu);
         }
         danhSachKhoanThu.setOnAction(event -> {
-           homeController.danhSachKhoanThuClicked();
+           controller.danhSachKhoanThuClicked();
         });
         taoKhoanThu.setOnAction(event -> {
-            homeController.taoKhoanThuClicked();
+            controller.taoKhoanThuClicked();
         });
         quanLyKhoanThu.setOnAction(event -> {
-            homeController.quanLyKhoanThuClicked();
+            controller.quanLyKhoanThuClicked();
         });
 
         // thong bao
@@ -298,14 +298,30 @@ public class HomeScene implements ThemeScene {
         Button quanLyThongBao = new Button("Quản lý thông báo");
         quanLyThongBao.getStyleClass().add("menu-sub-button");
         taoThongBao.setOnAction(event -> {
-            homeController.taoThongBaoClicked();
+            controller.taoThongBaoClicked();
         });
 
         quanLyThongBao.setOnAction(event -> {
-            homeController.quanLyThongBaoClicked();
+            controller.quanLyThongBaoClicked();
         });
 
         thongBaoContainer.getChildren().addAll(thongBao, taoThongBao, quanLyThongBao);
+
+
+        // Tien ich
+        VBox tienIchContainer = new VBox();
+        Button tienIch = new Button("Tiện ích");
+        tienIch.getStyleClass().add("menu-main-button");
+        Button phuongTien = new Button("Phương tiện");
+        phuongTien.getStyleClass().add("menu-sub-button");
+        Button khieuNai = new Button("Khiếu nại");
+        khieuNai.getStyleClass().add("menu-sub-button");
+        tienIchContainer.getChildren().addAll(tienIch, phuongTien, khieuNai);
+        phuongTien.setOnAction(event -> {
+            controller.phuongTienClicked();
+        });
+        khieuNai.setOnAction(event -> {
+        });
 
         // my profile
         VBox myProfileContainer = new VBox();
@@ -313,23 +329,23 @@ public class HomeScene implements ThemeScene {
         myProfile.getStyleClass().add("menu-main-button");
         Button thongTinCaNhan = new Button("Thông tin cá nhân");
         thongTinCaNhan.setOnAction(event -> {
-            homeController.thongTinCaNhanClicked();
+            controller.thongTinCaNhanClicked();
         });
         thongTinCaNhan.getStyleClass().add("menu-sub-button");
         Button doiMatKhau = new Button("Đổi mật khẩu");
         doiMatKhau.getStyleClass().add("menu-sub-button");
         doiMatKhau.setOnAction(event -> {
-            homeController.passwordChangeButtonClicked();
+            controller.passwordChangeButtonClicked();
         });
         myProfileContainer.getChildren().addAll(myProfile, thongTinCaNhan, doiMatKhau);
 
         ToggleGroup menuToggleGroup = new ToggleGroup();
 
         menuContainer.getChildren().addAll(dashBoardContainer, danCuContainer, canHoContainer, khoanThuContainer);
-        if (homeController.getProfile().getRole() != AccountType.Resident) {
+        if (controller.getProfile().getRole() != AccountType.Resident) {
             menuContainer.getChildren().add(thongBaoContainer);
         }
-        menuContainer.getChildren().add(myProfileContainer);
+        menuContainer.getChildren().addAll(tienIchContainer, myProfileContainer);
         for (int i = 0; i < menuContainer.getChildren().size(); i++) {
             RadioButton tmp = new RadioButton();
             tmp.setToggleGroup(menuToggleGroup);
@@ -401,12 +417,12 @@ public class HomeScene implements ThemeScene {
 
     private void updateNotificationList() {
         notiList.getChildren().clear();
-        List<NotificationItem> ls = homeController.getNotificationList(homeController.getResident().getResidentId(), unReadNoti.isSelected());
+        List<NotificationItem> ls = controller.getNotificationList(controller.getResident().getResidentId(), unReadNoti.isSelected());
         ls.forEach(item -> {
             var mess = new Message(item.getTitle(), item.getMessage(), null);
             mess.setOnMouseClicked(event -> {
-                Noticement noticement = new Noticement(null, item.getId(), homeController.getResident().getResidentId(), true);
-                homeController.noticementClicked(noticement);
+                Noticement noticement = new Noticement(null, item.getId(), controller.getResident().getResidentId(), true);
+                controller.noticementClicked(noticement);
                 updateNotificationList();
             });
             mess.getStyleClass().add("hand-hover");

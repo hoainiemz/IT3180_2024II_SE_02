@@ -111,4 +111,8 @@ public class HomeController{
     public void danhSachCanHoClicked() {
         JavaFxApplication.showThemeScene(ApartmentScene.class);
     }
+
+    public void phuongTienClicked() {
+        JavaFxApplication.showThemeScene(VehicleScene.class);
+    }
 }

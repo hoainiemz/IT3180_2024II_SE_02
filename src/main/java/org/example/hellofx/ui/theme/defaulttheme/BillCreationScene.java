@@ -90,9 +90,7 @@ public class BillCreationScene extends Notificable implements ThemeScene {
         mainContent.setPrefWidth(content.getPrefWidth());
         mainContent.setMinWidth(content.getPrefWidth());
         mainContent.setMaxWidth(content.getPrefWidth());
-//        mainContent.setPrefHeight(content.getPrefHeight());
         mainContent.setMinHeight(content.getPrefHeight());
-//        mainContent.setMaxHeight(content.getPrefHeight());
 
         scrollPane.setPrefWidth(content.getPrefWidth());
         scrollPane.setMinWidth(content.getPrefWidth());
