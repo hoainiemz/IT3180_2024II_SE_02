@@ -8,6 +8,7 @@ import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.service.BillService;
+import org.example.hellofx.service.PaymentService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.ApartmentCreationScene;
 import org.example.hellofx.ui.theme.defaulttheme.BillCreationScene;
@@ -22,6 +23,8 @@ public class BillManagerController{
 
     @Autowired
     private BillService billService;
+    @Autowired
+    private PaymentService paymentService;
 
     public Resident getResident() {
         return profileController.getResident();
@@ -46,5 +49,13 @@ public class BillManagerController{
     public Scene getBillInfoScene(Scene scene, Integer billId) {
         BillInformationScene theme = SpringBootFxApplication.context.getBean(BillInformationScene.class);
         return theme.getScene(billId, scene);
+    }
+
+    public void generatePaymentsForBill(Bill bill) {
+        paymentService.generatePaymentsForBill(bill);
+    }
+
+    public Bill saveBill(Bill bill) {
+        return billService.save(bill);
     }
 }

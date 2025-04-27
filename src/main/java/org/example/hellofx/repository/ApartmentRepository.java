@@ -25,4 +25,11 @@ public interface ApartmentRepository extends JpaRepository<Apartment, String> {
     List<Integer> findApartmentIdsByBillId(@Param("billId") Integer billId);
 
     Apartment findByApartmentName(String apartmentName);
+
+    @Query("""
+       SELECT DISTINCT a
+       FROM Apartment a
+       JOIN Settlement s ON s.apartmentId = a.apartmentId
+    """)
+    List<Apartment> findOccupiedApartments();
 }

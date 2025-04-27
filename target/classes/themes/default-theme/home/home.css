@@ -533,3 +533,40 @@ VerticleTextAndTextArea .editable-text-field {
 .register-button:pressed {
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 3, 0, 0, 1);
 }
+
+.auto-addnew-button {
+    -fx-background-color: #55925a; /* Material Design primary purple */
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 10px; /* Rounded corners */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+    -fx-cursor: hand;
+}
+
+.auto-addnew-button:hover {
+    -fx-background-color: #47774b; /* Slightly lighter purple for hover state */
+}
+
+.auto-addnew-button:pressed {
+    -fx-background-color: #375a3a; /* Darker purple for pressed state */
+}
+.auto-no-button {
+    /*-fx-background-color: #55925a; !* Material Design primary purple *!*/
+    /*-fx-text-fill: white;*/
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 10px; /* Rounded corners */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+    -fx-cursor: hand;
+}
+
+.auto-no-button:hover {
+    /*-fx-background-color: #47774b; !* Slightly lighter purple for hover state *!*/
+}
+
+.auto-no-button:pressed {
+    /*-fx-background-color: #375a3a; !* Darker purple for pressed state *!*/
+}

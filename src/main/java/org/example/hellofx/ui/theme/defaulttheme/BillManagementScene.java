@@ -34,10 +34,13 @@ import org.example.hellofx.utils.ScreenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 
 @Component
-public class BillManagementScene implements ThemeScene {
+public class BillManagementScene extends Notificable implements ThemeScene {
     @Autowired
     private BillManagerController controller;
 
@@ -51,6 +54,9 @@ public class BillManagementScene implements ThemeScene {
     private Scene scene;
     private Stage popupStage;
 
+    protected Scene getCurrentScene() {
+        return scene;
+    }
 
     public void reset() {
         masterData = null;
@@ -140,12 +146,18 @@ public class BillManagementScene implements ThemeScene {
         if (controller.getProfile().getRole() != AccountType.Resident) {
             HBox addnewContrainer = new HBox();
             Button addnew = new Button("Thêm khoản thu mới");
-            addnewContrainer.getChildren().add(addnew);
+            Button addServiceFee = new Button("Tạo khoản thu hàng tháng");
+            addServiceFee.getStyleClass().add("auto-addnew-button");
+            addnewContrainer.getChildren().addAll(addnew, addServiceFee);
             addnew.getStyleClass().add("addnew-button");
-            mainContent.getChildren().add(addnewContrainer);
+            mainContent.getChildren().addAll(addnewContrainer);
+            addnewContrainer.setSpacing(20);
             addnewContrainer.setAlignment(Pos.CENTER_LEFT);
             addnew.setOnAction(event -> {
                 showAddingPopup(JavaFxApplication.getCurrentStage());
+            });
+            addServiceFee.setOnAction(actionEvent -> {
+                showFullscreenPopup(JavaFxApplication.getCurrentStage());
             });
         }
 
@@ -410,6 +422,89 @@ public class BillManagementScene implements ThemeScene {
         });
 
         overlay.requestFocus();
+        // Hiển thị popup
+        popupStage.show();
+    }
+
+
+    private void showFullscreenPopup(Stage ownerStage) {
+        // Tạo một stage mới cho popup
+        Stage popupStage = new Stage();
+
+        // Áp dụng hiệu ứng blur cho nội dung chính
+        GaussianBlur blur = new GaussianBlur(10); // Độ mờ có thể điều chỉnh
+        mainContent.setEffect(blur);
+
+        // Panel chứa nội dung popup
+        VBox popupContent = new VBox(20);
+        popupContent.setAlignment(Pos.CENTER);
+        popupContent.setMaxWidth(400);
+        popupContent.setMaxHeight(300);
+        popupContent.setStyle("-fx-background-color: white; -fx-padding: 20px; -fx-background-radius: 10px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.5, 0.0, 0.0);");
+
+        // Nội dung của popup
+        Label popupTitle = new Label("Tạo khoản thu dịch vụ hàng tháng");
+        popupTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        Label popupMessage = new Label("Thao tác này sẽ tạo khoản thu hàng tháng cho các phòng.\nBạn có chắc muốn tiếp tục.");
+        popupMessage.setStyle("-fx-font-size: 14px; -fx-text-alignment: center;");
+        popupMessage.setWrapText(true);
+
+        HBox popupButtons = new HBox(50);
+        Button next = new Button("Có");
+        Button quit = new Button("Không");
+        next.getStyleClass().add("auto-addnew-button");
+        quit.getStyleClass().add("auto-no-button");
+        popupButtons.setAlignment(Pos.CENTER);
+        popupButtons.getChildren().addAll(next, quit);
+
+        popupContent.getChildren().addAll(popupTitle, popupMessage, popupButtons);
+
+        next.setOnAction(e -> {
+            LocalDateTime now = LocalDateTime.now();
+            Bill bill = new Bill(null, null, null, now.with(TemporalAdjusters.firstDayOfNextMonth()).with(LocalTime.MIN), "Tiền nhà tháng " + now.getMonthValue() + " năm " + now.getYear(), null, true);
+            bill = controller.saveBill(bill);
+            controller.generatePaymentsForBill(bill);
+            quit.fire();
+            reloadTable(scene);
+            showPopUpMessage("Success", "Đã tạo khoản thu hàng tháng thành công!");
+        });
+
+        // Lớp overlay bao phủ toàn màn hình
+        StackPane overlay = new StackPane();
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Màu đen với độ trong suốt 50%
+        overlay.getChildren().add(popupContent);
+
+        // Scene cho popup
+        Scene popupScene = new Scene(overlay);
+        popupScene.setFill(Color.TRANSPARENT);
+        String popupCssPath = getClass().getResource("/themes/default-theme/home/home.css").toExternalForm();
+        popupScene.getStylesheets().add(popupCssPath);
+
+        // Cấu hình stage cho popup
+        popupStage.initOwner(ownerStage);
+        popupStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác với cửa sổ chính
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.setScene(popupScene);
+
+        // Đảm bảo popup có kích thước giống với cửa sổ chính
+        popupStage.setX(ownerStage.getX());
+        popupStage.setY(ownerStage.getY());
+        popupStage.setWidth(ownerStage.getWidth());
+        popupStage.setHeight(ownerStage.getHeight());
+
+        // Xử lý sự kiện đóng popup
+        quit.setOnAction(e -> {
+            popupStage.close();
+            mainContent.setEffect(null); // Xóa hiệu ứng blur khi đóng popup
+        });
+
+        // Xử lý khi đóng popup bằng cách khác (X, Alt+F4)
+        popupStage.setOnCloseRequest(e -> {
+            mainContent.setEffect(null);
+        });
+
         // Hiển thị popup
         popupStage.show();
     }
