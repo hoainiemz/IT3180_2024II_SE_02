@@ -71,7 +71,7 @@ public class HomeScene implements ThemeScene {
         }
     }
 
-    public Scene getScene() {
+    public Scene getScene(Scene scene) {
 //        final Scene scene = JavaFxApplication.getCurrentScene();
         menuButtonList = new ArrayList<RadioButton>();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/themes/default-theme/home/home.fxml"));
@@ -81,6 +81,7 @@ public class HomeScene implements ThemeScene {
         catch (IOException exception) {
             return null;
         }
+        this.scene = scene;
         scene.getStylesheets().add("/themes/default-theme/home/home.css");
 
         HBox topBar = (HBox) scene.lookup("#topBar");
@@ -172,7 +173,7 @@ public class HomeScene implements ThemeScene {
                 double x = profileContainer.localToScreen(profileContainer.getBoundsInLocal()).getMinX();
                 double y = profileContainer.localToScreen(profileContainer.getBoundsInLocal()).getMaxY() - 5;
                 profileDropDownContent.setPrefWidth(profileContainer.getWidth() - 5);
-                popup.show(scene.getWindow(), x, y);
+                popup.show(this.scene.getWindow(), x, y);
             }
         });
         profileDropDownContent.getChildren().get(2).setOnMouseClicked(event -> {
@@ -197,7 +198,7 @@ public class HomeScene implements ThemeScene {
                 notiScrollPane.setPrefHeight(container.getHeight() * 0.8);
                 notiScrollPane.setEffect(dropShadow);
                 showNotificationList();
-                notiPopup.show(scene.getWindow(), x, y);
+                notiPopup.show(this.scene.getWindow(), x, y);
             }
         });
         profileDropDownContent.getChildren().get(3).setOnMouseClicked(event -> {
@@ -253,9 +254,9 @@ public class HomeScene implements ThemeScene {
         danhSachCanHo.getStyleClass().add("menu-sub-button");
         themCanHo.getStyleClass().add("menu-sub-button");
         canHoContainer.getChildren().addAll(canHo, danhSachCanHo);
-        if (controller.getProfile().getRole() != AccountType.Resident) {
-            canHoContainer.getChildren().addAll(themCanHo);
-        }
+//        if (controller.getProfile().getRole() != AccountType.Resident) {
+//            canHoContainer.getChildren().addAll(themCanHo);
+//        }
         danhSachCanHo.setOnAction(event -> {
             controller.danhSachCanHoClicked();
         });
@@ -358,7 +359,7 @@ public class HomeScene implements ThemeScene {
                 int idx = menuContainer.getChildren().indexOf(tgt);
                 RadioButton radio = (RadioButton) menuButtonList.get(idx);
                 radio.setSelected(true);
-                resetMenuBar(scene);
+                resetMenuBar(this.scene);
             });
             curr.setPrefWidth(menuContainer.getPrefWidth());
             for (int j = 0; j < curr.getChildren().size(); j++) {

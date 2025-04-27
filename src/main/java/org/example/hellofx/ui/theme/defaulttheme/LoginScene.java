@@ -73,8 +73,7 @@ public class LoginScene extends Notificable implements ThemeScene {
         }
     }
 
-    public Scene getScene(){
-        scene = JavaFxApplication.getCurrentScene();
+    public Scene getScene(Scene scene){
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/themes/default-theme/login/login.fxml"));
         try {
             scene = new Scene(fxmlLoader.load());
@@ -82,6 +81,7 @@ public class LoginScene extends Notificable implements ThemeScene {
         catch (IOException e) {
             return null;
         }
+        this.scene = scene;
         scene.getStylesheets().add("/themes/default-theme/login/login.css");
         VBox leftFrame = (VBox) scene.lookup("#leftFrame");
         StackPane rightFrame = (StackPane) scene.lookup("#rightFrame");

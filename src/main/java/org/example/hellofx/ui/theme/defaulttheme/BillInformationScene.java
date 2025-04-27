@@ -72,10 +72,10 @@ public class BillInformationScene extends Notificable{
         selectedMap = null;
     }
 
-    public Scene getScene(Integer billId) {
+    public Scene getScene(Integer billId, Scene scene) {
         bill = controller.findBillByBillId(billId);
         reset();
-        scene = JavaFxApplication.getCurrentScene();
+        this.scene = scene;
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();

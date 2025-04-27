@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -67,10 +68,10 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
     }
 
 
-    public Scene getScene() {
+    public Scene getScene(Scene scene) {
         reset();
-        scene = JavaFxApplication.getCurrentScene();
-        HBox container = (HBox) scene.lookup("#container");
+        this.scene = scene;
+        Pane container = (Pane) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();
         mainContent = new VBox();
@@ -195,14 +196,20 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
 
         HBox createButtonContainer = new HBox();
         Button savebutton = new Button("Tạo căn hộ");
+        Button cancelButton = new Button("Hủy");
         savebutton.setId("save-button");
-        createButtonContainer.getChildren().add(savebutton);
+        cancelButton.getStyleClass().add("cancel-button");
+        cancelButton.setId("close");
+        createButtonContainer.getChildren().addAll(savebutton, cancelButton);
         createButtonContainer.setPrefWidth(mainContent.getPrefWidth() * 0.9);
         createButtonContainer.setMaxWidth(mainContent.getPrefWidth() * 0.9);
         createButtonContainer.setMinWidth(mainContent.getPrefWidth() * 0.9);
         savebutton.setStyle("-fx-background-color: #4abc96 !important;");
-        mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
+//        mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
         mainContent.getChildren().addAll(createButtonContainer);
+
+        createButtonContainer.setAlignment(Pos.CENTER_RIGHT);
+        createButtonContainer.setSpacing(20);
 
         savebutton.setOnAction(event -> {
             String name = ((VerticleTextAndTextField) mainContent.lookup("#apartment-name-info")).getTextField().getText();
@@ -271,8 +278,7 @@ public class ApartmentCreationScene extends Notificable implements ThemeScene {
             });
             controller.save(name, monthlyRentPrice, lastMonthElectricIndex, electricUnitPrice, lastMonthWaterIndex, waterUnitPrice, ds);
 
-            controller.reset();
-            showPopUpMessage(ValidationState.OK.toString(), "Tạo căn hộ thành công!");
+            cancelButton.fire();
         });
         return scene;
     }

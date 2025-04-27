@@ -47,35 +47,35 @@ public class JavaFxApplication extends Application {
 
     public static <T> void showThemeScene(Class<T> clazz){
         ThemeScene theme = (ThemeScene) SpringBootFxApplication.context.getBean(clazz);
-        currentStage.setScene(theme.getScene());
+        currentStage.setScene(theme.getScene(getCurrentScene()));
     }
 
     public static void showUserInformationScene() {
         UserInformationScene theme = SpringBootFxApplication.context.getBean(UserInformationScene.class);
         ProfileController profileController = SpringBootFxApplication.context.getBean(ProfileController.class);
-        currentStage.setScene(theme.getScene(profileController.getProfile(), profileController.getResident()));
+        currentStage.setScene(theme.getScene(profileController.getProfile(), profileController.getResident(), getCurrentScene()));
     }
 
     public static void showUserInformationScene(Account profile, Resident resident) {
         UserInformationScene theme = SpringBootFxApplication.context.getBean(UserInformationScene.class);
-        currentStage.setScene(theme.getScene(profile, resident));
+        currentStage.setScene(theme.getScene(profile, resident, getCurrentScene()));
     }
 
     public static void showBillInformationScene(Integer billId) {
         BillInformationScene theme = SpringBootFxApplication.context.getBean(BillInformationScene.class);
-        currentStage.setScene(theme.getScene(billId));
+        currentStage.setScene(theme.getScene(billId, getCurrentScene()));
     }
 
     public static void showNotificationInformationScene(Integer notiId) {
         NotificationInformationScene theme = SpringBootFxApplication.context.getBean(NotificationInformationScene.class);
-        currentStage.setScene(theme.getScene(notiId));
+        currentStage.setScene(theme.getScene(notiId, getCurrentScene()));
     }
 
     public static void showApartmentInformationScene(Integer apartmentId) {
         ApartmentInformationController controller = SpringBootFxApplication.context.getBean(ApartmentInformationController.class);
         controller.setApartmentId(apartmentId);
         ApartmentInformationScene theme = SpringBootFxApplication.context.getBean(ApartmentInformationScene.class);
-        currentStage.setScene(theme.getScene());
+        currentStage.setScene(theme.getScene(getCurrentScene()));
 
     }
 }

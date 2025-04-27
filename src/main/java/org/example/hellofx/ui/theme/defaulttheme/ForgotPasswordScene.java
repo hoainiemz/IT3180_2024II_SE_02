@@ -35,9 +35,9 @@ public class ForgotPasswordScene extends Notificable implements ThemeScene {
         return scene;
     }
 
-    public Scene getScene() {
+    public Scene getScene(Scene scene) {
         realCode = null;
-        scene = JavaFxApplication.getCurrentScene();
+        this.scene = scene;
         VBox leftFrame = (VBox) scene.lookup("#leftFrame");
         leftFrame.setAlignment(Pos.CENTER);
         leftFrame.getChildren().clear();

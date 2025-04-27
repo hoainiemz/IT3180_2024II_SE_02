@@ -36,8 +36,8 @@ public class SignUpScene extends Notificable implements ThemeScene {
         return scene;
     }
 
-    public Scene getScene() {
-        scene = JavaFxApplication.getCurrentScene();
+    public Scene getScene(Scene scene) {
+        this.scene = scene;
         VBox leftFrame = (VBox) scene.lookup("#leftFrame");
         leftFrame.setAlignment(Pos.TOP_CENTER);
         leftFrame.getChildren().clear();

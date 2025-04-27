@@ -31,8 +31,8 @@ public class PasswordChangeScene extends Notificable implements ThemeScene {
         return scene;
     }
 
-    public Scene getScene() {
-        scene = JavaFxApplication.getCurrentScene();
+    public Scene getScene(Scene scene) {
+        this.scene = scene;
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.setAlignment(Pos.TOP_CENTER);

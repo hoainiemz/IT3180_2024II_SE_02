@@ -51,10 +51,10 @@ public class UserInformationScene extends Notificable{
         return scene;
     }
 
-    public Scene getScene(Account reprofile, Resident reresident) {
+    public Scene getScene(Account reprofile, Resident reresident, Scene scene) {
         profile = reprofile;
         resident = reresident;
-        scene = JavaFxApplication.getCurrentScene();
+        this.scene = scene;
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();

@@ -71,9 +71,9 @@ public class AllResidentRequestScene extends Notificable implements ThemeScene {
         resetPagination();
     }
 
-    public Scene getScene() {
+    public Scene getScene(Scene scene) {
         reset();
-        scene = JavaFxApplication.getCurrentScene();
+        this.scene = scene;
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();

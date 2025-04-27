@@ -42,6 +42,7 @@ public class ResidentScene implements ThemeScene {
     private TableView<Resident> table;
     private Pagination pagination;
     private VBox mainContent;
+    private Scene scene;
 
     public void reset() {
         masterData = null;
@@ -62,9 +63,9 @@ public class ResidentScene implements ThemeScene {
 //        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
     }
 
-    public Scene getScene() {
+    public Scene getScene(Scene scene) {
         reset();
-        Scene scene = JavaFxApplication.getCurrentScene();
+        this.scene = scene;
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();

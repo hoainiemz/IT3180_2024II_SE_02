@@ -43,6 +43,7 @@ public class BillResidentScene implements ThemeScene {
     private TableView<PaymentProjection> table;
     private Pagination pagination;
     private VBox mainContent;
+    private Scene scene;
 
 
     public void reset() {
@@ -97,9 +98,9 @@ public class BillResidentScene implements ThemeScene {
         resetPagination();
     }
 
-    public Scene getScene() {
+    public Scene getScene(Scene scene) {
         reset();
-        Scene scene = JavaFxApplication.getCurrentScene();
+        this.scene = scene;
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();

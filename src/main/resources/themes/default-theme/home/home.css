@@ -143,6 +143,12 @@
     -fx-text-fill: white;
 }
 
+.cancel-button {
+    -fx-background-color: rgba(164,42,0,255);
+    -fx-cursor: hand;
+    -fx-text-fill: white;
+}
+
 .state-text Text {
     -fx-font-size: 15px;
 }

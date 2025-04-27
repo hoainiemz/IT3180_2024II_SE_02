@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -66,11 +67,11 @@ public class ApartmentInformationScene extends Notificable implements ThemeScene
     }
 
 
-    public Scene getScene() {
+    public Scene getScene(Scene scene) {
         reset();
         apartment = controller.getApartment();
-        scene = JavaFxApplication.getCurrentScene();
-        HBox container = (HBox) scene.lookup("#container");
+        this.scene = scene;
+        Pane container = (Pane) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();
         mainContent = new VBox();
@@ -202,13 +203,18 @@ public class ApartmentInformationScene extends Notificable implements ThemeScene
 
         HBox createButtonContainer = new HBox();
         Button savebutton = new Button("Lưu");
+        Button cancelButton = new Button("Thoát");
+        cancelButton.getStyleClass().add("cancel-button");
         savebutton.setId("save-button");
-        createButtonContainer.getChildren().add(savebutton);
+        cancelButton.setId("close");
+        createButtonContainer.getChildren().addAll(savebutton, cancelButton);
         createButtonContainer.setPrefWidth(mainContent.getPrefWidth() * 0.9);
         createButtonContainer.setMaxWidth(mainContent.getPrefWidth() * 0.9);
         createButtonContainer.setMinWidth(mainContent.getPrefWidth() * 0.9);
         savebutton.setStyle("-fx-background-color: #4abc96 !important;");
-        mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
+//        mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
+        createButtonContainer.setAlignment(Pos.CENTER_RIGHT);
+        createButtonContainer.setSpacing(20);
         mainContent.getChildren().addAll(createButtonContainer);
 
         savebutton.setOnAction(event -> {
@@ -223,7 +229,7 @@ public class ApartmentInformationScene extends Notificable implements ThemeScene
             BigDecimal electricUnitPrice = null;
 
             String tmp = ((VerticleTextAndTextField) mainContent.lookup("#electric-unit-price")).getTextField().getText();
-            if (tmp != null) {
+            if (tmp != null && !tmp.isEmpty()) {
                 electricUnitPrice = BigDecimal.valueOf(Double.valueOf(tmp));
             }
             else {
@@ -233,7 +239,7 @@ public class ApartmentInformationScene extends Notificable implements ThemeScene
 
             Integer lastMonthElectricIndex = null;
             tmp = ((VerticleTextAndTextField) mainContent.lookup("#last-month-electric-index")).getTextField().getText();
-            if (tmp != null) {
+            if (tmp != null && !tmp.isEmpty()) {
                 lastMonthElectricIndex = Integer.valueOf(tmp);
             }
             else {
@@ -244,7 +250,7 @@ public class ApartmentInformationScene extends Notificable implements ThemeScene
             BigDecimal waterUnitPrice = null;
 
             tmp = ((VerticleTextAndTextField) mainContent.lookup("#water-unit-price")).getTextField().getText();
-            if (tmp != null) {
+            if (tmp != null && !tmp.isEmpty()) {
                 waterUnitPrice = BigDecimal.valueOf(Double.valueOf(tmp));
             }
             else {
@@ -254,7 +260,7 @@ public class ApartmentInformationScene extends Notificable implements ThemeScene
 
             Integer lastMonthWaterIndex = null;
             tmp = ((VerticleTextAndTextField) mainContent.lookup("#last-month-water-index")).getTextField().getText();
-            if (tmp != null) {
+            if (tmp != null && !tmp.isEmpty()) {
                 lastMonthWaterIndex = Integer.valueOf(tmp);
             }
             else {
@@ -264,7 +270,7 @@ public class ApartmentInformationScene extends Notificable implements ThemeScene
 
             BigDecimal monthlyRentPrice = null;
             tmp = ((VerticleTextAndTextField) mainContent.lookup("#monthly-rent-price")).getTextField().getText();
-            if (tmp != null) {
+            if (tmp != null && !tmp.isEmpty()) {
                 monthlyRentPrice = BigDecimal.valueOf(Double.valueOf(tmp));
             }
             else {
@@ -294,8 +300,9 @@ public class ApartmentInformationScene extends Notificable implements ThemeScene
 
             controller.save(name, monthlyRentPrice, lastMonthElectricIndex, electricUnitPrice, lastMonthWaterIndex, waterUnitPrice, dsIn, dsOut);
 
-            controller.reset();
-            showPopUpMessage(ValidationState.OK.toString(), "Lưu thành công!");
+//            controller.reset();
+            cancelButton.fire();
+//            showPopUpMessage(ValidationState.OK.toString(), "Lưu thành công!");
         });
         return scene;
     }

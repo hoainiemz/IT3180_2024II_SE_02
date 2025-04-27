@@ -83,10 +83,10 @@ public class NotificationInformationScene extends Notificable{
     }
 
     @Transactional
-    public Scene getScene(Integer notiId) {
+    public Scene getScene(Integer notiId, Scene scene) {
         reset();
         noti = controller.getNotificationItemById(notiId);
-        scene = JavaFxApplication.getCurrentScene();
+        this.scene = scene;
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();

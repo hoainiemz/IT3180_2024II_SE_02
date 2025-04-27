@@ -1,6 +1,9 @@
 package org.example.hellofx.ui.theme.defaulttheme;
 
+import atlantafx.base.controls.Notification;
 import atlantafx.base.theme.Styles;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,21 +14,30 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.effect.GaussianBlur;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import org.example.hellofx.controller.ApartmentController;
 import org.example.hellofx.controller.ResidentController;
 import org.example.hellofx.dto.ApartmentCountProjection;
 import org.example.hellofx.model.Resident;
+import org.example.hellofx.model.Validation;
 import org.example.hellofx.model.enums.AccountType;
+import org.example.hellofx.model.enums.ValidationState;
+import org.example.hellofx.model.enums.VehicleType;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextComboBox;
+import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.VerticleTextAndComboBox;
+import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.VerticleTextAndTextField;
+import org.example.hellofx.utils.ScreenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +46,7 @@ import java.util.TreeMap;
 
 
 @Component
-public class ApartmentScene implements ThemeScene {
+public class ApartmentScene extends Notificable implements ThemeScene {
     @Autowired
     ApartmentController controller;
 
@@ -43,12 +55,19 @@ public class ApartmentScene implements ThemeScene {
     private TableView<ApartmentCountProjection> table;
     private Pagination pagination;
     private VBox mainContent;
+    private Notification myInfo;
+    private Stage popupStage;
+    private Scene scene;
 
     public void reset() {
         masterData = null;
         table = null;
         pagination = null;
         mainContent = null;
+    }
+
+    protected Scene getCurrentScene() {
+        return scene;
     }
 
     void reloadTable(Scene scene) {
@@ -59,9 +78,9 @@ public class ApartmentScene implements ThemeScene {
         resetPagination();
     }
 
-    public Scene getScene() {
+    public Scene getScene(Scene scene) {
         reset();
-        Scene scene = JavaFxApplication.getCurrentScene();
+        this.scene = scene;
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();
@@ -101,6 +120,18 @@ public class ApartmentScene implements ThemeScene {
         filter.setAlignment(Pos.CENTER_LEFT);
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
+
+        if (controller.getProfile().getRole() != AccountType.Resident) {
+            HBox addnewContrainer = new HBox();
+            Button addnew = new Button("Thêm Căn hộ mới");
+            addnewContrainer.getChildren().add(addnew);
+            addnew.getStyleClass().add("addnew-button");
+            mainContent.getChildren().add(addnewContrainer);
+            addnewContrainer.setAlignment(Pos.CENTER_LEFT);
+            addnew.setOnAction(event -> {
+                showAddingPopup(JavaFxApplication.getCurrentStage());
+            });
+        }
 
         filter.getChildren().add(new TextAndTextField("Theo từ khóa: ", null, "Enter the search keyword", "searchFilter", true));
 
@@ -160,8 +191,9 @@ public class ApartmentScene implements ThemeScene {
             row.setOnMouseClicked(event -> {
                 if (!row.isEmpty() && event.getClickCount() == 1) {
                     ApartmentCountProjection clicked = row.getItem();
-                    controller.seeMoreInformation(clicked.getApartmentId());
+//                    controller.seeMoreInformation(clicked.getApartmentId());
 //                    System.out.println("Clicked on: " + clickedResident.getFirstName());
+                    showInfoPopup(JavaFxApplication.getCurrentStage(), clicked.getApartmentId());
                 }
             });
             return row;
@@ -203,5 +235,188 @@ public class ApartmentScene implements ThemeScene {
                 masterData.subList(fromIndex, toIndex));
 
         table.setItems(pageData);
+    }
+
+
+    private void showAddingPopup(Stage ownerStage) {
+        // Tạo một stage mới cho popup
+        popupStage = new Stage();
+
+        // Áp dụng hiệu ứng blur cho nội dung chính
+        GaussianBlur blur = new GaussianBlur(10); // Độ mờ có thể điều chỉnh
+        mainContent.setEffect(blur);
+
+        // Panel chứa nội dung popup
+        StackPane popupContent = new StackPane();
+        popupContent.setPrefWidth(ScreenUtils.getScreenWidth() * 0.8);
+        popupContent.setPrefHeight(ScreenUtils.getScreenHeight() * 0.8);
+        popupContent.setAlignment(Pos.TOP_CENTER);
+        popupContent.setStyle("-fx-background-color: white; -fx-padding: 20px; -fx-background-radius: 10px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.5, 0.0, 0.0);");
+        popupContent.setId("content");
+
+        // Lớp overlay bao phủ toàn màn hình
+        AnchorPane overlay = new AnchorPane();
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Màu đen với độ trong suốt 50%
+        overlay.getChildren().add(popupContent);
+
+
+        popupContent.translateXProperty().bind(
+                overlay.widthProperty()
+                        .subtract(popupContent.widthProperty())
+                        .divide(2)
+        );
+        popupContent.translateYProperty().bind(
+                overlay.heightProperty()
+                        .subtract(popupContent.heightProperty())
+                        .divide(2)
+        );
+
+        // Scene cho popup
+        overlay.setId("container");
+        Scene popupScene = controller.getApartmentCreationScene(new Scene(overlay));
+        popupScene.setFill(Color.TRANSPARENT);
+
+        String popupCssPath = getClass().getResource("/themes/default-theme/home/home.css").toExternalForm();
+        popupScene.getStylesheets().add(popupCssPath);
+
+        // Cấu hình stage cho popup
+        popupStage.initOwner(ownerStage);
+        popupStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác với cửa sổ chính
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.setScene(popupScene);
+
+        // Đảm bảo popup có kích thước giống với cửa sổ chính
+        popupStage.setX(ownerStage.getX());
+        popupStage.setY(ownerStage.getY());
+        popupStage.setWidth(ownerStage.getWidth());
+        popupStage.setHeight(ownerStage.getHeight());
+
+        // Xử lý sự kiện đóng popup
+        ((Button) ((ScrollPane) overlay.lookup("ScrollPane")).getContent().lookup("#close")).setOnAction(e -> {
+            popupStage.close();
+            reloadTable(scene);
+            mainContent.setEffect(null); // Xóa hiệu ứng blur khi đóng popup
+        });
+
+        // Xử lý khi đóng popup bằng cách khác (X, Alt+F4)
+        popupStage.setOnCloseRequest(e -> {
+            mainContent.setEffect(null);
+        });
+
+        overlay.requestFocus();
+        // Hiển thị popup
+        popupStage.show();
+    }
+
+    private void showInfoPopup(Stage ownerStage, Integer apartmentId) {
+        // Tạo một stage mới cho popup
+        popupStage = new Stage();
+
+        // Áp dụng hiệu ứng blur cho nội dung chính
+        GaussianBlur blur = new GaussianBlur(10); // Độ mờ có thể điều chỉnh
+        mainContent.setEffect(blur);
+
+        // Panel chứa nội dung popup
+        StackPane popupContent = new StackPane();
+        popupContent.setPrefWidth(ScreenUtils.getScreenWidth() * 0.8);
+        popupContent.setPrefHeight(ScreenUtils.getScreenHeight() * 0.8);
+        popupContent.setAlignment(Pos.TOP_CENTER);
+        popupContent.setStyle("-fx-background-color: white; -fx-padding: 20px; -fx-background-radius: 10px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.5, 0.0, 0.0);");
+        popupContent.setId("content");
+
+        // Lớp overlay bao phủ toàn màn hình
+        AnchorPane overlay = new AnchorPane();
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Màu đen với độ trong suốt 50%
+        overlay.getChildren().add(popupContent);
+
+
+        popupContent.translateXProperty().bind(
+                overlay.widthProperty()
+                        .subtract(popupContent.widthProperty())
+                        .divide(2)
+        );
+        popupContent.translateYProperty().bind(
+                overlay.heightProperty()
+                        .subtract(popupContent.heightProperty())
+                        .divide(2)
+        );
+
+        // Scene cho popup
+        overlay.setId("container");
+        Scene popupScene = controller.getApartmentInformationScene(new Scene(overlay), apartmentId);
+        popupScene.setFill(Color.TRANSPARENT);
+
+        String popupCssPath = getClass().getResource("/themes/default-theme/home/home.css").toExternalForm();
+        popupScene.getStylesheets().add(popupCssPath);
+
+        // Cấu hình stage cho popup
+        popupStage.initOwner(ownerStage);
+        popupStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác với cửa sổ chính
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.setScene(popupScene);
+
+        // Đảm bảo popup có kích thước giống với cửa sổ chính
+        popupStage.setX(ownerStage.getX());
+        popupStage.setY(ownerStage.getY());
+        popupStage.setWidth(ownerStage.getWidth());
+        popupStage.setHeight(ownerStage.getHeight());
+
+        // Xử lý sự kiện đóng popup
+        ((Button) ((ScrollPane) overlay.lookup("ScrollPane")).getContent().lookup("#close")).setOnAction(e -> {
+            popupStage.close();
+            reloadTable(scene);
+            mainContent.setEffect(null); // Xóa hiệu ứng blur khi đóng popup
+        });
+
+        // Xử lý khi đóng popup bằng cách khác (X, Alt+F4)
+        popupStage.setOnCloseRequest(e -> {
+            mainContent.setEffect(null);
+        });
+
+        overlay.requestFocus();
+        // Hiển thị popup
+        popupStage.show();
+    }
+
+    private void showMyPopUpMessage(String state, String message) {
+        AnchorPane tmp = (AnchorPane) popupStage.getScene().lookup("AnchorPane");
+        AnchorPane rightFrame = tmp;
+        if (myInfo == null) {
+            myInfo = new Notification(message);
+            myInfo.getStyleClass().add(Styles.ELEVATED_1);
+            myInfo.setMaxHeight(100);
+        }
+        else {
+            myInfo.setMessage(message);
+            try {
+                rightFrame.getChildren().remove(myInfo);
+            }
+            catch (NullPointerException e) {
+            }
+        }
+        try {
+            myInfo.getStyleClass().remove(Styles.WARNING);
+        }
+        catch (NullPointerException e) {}
+        try {
+            myInfo.getStyleClass().remove(Styles.SUCCESS);
+        }
+        catch (NullPointerException e) {}
+        if (state.toUpperCase().equals(ValidationState.ERROR.toString())) {
+            myInfo.getStyleClass().add(Styles.WARNING);
+            myInfo.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
+        }
+        else {
+            myInfo.getStyleClass().add(Styles.SUCCESS);
+            myInfo.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE));
+        }
+        myInfo.setOnClose(event -> {
+            rightFrame.getChildren().remove(myInfo);
+        });
+        rightFrame.getChildren().add(myInfo);
+        AnchorPane.setBottomAnchor(myInfo, 10.0);
+        AnchorPane.setRightAnchor  (myInfo, 10.0);
     }
 }

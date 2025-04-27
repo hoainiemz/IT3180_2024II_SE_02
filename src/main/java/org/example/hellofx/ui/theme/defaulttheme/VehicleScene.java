@@ -78,9 +78,9 @@ public class VehicleScene extends Notificable implements ThemeScene {
         return scene;
     }
 
-    public Scene getScene() {
+    public Scene getScene(Scene scene) {
         reset();
-        scene = JavaFxApplication.getCurrentScene();
+        this.scene = scene;
         HBox container = (HBox) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();
