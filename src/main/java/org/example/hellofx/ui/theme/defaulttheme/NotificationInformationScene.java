@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -87,7 +88,7 @@ public class NotificationInformationScene extends Notificable{
         reset();
         noti = controller.getNotificationItemById(notiId);
         this.scene = scene;
-        HBox container = (HBox) scene.lookup("#container");
+        Pane container = (Pane) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();
         mainContent = new VBox();
@@ -216,8 +217,14 @@ public class NotificationInformationScene extends Notificable{
 
         HBox createButtonContainer = new HBox();
         Button savebutton = new Button("Lưu thông báo");
+        Button cancelButton = new Button("Thoát");
         savebutton.setId("save-button");
-        createButtonContainer.getChildren().add(savebutton);
+        cancelButton.setId("close");
+        cancelButton.getStyleClass().add("cancel-button");
+        savebutton.setId("save-button");
+        createButtonContainer.getChildren().addAll(savebutton, cancelButton);
+        createButtonContainer.setSpacing(20);
+        createButtonContainer.setAlignment(Pos.CENTER_RIGHT);
         createButtonContainer.setPrefWidth(mainContent.getPrefWidth() * 0.9);
         createButtonContainer.setMaxWidth(mainContent.getPrefWidth() * 0.9);
         createButtonContainer.setMinWidth(mainContent.getPrefWidth() * 0.9);
@@ -266,9 +273,10 @@ public class NotificationInformationScene extends Notificable{
 
             controller.saveButtonClicked(noti, newNoti, dsIn, dsOut);
 
-            reset();
-            controller.reset(noti.getId());
-            showPopUpMessage("Thành công", "Cập nhật thông báo thành công!");
+            cancelButton.fire();
+//            reset();
+//            controller.reset(noti.getId());
+//            showPopUpMessage("Thành công", "Cập nhật thông báo thành công!");
         });
         return scene;
     }

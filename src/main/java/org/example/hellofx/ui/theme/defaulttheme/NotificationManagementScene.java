@@ -208,14 +208,15 @@ public class NotificationManagementScene implements ThemeScene {
         col3.setMaxWidth(table.getPrefWidth() * 0.45);
 
         table.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
+                TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS
         );
         table.setRowFactory(tv -> {
             TableRow<NotificationItem> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (!row.isEmpty() && event.getClickCount() == 1) {
                     NotificationItem clickedNotificationItem = row.getItem();
-                    controller.seeNotificationItemInformation(clickedNotificationItem.getId());
+//                    controller.seeNotificationItemInformation(clickedNotificationItem.getId());
+                    showInfoPopup(JavaFxApplication.getCurrentStage(), clickedNotificationItem.getId());
                 }
             });
             return row;
@@ -285,6 +286,77 @@ public class NotificationManagementScene implements ThemeScene {
         // Scene cho popup
         overlay.setId("container");
         Scene popupScene = controller.getNotificationCreationScene(new Scene(overlay));
+        popupScene.setFill(Color.TRANSPARENT);
+
+        String popupCssPath = getClass().getResource("/themes/default-theme/home/home.css").toExternalForm();
+        popupScene.getStylesheets().add(popupCssPath);
+
+        // Cấu hình stage cho popup
+        popupStage.initOwner(ownerStage);
+        popupStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác với cửa sổ chính
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.setScene(popupScene);
+
+        // Đảm bảo popup có kích thước giống với cửa sổ chính
+        popupStage.setX(ownerStage.getX());
+        popupStage.setY(ownerStage.getY());
+        popupStage.setWidth(ownerStage.getWidth());
+        popupStage.setHeight(ownerStage.getHeight());
+
+        // Xử lý sự kiện đóng popup
+        ((Button) ((ScrollPane) overlay.lookup("ScrollPane")).getContent().lookup("#close")).setOnAction(e -> {
+            popupStage.close();
+            reloadTable(scene);
+            mainContent.setEffect(null); // Xóa hiệu ứng blur khi đóng popup
+        });
+
+        // Xử lý khi đóng popup bằng cách khác (X, Alt+F4)
+        popupStage.setOnCloseRequest(e -> {
+            mainContent.setEffect(null);
+        });
+
+        overlay.requestFocus();
+        // Hiển thị popup
+        popupStage.show();
+    }
+
+    private void showInfoPopup(Stage ownerStage, Integer billId) {
+        // Tạo một stage mới cho popup
+        popupStage = new Stage();
+
+        // Áp dụng hiệu ứng blur cho nội dung chính
+        GaussianBlur blur = new GaussianBlur(10); // Độ mờ có thể điều chỉnh
+        mainContent.setEffect(blur);
+
+        // Panel chứa nội dung popup
+        StackPane popupContent = new StackPane();
+        popupContent.setPrefWidth(ScreenUtils.getScreenWidth() * 0.8);
+        popupContent.setPrefHeight(ScreenUtils.getScreenHeight() * 0.8);
+        popupContent.setAlignment(Pos.TOP_CENTER);
+        popupContent.setStyle("-fx-background-color: white; -fx-padding: 20px; -fx-background-radius: 10px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.5, 0.0, 0.0);");
+        popupContent.setId("content");
+
+        // Lớp overlay bao phủ toàn màn hình
+        AnchorPane overlay = new AnchorPane();
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Màu đen với độ trong suốt 50%
+        overlay.getChildren().add(popupContent);
+
+
+        popupContent.translateXProperty().bind(
+                overlay.widthProperty()
+                        .subtract(popupContent.widthProperty())
+                        .divide(2)
+        );
+        popupContent.translateYProperty().bind(
+                overlay.heightProperty()
+                        .subtract(popupContent.heightProperty())
+                        .divide(2)
+        );
+
+        // Scene cho popup
+        overlay.setId("container");
+        Scene popupScene = controller.getNotificationInfoScene(new Scene(overlay), billId);
         popupScene.setFill(Color.TRANSPARENT);
 
         String popupCssPath = getClass().getResource("/themes/default-theme/home/home.css").toExternalForm();

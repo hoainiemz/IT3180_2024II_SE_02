@@ -10,6 +10,7 @@ import org.example.hellofx.service.NotificationService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.BillCreationScene;
 import org.example.hellofx.ui.theme.defaulttheme.NotificationCreationScene;
+import org.example.hellofx.ui.theme.defaulttheme.NotificationInformationScene;
 import org.example.hellofx.ui.theme.defaulttheme.NotificationManagementScene;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,5 +30,10 @@ public class NotificationManagementController{
 
     public Scene getNotificationCreationScene(Scene scene) {
         return SpringBootFxApplication.context.getBean(NotificationCreationScene.class).getScene(scene);
+    }
+
+    public Scene getNotificationInfoScene(Scene scene, Integer notiId) {
+        NotificationInformationScene theme = SpringBootFxApplication.context.getBean(NotificationInformationScene.class);
+        return theme.getScene(notiId, scene);
     }
 }
