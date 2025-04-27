@@ -1,11 +1,9 @@
 package org.example.hellofx.controller;
 
-import org.example.hellofx.model.Account;
-import org.example.hellofx.model.Noticement;
-import org.example.hellofx.model.NotificationItem;
-import org.example.hellofx.model.Resident;
+import org.example.hellofx.model.*;
 import org.example.hellofx.repository.NoticementRepository;
 import org.example.hellofx.repository.NotificationItemRepository;
+import org.example.hellofx.service.FeedbackService;
 import org.example.hellofx.service.NoticementService;
 import org.example.hellofx.service.NotificationService;
 import org.example.hellofx.ui.JavaFxApplication;
@@ -27,6 +25,8 @@ public class HomeController{
     private NoticementService noticementService;
 
     private static final int NUM_NOTIES = 20;
+    @Autowired
+    private FeedbackService feedbackService;
 
     public void logoutButtonClicked(){
         profileController.logOutRequest();
@@ -80,6 +80,18 @@ public class HomeController{
         return null;
     }
 
+    public List<Feedback> getFeedbackList(boolean unreadOnly) {
+        for (int i = 0; i < 10; i++) {
+            try {
+                return feedbackService.getTopFeedbackByWatchedStatusOrderByCreatedAtDesc(unreadOnly, PageRequest.of(0, 20));
+            }
+            catch (Exception e) {
+                continue;
+            }
+        }
+        return null;
+    }
+
     public Resident getResident() {
         return profileController.getResident();
     }
@@ -114,5 +126,13 @@ public class HomeController{
 
     public void phuongTienClicked() {
         JavaFxApplication.showThemeScene(VehicleScene.class);
+    }
+
+    public void khieuNaiClicked() {
+        JavaFxApplication.showThemeScene(FeedbackCreationScene.class);
+    }
+
+    public Feedback saveFeedback(Feedback feedback) {
+        return feedbackService.save(feedback);
     }
 }

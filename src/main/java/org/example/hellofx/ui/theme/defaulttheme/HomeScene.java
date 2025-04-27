@@ -8,10 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,8 +19,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Popup;
+import javafx.util.Duration;
 import org.example.hellofx.controller.HomeController;
 import org.example.hellofx.controller.ProfileController;
+import org.example.hellofx.model.Feedback;
 import org.example.hellofx.model.Noticement;
 import org.example.hellofx.model.NotificationItem;
 import org.example.hellofx.model.enums.AccountType;
@@ -315,13 +314,17 @@ public class HomeScene implements ThemeScene {
         tienIch.getStyleClass().add("menu-main-button");
         Button phuongTien = new Button("Phương tiện");
         phuongTien.getStyleClass().add("menu-sub-button");
-        Button khieuNai = new Button("Khiếu nại");
+        Button khieuNai = new Button("Gửi khiếu nại");
         khieuNai.getStyleClass().add("menu-sub-button");
-        tienIchContainer.getChildren().addAll(tienIch, phuongTien, khieuNai);
+        tienIchContainer.getChildren().addAll(tienIch, phuongTien);
         phuongTien.setOnAction(event -> {
             controller.phuongTienClicked();
         });
+        if (controller.getProfile().getRole() == AccountType.Resident) {
+            tienIchContainer.getChildren().addAll(khieuNai);
+        }
         khieuNai.setOnAction(event -> {
+            controller.khieuNaiClicked();
         });
 
         // my profile
@@ -386,6 +389,9 @@ public class HomeScene implements ThemeScene {
     public void showNotificationList() {
         notiContainer.getChildren().clear();
         Text thongBaoText = new Text("Thông báo:");
+        if (controller.getProfile().getRole() != AccountType.Resident) {
+            thongBaoText.setText("Khiếu nại:");
+        }
         thongBaoText.setStyle("-fx-font-weight: bold; -fx-text-fill: black; -fx-font-size: 30px;");
         notiContainer.getChildren().add(thongBaoText);
 //        notiContainer.setStyle("-fx-background-color: red");
@@ -418,36 +424,78 @@ public class HomeScene implements ThemeScene {
 
     private void updateNotificationList() {
         notiList.getChildren().clear();
-        List<NotificationItem> ls = controller.getNotificationList(controller.getResident().getResidentId(), unReadNoti.isSelected());
-        ls.forEach(item -> {
-            var mess = new Message(item.getTitle(), item.getMessage(), null);
-            mess.setOnMouseClicked(event -> {
-                Noticement noticement = new Noticement(null, item.getId(), controller.getResident().getResidentId(), true);
-                controller.noticementClicked(noticement);
-                updateNotificationList();
+        if (controller.getProfile().getRole() == AccountType.Resident) {
+            List<NotificationItem> ls = controller.getNotificationList(controller.getResident().getResidentId(), unReadNoti.isSelected());
+            ls.forEach(item -> {
+                var mess = new Message(item.getTitle(), item.getMessage(), null);
+                mess.setOnMouseClicked(event -> {
+                    Noticement noticement = new Noticement(null, item.getId(), controller.getResident().getResidentId(), true);
+                    controller.noticementClicked(noticement);
+                    updateNotificationList();
+                });
+                mess.getStyleClass().add("hand-hover");
+                switch (item.getType()) {
+                    case "Info":
+                        mess.setGraphic(new FontIcon(MaterialDesignI.INFORMATION_OUTLINE));
+                        mess.getStyleClass().add(Styles.ACCENT);
+                        break;
+                    case "Success":
+                        mess.setGraphic(new FontIcon(MaterialDesignC.CHECK_CIRCLE_OUTLINE));
+                        mess.getStyleClass().add(Styles.SUCCESS);
+                        break;
+                    case "Warning":
+                        mess.setGraphic(new FontIcon(MaterialDesignA.ALERT_OUTLINE));
+                        mess.getStyleClass().add(Styles.WARNING);
+                        break;
+                    case "Danger":
+                        mess.setGraphic(new FontIcon(MaterialDesignA.ALERT_CIRCLE_OUTLINE));
+                        mess.getStyleClass().add(Styles.DANGER);
+                        break;
+                    default:
+                        assert false;
+                }
+                notiList.getChildren().add(mess);
             });
-            mess.getStyleClass().add("hand-hover");
-            switch (item.getType()) {
-                case "Info":
-                    mess.setGraphic(new FontIcon(MaterialDesignI.INFORMATION_OUTLINE));
-                    mess.getStyleClass().add(Styles.ACCENT);
-                    break;
-                case "Success":
-                    mess.setGraphic(new FontIcon(MaterialDesignC.CHECK_CIRCLE_OUTLINE));
-                    mess.getStyleClass().add(Styles.SUCCESS);
-                    break;
-                case "Warning":
-                    mess.setGraphic(new FontIcon(MaterialDesignA.ALERT_OUTLINE));
-                    mess.getStyleClass().add(Styles.WARNING);
-                    break;
-                case "Danger":
-                    mess.setGraphic(new FontIcon(MaterialDesignA.ALERT_CIRCLE_OUTLINE));
-                    mess.getStyleClass().add(Styles.DANGER);
-                    break;
-                default:
-                    assert false;
-            }
-            notiList.getChildren().add(mess);
-        });
+        }
+        else {
+            List<Feedback> ls = controller.getFeedbackList(unReadNoti.isSelected());
+            ls.forEach(item -> {
+                var mess = new Message(item.getTitle(), item.getContent(), null);
+                mess.setOnMouseClicked(event -> {
+                    Feedback feedback = new Feedback(item.getResidentId(), item.getTitle(), item.getContent());
+                    feedback.setFeedbackId(item.getFeedbackId());
+                    feedback.setWatched(true);
+
+                    controller.saveFeedback(feedback);
+                    updateNotificationList();
+                });
+                mess.getStyleClass().add("hand-hover");
+                Tooltip tooltip = new Tooltip(item.getResidentId().toString());
+                tooltip.setShowDelay(Duration.seconds(0.1));
+//                Tooltip.install(mess, tooltip);
+                mess.setTooltip(tooltip);
+                switch (item.getType()) {
+                    case "Info":
+                        mess.setGraphic(new FontIcon(MaterialDesignI.INFORMATION_OUTLINE));
+                        mess.getStyleClass().add(Styles.ACCENT);
+                        break;
+                    case "Success":
+                        mess.setGraphic(new FontIcon(MaterialDesignC.CHECK_CIRCLE_OUTLINE));
+                        mess.getStyleClass().add(Styles.SUCCESS);
+                        break;
+                    case "Warning":
+                        mess.setGraphic(new FontIcon(MaterialDesignA.ALERT_OUTLINE));
+                        mess.getStyleClass().add(Styles.WARNING);
+                        break;
+                    case "Danger":
+                        mess.setGraphic(new FontIcon(MaterialDesignA.ALERT_CIRCLE_OUTLINE));
+                        mess.getStyleClass().add(Styles.DANGER);
+                        break;
+                    default:
+                        assert false;
+                }
+                notiList.getChildren().add(mess);
+            });
+        }
     }
 }

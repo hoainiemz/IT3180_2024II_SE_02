@@ -2,6 +2,8 @@ package org.example.hellofx.ui.theme.defaulttheme;
 
 import atlantafx.base.theme.Styles;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -158,13 +160,18 @@ public class ResidentScene implements ThemeScene {
         col0.setEditable(true);
         col0.setPrefWidth(60);
 
-        var col1 = new TableColumn<Resident, String>("Họ");
+        var col1 = new TableColumn<Resident, Integer>("Id cư dân");
         col1.setCellValueFactory(
+                c -> new SimpleObjectProperty(c.getValue().getResidentId())
+        );
+
+        var col2 = new TableColumn<Resident, String>("Họ");
+        col2.setCellValueFactory(
                 c -> new SimpleStringProperty(c.getValue().getLastName())
         );
 
-        var col2 = new TableColumn<Resident, String>("Tên");
-        col2.setCellValueFactory(
+        var col3 = new TableColumn<Resident, String>("Tên");
+        col3.setCellValueFactory(
                 c -> {
                     if (c.getValue().getFirstName() == null) {
                         return null;
@@ -173,8 +180,8 @@ public class ResidentScene implements ThemeScene {
                 }
         );
 
-        var col3 = new TableColumn<Resident, String>("Giới tính");
-        col3.setCellValueFactory(
+        var col4 = new TableColumn<Resident, String>("Giới tính");
+        col4.setCellValueFactory(
                 c -> {
                     if (c.getValue().getGender() == null) {
                         return null;
@@ -183,8 +190,8 @@ public class ResidentScene implements ThemeScene {
                 }
         );
 
-        var col4 = new TableColumn<Resident, String>("Ngày sinh (yyyy/mm/dd)");
-        col4.setCellValueFactory(
+        var col5 = new TableColumn<Resident, String>("Ngày sinh (yyyy/mm/dd)");
+        col5.setCellValueFactory(
                 c -> {
                     if (c.getValue().getDateOfBirth() == null) {
                         return null;
@@ -199,7 +206,7 @@ public class ResidentScene implements ThemeScene {
             //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3, col4);
+        table.getColumns().setAll(col0, col1, col2, col3, col4, col5);
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );

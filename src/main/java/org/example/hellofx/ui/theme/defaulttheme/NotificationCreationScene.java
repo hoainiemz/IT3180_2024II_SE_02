@@ -142,7 +142,7 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
         notiType.getSelectionModel().selectFirst(); // Default selection
         notificationInfo.getChildren().add(new VerticleTextAndComboBox("Loại: ", notiType, "Enter the type of notification", "noti-type-info", true));
         notificationInfo.getChildren().add(new VerticleTextAndTextField("Tiêu đề:", null, "enter the title of the notification", "noti-title-info", true));
-        notificationInfo.getChildren().add(new VerticleTextAndTextArea("Nội dung thông baáo: ", null, "enter the message of the notification", "noti-message-info", true));
+        notificationInfo.getChildren().add(new VerticleTextAndTextArea("Nội dung thông báo: ", null, "enter the message of the notification", "noti-message-info", true));
 
         mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
         TextFlow section2 = new TextFlow(new Text("Đối tượng được thông báo:"));
