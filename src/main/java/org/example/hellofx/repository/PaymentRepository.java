@@ -14,6 +14,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
     @Query("""
         SELECT DISTINCT
+            b.billId AS billId,
             b.dueDate AS dueDate,
             b.required AS required,
             b.content AS content,

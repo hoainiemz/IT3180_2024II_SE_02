@@ -2,11 +2,14 @@ package org.example.hellofx.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import org.example.hellofx.SpringBootFxApplication;
 import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.service.AccountService;
 import org.example.hellofx.service.ResidentService;
 import org.example.hellofx.ui.JavaFxApplication;
+import org.example.hellofx.ui.theme.defaulttheme.UserInformationScene;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,5 +49,12 @@ public class ResidentController {
 
     public ObservableList<Resident> getResidentsByFilters(String houseNameFilter, String roleFilter, String searchFilter) {
         return FXCollections.observableArrayList(residentService.findResidentsByFilters(houseNameFilter, roleFilter, searchFilter));
+    }
+
+    public Scene getResidentInfoScene(Scene scene, Integer residentId) {
+        UserInformationScene theme = SpringBootFxApplication.context.getBean(UserInformationScene.class);
+        Account profile = accountService.findAccountByUserId(residentId);
+        Resident resident = residentService.findResidentByUserId(residentId);
+        return theme.getScene(profile, resident, scene);
     }
 }

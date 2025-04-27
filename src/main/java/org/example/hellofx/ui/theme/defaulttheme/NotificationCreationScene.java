@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -84,7 +85,7 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
     public Scene getScene(Scene scene) {
         reset();
         this.scene = scene;
-        HBox container = (HBox) scene.lookup("#container");
+        Pane container = (Pane) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();
         mainContent = new VBox();
@@ -211,11 +212,16 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
 
         HBox createButtonContainer = new HBox();
         Button savebutton = new Button("Tạo thông báo");
+        Button cancelButton = new Button("Hủy");
         savebutton.setId("save-button");
-        createButtonContainer.getChildren().add(savebutton);
+        cancelButton.getStyleClass().add("cancel-button");
+        cancelButton.setId("close");
+        createButtonContainer.getChildren().addAll(savebutton, cancelButton);
         createButtonContainer.setPrefWidth(mainContent.getPrefWidth() * 0.9);
         createButtonContainer.setMaxWidth(mainContent.getPrefWidth() * 0.9);
         createButtonContainer.setMinWidth(mainContent.getPrefWidth() * 0.9);
+        createButtonContainer.setSpacing(20);
+        createButtonContainer.setAlignment(Pos.CENTER_RIGHT);
         savebutton.setStyle("-fx-background-color: #4abc96 !important;");
         mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
         mainContent.getChildren().addAll(createButtonContainer);
@@ -244,8 +250,9 @@ public class NotificationCreationScene extends Notificable implements ThemeScene
             });
             controller.createNotificationClicked(notification, ds);
             reset();
-            controller.reset();
-            showPopUpMessage("Thành công", "Tạo thông báo thành công!");
+            cancelButton.fire();
+//            controller.reset();
+//            showPopUpMessage("Thành công", "Tạo thông báo thành công!");
         });
         return scene;
     }

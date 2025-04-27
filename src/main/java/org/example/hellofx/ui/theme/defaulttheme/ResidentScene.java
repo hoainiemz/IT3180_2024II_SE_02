@@ -12,11 +12,17 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.effect.GaussianBlur;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import org.example.hellofx.controller.ResidentController;
 import org.example.hellofx.model.Resident;
@@ -25,6 +31,7 @@ import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextComboBox;
+import org.example.hellofx.utils.ScreenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +42,7 @@ import java.util.TreeMap;
 @Component
 public class ResidentScene implements ThemeScene {
     @Autowired
-    ResidentController residentController;
+    ResidentController controller;
 
     private static final int ITEMS_PER_PAGE = 9;
     private ObservableList<Resident> masterData;
@@ -43,6 +50,7 @@ public class ResidentScene implements ThemeScene {
     private Pagination pagination;
     private VBox mainContent;
     private Scene scene;
+    private Stage popupStage;
 
     public void reset() {
         masterData = null;
@@ -57,10 +65,8 @@ public class ResidentScene implements ThemeScene {
         ComboBox<AccountType> roleFilter = ((ComboBox<AccountType>) scene.lookup("#roleFilter"));
         TextField searchFilter = ((TextAndTextField) scene.lookup("#searchFilter")).getTextField();
         TableView<Resident> table = (TableView) scene.lookup("#resident-table");
-//        table.getItems().clear();
-        masterData = residentController.getResidentsByFilters(houseIdFilter.getValue(), roleFilter.getValue().toString(), searchFilter.getText());
+        masterData = controller.getResidentsByFilters(houseIdFilter.getValue(), roleFilter.getValue().toString(), searchFilter.getText());
         resetPagination();
-//        table.setItems(FXCollections.observableArrayList(dataBaseService.nativeResidentQuery(query)));
     }
 
     public Scene getScene(Scene scene) {
@@ -107,9 +113,9 @@ public class ResidentScene implements ThemeScene {
         mainContent.setAlignment(Pos.TOP_CENTER);
         mainContent.setSpacing(20);
 
-        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", residentController.getAllHouseIds(), true, 100, "houseIdFilter"));
-//        if (residentController.getProfile().getRole() != AccountType.Resident) {
-            TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.Client, AccountType.Resident), false, 140, "roleFilter", (residentController.getProfile().getRole() != AccountType.Resident) ? false : true);
+        filter.getChildren().add(new TextComboBox<String>("Theo phòng: ", controller.getAllHouseIds(), true, 100, "houseIdFilter"));
+//        if (controller.getProfile().getRole() != AccountType.Resident) {
+            TextComboBox<AccountType> role = new TextComboBox<AccountType>("Theo quyền: ", FXCollections.observableArrayList(AccountType.Client, AccountType.Resident), false, 140, "roleFilter", (controller.getProfile().getRole() != AccountType.Resident) ? false : true);
             role.getComboBox().setValue(AccountType.Resident);
             filter.getChildren().add(new Separator(Orientation.VERTICAL));
             filter.getChildren().add(role);
@@ -177,7 +183,7 @@ public class ResidentScene implements ThemeScene {
                 }
         );
 
-        var col4 = new TableColumn<Resident, String>("Ngày sinh");
+        var col4 = new TableColumn<Resident, String>("Ngày sinh (yyyy/mm/dd)");
         col4.setCellValueFactory(
                 c -> {
                     if (c.getValue().getDateOfBirth() == null) {
@@ -204,14 +210,15 @@ public class ResidentScene implements ThemeScene {
             row.setOnMouseClicked(event -> {
                 if (!row.isEmpty() && event.getClickCount() == 1) {
                     Resident clickedResident = row.getItem();
-                    residentController.seeMoreInformation(clickedResident.getUserId().intValue());
+//                    controller.seeMoreInformation(clickedResident.getUserId().intValue());
 //                    System.out.println("Clicked on: " + clickedResident.getFirstName());
+                    showInfoPopup(JavaFxApplication.getCurrentStage(), clickedResident.getUserId());
                 }
             });
             return row;
         });
         Styles.toggleStyleClass(table, Styles.STRIPED);
-        if (residentController.getProfile().getRole() == AccountType.Admin || residentController.getProfile().getRole() == AccountType.Client) {
+        if (controller.getProfile().getRole() == AccountType.Admin || controller.getProfile().getRole() == AccountType.Client) {
             table.setEditable(true);
         }
         else {
@@ -247,5 +254,76 @@ public class ResidentScene implements ThemeScene {
                 masterData.subList(fromIndex, toIndex));
 
         table.setItems(pageData);
+    }
+
+    private void showInfoPopup(Stage ownerStage, Integer residentId) {
+        // Tạo một stage mới cho popup
+        popupStage = new Stage();
+
+        // Áp dụng hiệu ứng blur cho nội dung chính
+        GaussianBlur blur = new GaussianBlur(10); // Độ mờ có thể điều chỉnh
+        mainContent.setEffect(blur);
+
+        // Panel chứa nội dung popup
+        StackPane popupContent = new StackPane();
+        popupContent.setPrefWidth(ScreenUtils.getScreenWidth() * 0.8);
+        popupContent.setPrefHeight(ScreenUtils.getScreenHeight() * 0.8);
+        popupContent.setAlignment(Pos.TOP_CENTER);
+        popupContent.setStyle("-fx-background-color: white; -fx-padding: 20px; -fx-background-radius: 10px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.5, 0.0, 0.0);");
+        popupContent.setId("content");
+
+        // Lớp overlay bao phủ toàn màn hình
+        AnchorPane overlay = new AnchorPane();
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Màu đen với độ trong suốt 50%
+        overlay.getChildren().add(popupContent);
+
+
+        popupContent.translateXProperty().bind(
+                overlay.widthProperty()
+                        .subtract(popupContent.widthProperty())
+                        .divide(2)
+        );
+        popupContent.translateYProperty().bind(
+                overlay.heightProperty()
+                        .subtract(popupContent.heightProperty())
+                        .divide(2)
+        );
+
+        // Scene cho popup
+        overlay.setId("container");
+        Scene popupScene = controller.getResidentInfoScene(new Scene(overlay), residentId);
+        popupScene.setFill(Color.TRANSPARENT);
+
+        String popupCssPath = getClass().getResource("/themes/default-theme/home/home.css").toExternalForm();
+        popupScene.getStylesheets().add(popupCssPath);
+
+        // Cấu hình stage cho popup
+        popupStage.initOwner(ownerStage);
+        popupStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác với cửa sổ chính
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.setScene(popupScene);
+
+        // Đảm bảo popup có kích thước giống với cửa sổ chính
+        popupStage.setX(ownerStage.getX());
+        popupStage.setY(ownerStage.getY());
+        popupStage.setWidth(ownerStage.getWidth());
+        popupStage.setHeight(ownerStage.getHeight());
+
+        // Xử lý sự kiện đóng popup
+        ((Button) ((ScrollPane) overlay.lookup("ScrollPane")).getContent().lookup("#close")).setOnAction(e -> {
+            popupStage.close();
+            reloadTable(scene);
+            mainContent.setEffect(null); // Xóa hiệu ứng blur khi đóng popup
+        });
+
+        // Xử lý khi đóng popup bằng cách khác (X, Alt+F4)
+        popupStage.setOnCloseRequest(e -> {
+            mainContent.setEffect(null);
+        });
+
+        overlay.requestFocus();
+        // Hiển thị popup
+        popupStage.show();
     }
 }

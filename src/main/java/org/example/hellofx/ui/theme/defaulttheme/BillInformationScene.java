@@ -120,8 +120,8 @@ public class BillInformationScene extends Notificable{
         mainContent.setSpacing(20);
         billinfo.setSpacing(20);
 
-        billinfo.getChildren().add(new VerticleTextAndTextField("Tên khoản thu:", bill.getContent(), "enter the name of the bill", "bill-name-info", true));
-        billinfo.getChildren().add(new VerticleTextAndTextArea("Mô tả khoản thu: ", bill.getDescription(), "enter the description of the bill", "bill-description-info", true));
+        billinfo.getChildren().add(new VerticleTextAndTextField("Tên khoản thu:", bill.getContent(), "enter the name of the bill", "bill-name-info", controller.getProfile().getRole() != AccountType.Resident));
+        billinfo.getChildren().add(new VerticleTextAndTextArea("Mô tả khoản thu: ", bill.getDescription(), "enter the description of the bill", "bill-description-info", controller.getProfile().getRole() != AccountType.Resident));
 
         HBox doubleTab = new HBox();
         billinfo.getChildren().addAll(doubleTab);
@@ -134,16 +134,31 @@ public class BillInformationScene extends Notificable{
         leftTab.setAlignment(Pos.TOP_CENTER);
         rightTab.setAlignment(Pos.TOP_CENTER);
         if (bill.getAmount() != null) {
-            leftTab.getChildren().add(new VerticleTextAndTextField("Số tiền phải nộp (vnđ): ", (bill.getAmount() != null) ? bill.getAmount().toString() : null, "enter the amount of money", "amount-info", true, true));
+            leftTab.getChildren().add(new VerticleTextAndTextField("Số tiền phải nộp (vnđ): ", (bill.getAmount() != null) ? bill.getAmount().toString() : null, "enter the amount of money", "amount-info", controller.getProfile().getRole() != AccountType.Resident, true));
         }
         else {
             leftTab.getChildren().add(new VerticleTextAndTextField("Số tiền phải nộp (vnđ): ", (bill.getAmount() != null) ? bill.getAmount().toString() : null, "enter the amount of money", "amount-info", false, true));
         }
-        rightTab.getChildren().add(new VerticleTextAndTextField("Phí nộp muộn (vnđ): ", (bill.getLateFee() != null) ? bill.getLateFee().toString() : null, "enter the late fee", "late-fee-info", true, true));
+        rightTab.getChildren().add(new VerticleTextAndTextField("Phí nộp muộn (vnđ): ", (bill.getLateFee() != null) ? bill.getLateFee().toString() : null, "enter the late fee", "late-fee-info", controller.getProfile().getRole() != AccountType.Resident, true));
         ComboBox<String> req = new ComboBox<>(FXCollections.observableArrayList("Bắt buộc", "Không bắt buộc"));
         req.setValue(bill.getRequired() ? "Bắt buộc" : "Không bắt buộc");
         leftTab.getChildren().add(new VerticleTextAndComboBox("Ràng buộc: ", req, bill.getRequired().toString(), "required-info", true));
-        rightTab.getChildren().add(new VerticleTextAndDateTimePicker("Hạn nộp phí(yyyy-mm-dd hh:pp): ", bill.getDueDate(), null, "due-info", true, true));
+        if (controller.getProfile().getRole() == AccountType.Resident) {
+            req.setDisable(true);
+        }
+        rightTab.getChildren().add(new VerticleTextAndDateTimePicker("Hạn nộp phí(yyyy-mm-dd hh:pp): ", bill.getDueDate(), null, "due-info", controller.getProfile().getRole() != AccountType.Resident, true));
+
+        if (controller.getProfile().getRole() == AccountType.Resident) {
+            rightTab.lookup("#due-info").setDisable(true);
+            HBox actionContainer = new HBox();
+            Button close = new Button("Đóng");
+            close.setId("close");
+            close.getStyleClass().add("cancel-button");
+            actionContainer.getChildren().addAll(close);
+            actionContainer.setAlignment(Pos.CENTER_RIGHT);
+            mainContent.getChildren().addAll(actionContainer);
+            return scene;
+        }
 
         mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
         TextFlow section2 = new TextFlow(new Text("Đối tượng:"));
@@ -273,8 +288,6 @@ public class BillInformationScene extends Notificable{
             }
             controller.saveButtonClicked(bill, newBill, dsIn, dsOut);
             cancelButton.fire();
-//            controller.reset(newBill);
-//            showPopUpMessage("Thành công", "Lưu khoản thu thành công!");
         });
         return scene;
     }

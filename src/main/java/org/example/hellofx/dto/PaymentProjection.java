@@ -2,9 +2,9 @@ package org.example.hellofx.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalDate;
 
 public interface PaymentProjection {
+    Integer getBillId();
     LocalDateTime getDueDate();
     Boolean getRequired();
     String getContent();

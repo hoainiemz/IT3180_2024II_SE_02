@@ -194,7 +194,7 @@ public class HomeScene implements ThemeScene {
                 }
                 double x = notificationButton.localToScreen(notificationButton.getBoundsInLocal()).getMinX();
                 double y = notificationButton.localToScreen(notificationButton.getBoundsInLocal()).getMaxY();
-                notiScrollPane.setPrefWidth(notificationButton.getWidth() + profileContainer.getWidth() - 10);
+                notiScrollPane.setPrefWidth((notificationButton.getWidth() + profileContainer.getWidth()) * 1.2 - 10);
                 notiScrollPane.setPrefHeight(container.getHeight() * 0.8);
                 notiScrollPane.setEffect(dropShadow);
                 showNotificationList();
@@ -306,7 +306,7 @@ public class HomeScene implements ThemeScene {
             controller.quanLyThongBaoClicked();
         });
 
-        thongBaoContainer.getChildren().addAll(thongBao, taoThongBao, quanLyThongBao);
+        thongBaoContainer.getChildren().addAll(thongBao, quanLyThongBao);
 
 
         // Tien ich

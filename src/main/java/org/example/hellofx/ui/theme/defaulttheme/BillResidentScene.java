@@ -12,19 +12,27 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.GaussianBlur;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import org.example.hellofx.controller.BillResidentController;
 import org.example.hellofx.dto.PaymentProjection;
+import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Payment;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextComboBox;
+import org.example.hellofx.utils.ScreenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +52,7 @@ public class BillResidentScene implements ThemeScene {
     private Pagination pagination;
     private VBox mainContent;
     private Scene scene;
+    private Stage popupStage;
 
 
     public void reset() {
@@ -237,6 +246,16 @@ public class BillResidentScene implements ThemeScene {
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
+        table.setRowFactory(tv -> {
+            TableRow<PaymentProjection> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getClickCount() == 1) {
+                    PaymentProjection clickedBill = row.getItem();
+                    showInfoPopup(JavaFxApplication.getCurrentStage(), clickedBill.getBillId());
+                }
+            });
+            return row;
+        });
         Styles.toggleStyleClass(table, Styles.STRIPED);
     }
 
@@ -263,5 +282,77 @@ public class BillResidentScene implements ThemeScene {
                 masterData.subList(fromIndex, toIndex));
 
         table.setItems(pageData);
+    }
+
+
+    private void showInfoPopup(Stage ownerStage, Integer billId) {
+        // Tạo một stage mới cho popup
+        popupStage = new Stage();
+
+        // Áp dụng hiệu ứng blur cho nội dung chính
+        GaussianBlur blur = new GaussianBlur(10); // Độ mờ có thể điều chỉnh
+        mainContent.setEffect(blur);
+
+        // Panel chứa nội dung popup
+        StackPane popupContent = new StackPane();
+        popupContent.setPrefWidth(ScreenUtils.getScreenWidth() * 0.8);
+        popupContent.setPrefHeight(ScreenUtils.getScreenHeight() * 0.8);
+        popupContent.setAlignment(Pos.TOP_CENTER);
+        popupContent.setStyle("-fx-background-color: white; -fx-padding: 20px; -fx-background-radius: 10px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.5, 0.0, 0.0);");
+        popupContent.setId("content");
+
+        // Lớp overlay bao phủ toàn màn hình
+        AnchorPane overlay = new AnchorPane();
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Màu đen với độ trong suốt 50%
+        overlay.getChildren().add(popupContent);
+
+
+        popupContent.translateXProperty().bind(
+                overlay.widthProperty()
+                        .subtract(popupContent.widthProperty())
+                        .divide(2)
+        );
+        popupContent.translateYProperty().bind(
+                overlay.heightProperty()
+                        .subtract(popupContent.heightProperty())
+                        .divide(2)
+        );
+
+        // Scene cho popup
+        overlay.setId("container");
+        Scene popupScene = controller.getBillInfoScene(new Scene(overlay), billId);
+        popupScene.setFill(Color.TRANSPARENT);
+
+        String popupCssPath = getClass().getResource("/themes/default-theme/home/home.css").toExternalForm();
+        popupScene.getStylesheets().add(popupCssPath);
+
+        // Cấu hình stage cho popup
+        popupStage.initOwner(ownerStage);
+        popupStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác với cửa sổ chính
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.setScene(popupScene);
+
+        // Đảm bảo popup có kích thước giống với cửa sổ chính
+        popupStage.setX(ownerStage.getX());
+        popupStage.setY(ownerStage.getY());
+        popupStage.setWidth(ownerStage.getWidth());
+        popupStage.setHeight(ownerStage.getHeight());
+
+        // Xử lý sự kiện đóng popup
+        ((Button) ((ScrollPane) overlay.lookup("ScrollPane")).getContent().lookup("#close")).setOnAction(e -> {
+            popupStage.close();
+            reloadTable(scene);
+            mainContent.setEffect(null); // Xóa hiệu ứng blur khi đóng popup
+        });
+
+        // Xử lý khi đóng popup bằng cách khác (X, Alt+F4)
+        popupStage.setOnCloseRequest(e -> {
+            mainContent.setEffect(null);
+        });
+
+        overlay.requestFocus();
+        // Hiển thị popup
+        popupStage.show();
     }
 }

@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -55,7 +56,7 @@ public class UserInformationScene extends Notificable{
         profile = reprofile;
         resident = reresident;
         this.scene = scene;
-        HBox container = (HBox) scene.lookup("#container");
+        Pane container = (Pane) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();
         VBox mainContent = new VBox();
@@ -109,8 +110,18 @@ public class UserInformationScene extends Notificable{
         publicInfo.getChildren().add(new TextAndTextField("Số điện thoại: ", profile.getPhone(), "Enter your phone", "top-phone", false, true)); //profileController.getProfile().getRole() != AccountType.Resident || profile.getId().equals(profileController.getProfile().getId())));
         publicInfo.setAlignment(Pos.TOP_LEFT);
         publicInfo.setSpacing(15);
-
+        mainContent.setSpacing(20);
         if (profileController.getProfile().getRole() == AccountType.Resident && !profile.getUserId().equals(profileController.getProfile().getUserId())) {
+            HBox actionContainer = new HBox();
+            Button close = new Button("Đóng");
+            close.setId("close");
+            close.getStyleClass().add("cancel-button");
+            actionContainer.getChildren().addAll(close);
+            actionContainer.setAlignment(Pos.CENTER_RIGHT);
+            mainContent.getChildren().addAll(actionContainer);
+            actionContainer.setPrefWidth(mainContent.getPrefWidth() * 0.8);
+            actionContainer.setMaxWidth(mainContent.getPrefWidth() * 0.8);
+            actionContainer.setMinWidth(mainContent.getPrefWidth() * 0.8);
             return scene;
         }
 
@@ -163,12 +174,20 @@ public class UserInformationScene extends Notificable{
 //        mainContent.setStyle("-fx-background-color: red");
 
         HBox buttonContainer = new HBox();
+        Button close = new Button("Đóng");
+        close.setId("close");
+        close.getStyleClass().add("cancel-button");
         mainContent.getChildren().addAll(buttonContainer);
         Button save = new Button("Lưu");
-        buttonContainer.getChildren().add(save);
+        buttonContainer.getChildren().addAll(save);
+        if (JavaFxApplication.getCurrentScene() != scene) {
+            buttonContainer.getChildren().addAll(close);
+        }
         buttonContainer.setPrefWidth(mainContent.getPrefWidth() * 0.8);
         buttonContainer.setMaxWidth(mainContent.getPrefWidth() * 0.8);
         buttonContainer.setMinWidth(mainContent.getPrefWidth() * 0.8);
+        buttonContainer.setAlignment(Pos.CENTER_RIGHT);
+        buttonContainer.setSpacing(20);
 //        buttonContainer.setStyle("-fx-background-color: red;");
         save.setId("save-button");
         save.setPrefWidth(150);
@@ -204,10 +223,13 @@ public class UserInformationScene extends Notificable{
                 showPopUpMessage(vl.state().toString(), vl.message());
                 return;
             }
-
-
             profileController.residentProfileUpdateRequest(curResident);
             profileController.accountProfileUpdateRequest(currAccount);
+            if (JavaFxApplication.getCurrentScene() != scene) {
+                close.fire();
+                return;
+            }
+
             ((TextAndTextField) scene.lookup("#top-email")).getTextField().setText(email);
             ((TextAndTextField) scene.lookup("#top-phone")).getTextField().setText(phone);
             profile = profileController.findAccountByUserId(profile.getUserId());
