@@ -6,10 +6,12 @@ import org.example.hellofx.model.enums.VehicleType;
 import org.example.hellofx.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Component
+@Transactional
 public class VehicleService {
     @Autowired
     VehicleRepository vehicleRepository;
@@ -52,5 +54,9 @@ public class VehicleService {
 
     public boolean checkExistByLicensePlate(String val) {
         return vehicleRepository.existsByLicensePlate(val);
+    }
+
+    public void deleteVehicleById(Integer id) {
+        vehicleRepository.deleteByVehicleId(id);
     }
 }

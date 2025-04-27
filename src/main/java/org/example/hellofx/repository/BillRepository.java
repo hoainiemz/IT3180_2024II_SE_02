@@ -19,4 +19,5 @@ public interface BillRepository  extends JpaRepository<Bill, Integer> {
             @Param("requireFilter") int requireFilter,
             @Param("dueFilter") int dueFilter,
             @Param("searchFilter") String searchFilter);
+    void deleteByBillId(Integer billId);
 }

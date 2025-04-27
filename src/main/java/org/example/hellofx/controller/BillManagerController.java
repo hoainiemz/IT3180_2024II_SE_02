@@ -58,4 +58,8 @@ public class BillManagerController{
     public Bill saveBill(Bill bill) {
         return billService.save(bill);
     }
+
+    public void deleteBillByBillId(Integer billId) {
+        billService.deleteBillById(billId);
+    }
 }

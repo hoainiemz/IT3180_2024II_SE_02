@@ -570,3 +570,14 @@ VerticleTextAndTextArea .editable-text-field {
 .auto-no-button:pressed {
     /*-fx-background-color: #375a3a; !* Darker purple for pressed state *!*/
 }
+
+.btn-edit {
+    -fx-background-color: transparent !important;
+    -fx-icon-color: #5fa7fc !important;
+    -fx-fill: #5fa7fc !important;    /* màu xanh dương */
+}
+
+.btn-delete {
+    -fx-background-color: transparent !important;
+    -fx-icon-color: #fa4547 !important;    /* màu xanh dương */
+}

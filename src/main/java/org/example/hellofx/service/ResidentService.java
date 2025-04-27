@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
 public class ResidentService {
     @Autowired
@@ -40,9 +41,6 @@ public class ResidentService {
     public Resident findResidentByAccount(Account profile) {
         return residentRepository.findByUserId(profile.getUserId()).get();
     }
-
-
-
 
     @Transactional
     public List<String> findDistinctNonNullHouseId(Account profile, Resident resident) {
@@ -78,5 +76,9 @@ public class ResidentService {
 
     public List<Resident> findResidentsByFilters(String houseNameFilter, String roleFilter, String searchFilter) {
         return residentRepository.findResidentsByFilters(houseNameFilter, roleFilter, searchFilter);
+    }
+
+    public void deleteResidentById(Integer id) {
+        residentRepository.deleteByResidentId(id);
     }
 }

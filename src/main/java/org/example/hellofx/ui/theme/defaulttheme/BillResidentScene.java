@@ -28,11 +28,16 @@ import org.example.hellofx.controller.BillResidentController;
 import org.example.hellofx.dto.PaymentProjection;
 import org.example.hellofx.model.Bill;
 import org.example.hellofx.model.Payment;
+import org.example.hellofx.model.Resident;
+import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextComboBox;
 import org.example.hellofx.utils.ScreenUtils;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -236,26 +241,43 @@ public class BillResidentScene implements ThemeScene {
                 }
         );
 
+        var col6 = new TableColumn<PaymentProjection, HBox>("Thao tác");
+        col6.setCellValueFactory(
+                c -> {
+                    FontIcon pencilIcon = new FontIcon(MaterialDesignP.PENCIL);
+                    pencilIcon.setIconSize(16);        // size 16px
+                    pencilIcon.setStyle("-fx-icon-color: " + "#5fa7fc" + ";");
+
+                    FontIcon trashIcon = new FontIcon(MaterialDesignT.TRASH_CAN);
+                    trashIcon.setIconSize(16);
+                    trashIcon.setStyle("-fx-icon-color: " + "#fa4547" + ";");
+
+                    Button btnEdit   = new Button("", pencilIcon);
+                    Button btnDelete = new Button("", trashIcon);
+
+                    btnEdit.getStyleClass().add("btn-edit");
+                    btnDelete.getStyleClass().add("btn-delete");
+
+                    HBox hbox = new HBox(5, btnEdit);
+
+                    btnEdit.setOnAction(event -> {
+                        showInfoPopup(JavaFxApplication.getCurrentStage(), c.getValue().getBillId());
+                    });
+
+                    return new SimpleObjectProperty(hbox);
+                }
+        );
+
         if (table == null) {
             table = new TableView<PaymentProjection>();
             pagination = new Pagination();
             //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3, col4, col5);
+        table.getColumns().setAll(col0, col1, col2, col3, col4, col5, col6);
         table.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
+                TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS
         );
-        table.setRowFactory(tv -> {
-            TableRow<PaymentProjection> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (!row.isEmpty() && event.getClickCount() == 1) {
-                    PaymentProjection clickedBill = row.getItem();
-                    showInfoPopup(JavaFxApplication.getCurrentStage(), clickedBill.getBillId());
-                }
-            });
-            return row;
-        });
         Styles.toggleStyleClass(table, Styles.STRIPED);
     }
 

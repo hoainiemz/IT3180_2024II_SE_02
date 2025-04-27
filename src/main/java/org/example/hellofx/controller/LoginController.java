@@ -7,6 +7,7 @@ import org.example.hellofx.ui.theme.defaulttheme.ForgotPasswordScene;
 import org.example.hellofx.ui.theme.defaulttheme.SignUpScene;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class LoginController {
@@ -16,6 +17,7 @@ public class LoginController {
     @Autowired
     AccountService accountService;
 
+    @Transactional(readOnly = true)
     public String loginButtonClicked(String username, String password) {
         Account response = accountService.findAccountByUsernameAndPassword(username, password);
         if (response != null) {

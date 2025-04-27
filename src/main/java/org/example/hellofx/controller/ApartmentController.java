@@ -9,6 +9,7 @@ import org.example.hellofx.model.Account;
 import org.example.hellofx.model.Resident;
 import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.repository.SettlementRepository;
+import org.example.hellofx.service.ApartmentService;
 import org.example.hellofx.service.SettlementService;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.defaulttheme.ApartmentCreationScene;
@@ -24,6 +25,8 @@ public class ApartmentController {
     private ProfileController profileController;
     @Autowired
     private SettlementService settlementService;
+    @Autowired
+    private ApartmentService apartmentService;
 
     public Account getProfile() {
         return profileController.getProfile();
@@ -49,5 +52,9 @@ public class ApartmentController {
         ApartmentInformationScene theme = SpringBootFxApplication.context.getBean(ApartmentInformationScene.class);
         return theme.getScene(scene);
 //        return JavaFxApplication.showApartmentInformationScene(scene, apartmentId);
+    }
+
+    public void deleteApartmentByApartmentId(Integer id) {
+        apartmentService.deleteApartmentById(id);
     }
 }

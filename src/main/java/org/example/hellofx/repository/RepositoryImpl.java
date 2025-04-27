@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.example.hellofx.model.enums.GenderType;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,8 +16,15 @@ public class RepositoryImpl<T>{
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Transactional
     public List<T> executeRawSql(String sqlQuery, Class<T> type) {
-        return entityManager.createNativeQuery(sqlQuery, type).getResultList();
+        try {
+            Query query = entityManager.createNativeQuery(sqlQuery, type);
+            return query.getResultList();
+        } finally {
+            entityManager.clear(); // Clear the persistence context
+        }
     }
+
 
 }

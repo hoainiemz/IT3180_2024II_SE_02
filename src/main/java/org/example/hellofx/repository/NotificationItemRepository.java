@@ -37,5 +37,5 @@ public interface NotificationItemRepository extends JpaRepository<NotificationIt
             @Param("residentId") Integer residentId,
             @Param("showUnWatchedOnly") Boolean showUnWatchedOnly,
             Pageable pageable);
-
+    void deleteByNotificationId(Integer notificationId);
 }

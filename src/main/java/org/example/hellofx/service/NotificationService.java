@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class NotificationService {
     @Autowired
     private NotificationItemRepository notificationItemRepository;
@@ -28,5 +30,13 @@ public class NotificationService {
 
     public NotificationItem save(NotificationItem notificationItem) {
         return notificationItemRepository.save(notificationItem);
+    }
+
+    public void deleteNotificationById(Integer id) {
+        notificationItemRepository.deleteByNotificationId(id);
+    }
+
+    public List<NotificationItem> findAll() {
+        return notificationItemRepository.findAll();
     }
 }

@@ -44,8 +44,16 @@ public class ResidentController {
     }
 
     public ObservableList<String> getAllHouseIds(){
-        return FXCollections.observableArrayList(residentService.findDistinctNonNullHouseId(getProfile(), getResident()));
+        try {
+            List<String> houseIds = residentService.findDistinctNonNullHouseId(getProfile(), getResident());
+            return FXCollections.observableArrayList(houseIds);
+        } catch (Exception e) {
+            // Log the error and return empty list instead of propagating the exception
+            e.printStackTrace();
+            return FXCollections.observableArrayList();
+        }
     }
+
 
     public ObservableList<Resident> getResidentsByFilters(String houseNameFilter, String roleFilter, String searchFilter) {
         return FXCollections.observableArrayList(residentService.findResidentsByFilters(houseNameFilter, roleFilter, searchFilter));
@@ -56,5 +64,9 @@ public class ResidentController {
         Account profile = accountService.findAccountByUserId(residentId);
         Resident resident = residentService.findResidentByUserId(residentId);
         return theme.getScene(profile, resident, scene);
+    }
+
+    public void deleteResidentByResidentId(Integer residentId) {
+        residentService.deleteResidentById(residentId);
     }
 }

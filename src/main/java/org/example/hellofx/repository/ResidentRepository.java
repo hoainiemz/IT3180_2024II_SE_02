@@ -55,4 +55,6 @@ public interface ResidentRepository extends JpaRepository<Resident, Integer> {
             @Param("roleFilter") String roleFilter,
             @Param("searchFilter") String searchFilter
     );
+
+    void deleteByResidentId(Integer residentId);
 }

@@ -70,4 +70,8 @@ public class VehicleController {
     public void reset() {
         JavaFxApplication.showThemeScene(VehicleScene.class);
     }
+
+    public void deleteVehicleByVehicleId(Integer id) {
+        vehicleService.deleteVehicleById(id);
+    }
 }

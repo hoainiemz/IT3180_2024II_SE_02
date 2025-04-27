@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -41,6 +42,9 @@ import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextComboBox;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.VerticleTextAndComboBox;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.VerticleTextAndTextField;
 import org.example.hellofx.utils.ScreenUtils;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -178,12 +182,40 @@ public class VehicleScene extends Notificable implements ThemeScene {
                 c -> new SimpleStringProperty(c.getValue().getApartmentName())
         );
 
+        var col5 = new TableColumn<VehicleInfo, HBox>("Thao tác");
+        col5.setCellValueFactory(
+                c -> {
+                    FontIcon trashIcon = new FontIcon(MaterialDesignT.TRASH_CAN);
+                    trashIcon.setIconSize(16);
+                    trashIcon.setStyle("-fx-icon-color: " + "#fa4547" + ";");
+
+                    Button btnDelete = new Button("", trashIcon);
+
+                    btnDelete.getStyleClass().add("btn-delete");
+                    btnDelete.setCursor(Cursor.HAND);
+
+                    HBox hbox = new HBox(5);
+
+                    if (controller.getProfile().getRole() != AccountType.Resident) {
+                        hbox.getChildren().add(btnDelete);
+                        btnDelete.setOnAction(e -> {
+                            showFullscreenPopup(JavaFxApplication.getCurrentStage(), c.getValue().getVehicleId());
+                        });
+                    }
+
+                    return new SimpleObjectProperty(hbox);
+                }
+        );
+
         if (table == null) {
             table = new TableView<VehicleInfo>();
             pagination = new Pagination();
             masterData = FXCollections.observableArrayList();
         }
         table.getColumns().setAll(col1, col2, col3, col4);
+        if (controller.getProfile().getRole() != AccountType.Resident) {
+            table.getColumns().add(col5);
+        }
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS
         );
@@ -394,5 +426,83 @@ public class VehicleScene extends Notificable implements ThemeScene {
         rightFrame.getChildren().add(myInfo);
         AnchorPane.setBottomAnchor(myInfo, 10.0);
         AnchorPane.setRightAnchor  (myInfo, 10.0);
+    }
+
+    private void showFullscreenPopup(Stage ownerStage, Integer vehicleId) {
+        // Tạo một stage mới cho popup
+        Stage popupStage = new Stage();
+
+        // Áp dụng hiệu ứng blur cho nội dung chính
+        GaussianBlur blur = new GaussianBlur(10); // Độ mờ có thể điều chỉnh
+        mainContent.setEffect(blur);
+
+        // Panel chứa nội dung popup
+        VBox popupContent = new VBox(20);
+        popupContent.setAlignment(Pos.CENTER);
+        popupContent.setMaxWidth(400);
+        popupContent.setMaxHeight(300);
+        popupContent.setStyle("-fx-background-color: white; -fx-padding: 20px; -fx-background-radius: 10px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.5, 0.0, 0.0);");
+
+        // Nội dung của popup
+        Label popupTitle = new Label("Xóa phương tiện");
+        popupTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        Label popupMessage = new Label("Thao tác này sẽ phương tiện được chọn.\nBạn có chắc muốn tiếp tục.");
+        popupMessage.setStyle("-fx-font-size: 14px; -fx-text-alignment: center;");
+        popupMessage.setWrapText(true);
+
+        HBox popupButtons = new HBox(50);
+        Button next = new Button("Có");
+        Button quit = new Button("Không");
+        next.getStyleClass().add("auto-addnew-button");
+        quit.getStyleClass().add("auto-no-button");
+        popupButtons.setAlignment(Pos.CENTER);
+        popupButtons.getChildren().addAll(next, quit);
+
+        popupContent.getChildren().addAll(popupTitle, popupMessage, popupButtons);
+
+        next.setOnAction(e -> {
+            controller.deleteVehicleByVehicleId(vehicleId);
+            quit.fire();
+            reloadTable(scene);
+        });
+
+        // Lớp overlay bao phủ toàn màn hình
+        StackPane overlay = new StackPane();
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Màu đen với độ trong suốt 50%
+        overlay.getChildren().add(popupContent);
+
+        // Scene cho popup
+        Scene popupScene = new Scene(overlay);
+        popupScene.setFill(Color.TRANSPARENT);
+        String popupCssPath = getClass().getResource("/themes/default-theme/home/home.css").toExternalForm();
+        popupScene.getStylesheets().add(popupCssPath);
+
+        // Cấu hình stage cho popup
+        popupStage.initOwner(ownerStage);
+        popupStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác với cửa sổ chính
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.setScene(popupScene);
+
+        // Đảm bảo popup có kích thước giống với cửa sổ chính
+        popupStage.setX(ownerStage.getX());
+        popupStage.setY(ownerStage.getY());
+        popupStage.setWidth(ownerStage.getWidth());
+        popupStage.setHeight(ownerStage.getHeight());
+
+        // Xử lý sự kiện đóng popup
+        quit.setOnAction(e -> {
+            popupStage.close();
+            mainContent.setEffect(null); // Xóa hiệu ứng blur khi đóng popup
+        });
+
+        // Xử lý khi đóng popup bằng cách khác (X, Alt+F4)
+        popupStage.setOnCloseRequest(e -> {
+            mainContent.setEffect(null);
+        });
+
+        // Hiển thị popup
+        popupStage.show();
     }
 }

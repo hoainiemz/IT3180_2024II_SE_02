@@ -2,6 +2,7 @@ package org.example.hellofx.ui.theme.defaulttheme;
 
 import atlantafx.base.theme.Styles;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,12 +26,16 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import org.example.hellofx.controller.BillManagerController;
 import org.example.hellofx.model.Bill;
+import org.example.hellofx.model.Resident;
 import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextComboBox;
 import org.example.hellofx.utils.ScreenUtils;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -226,13 +231,47 @@ public class BillManagementScene extends Notificable implements ThemeScene {
                 }
         );
 
+        var col4 = new TableColumn<Bill, HBox>("Thao tác");
+        col4.setCellValueFactory(
+                c -> {
+                    FontIcon pencilIcon = new FontIcon(MaterialDesignP.PENCIL);
+                    pencilIcon.setIconSize(16);        // size 16px
+                    pencilIcon.setStyle("-fx-icon-color: " + "#5fa7fc" + ";");
+
+                    FontIcon trashIcon = new FontIcon(MaterialDesignT.TRASH_CAN);
+                    trashIcon.setIconSize(16);
+                    trashIcon.setStyle("-fx-icon-color: " + "#fa4547" + ";");
+
+                    Button btnEdit   = new Button("", pencilIcon);
+                    Button btnDelete = new Button("", trashIcon);
+
+                    btnEdit.getStyleClass().add("btn-edit");
+                    btnDelete.getStyleClass().add("btn-delete");
+
+                    HBox hbox = new HBox(5, btnEdit);
+
+                    btnEdit.setOnAction(event -> {
+                        showInfoPopup(JavaFxApplication.getCurrentStage(), c.getValue().getBillId());
+                    });
+
+                    if (controller.getProfile().getRole() != AccountType.Resident) {
+                        hbox.getChildren().add(btnDelete);
+                        btnDelete.setOnAction(e -> {
+                            showFullscreenPopup(JavaFxApplication.getCurrentStage(), c.getValue().getBillId());
+                        });
+                    }
+
+                    return new SimpleObjectProperty(hbox);
+                }
+        );
+
         if (table == null) {
             table = new TableView<Bill>();
             pagination = new Pagination();
             //        pagination.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3);
+        table.getColumns().setAll(col0, col1, col2, col3, col4);
         table.setPrefWidth(mainContent.getPrefWidth());
         col0.setPrefWidth(table.getPrefWidth() * 0.2);
         col1.setPrefWidth(table.getPrefWidth() * 0.1);
@@ -245,18 +284,6 @@ public class BillManagementScene extends Notificable implements ThemeScene {
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
-        table.setRowFactory(tv -> {
-            TableRow<Bill> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (!row.isEmpty() && event.getClickCount() == 1) {
-                    Bill clickedBill = row.getItem();
-//                    controller.seeBillInformation(clickedBill.getBillId().intValue());
-//                    System.out.println("Clicked on: " + clickedResident.getFirstName());
-                    showInfoPopup(JavaFxApplication.getCurrentStage(), clickedBill.getBillId());
-                }
-            });
-            return row;
-        });
         Styles.toggleStyleClass(table, Styles.STRIPED);
     }
 
@@ -469,6 +496,85 @@ public class BillManagementScene extends Notificable implements ThemeScene {
             quit.fire();
             reloadTable(scene);
             showPopUpMessage("Success", "Đã tạo khoản thu hàng tháng thành công!");
+        });
+
+        // Lớp overlay bao phủ toàn màn hình
+        StackPane overlay = new StackPane();
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Màu đen với độ trong suốt 50%
+        overlay.getChildren().add(popupContent);
+
+        // Scene cho popup
+        Scene popupScene = new Scene(overlay);
+        popupScene.setFill(Color.TRANSPARENT);
+        String popupCssPath = getClass().getResource("/themes/default-theme/home/home.css").toExternalForm();
+        popupScene.getStylesheets().add(popupCssPath);
+
+        // Cấu hình stage cho popup
+        popupStage.initOwner(ownerStage);
+        popupStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác với cửa sổ chính
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.setScene(popupScene);
+
+        // Đảm bảo popup có kích thước giống với cửa sổ chính
+        popupStage.setX(ownerStage.getX());
+        popupStage.setY(ownerStage.getY());
+        popupStage.setWidth(ownerStage.getWidth());
+        popupStage.setHeight(ownerStage.getHeight());
+
+        // Xử lý sự kiện đóng popup
+        quit.setOnAction(e -> {
+            popupStage.close();
+            mainContent.setEffect(null); // Xóa hiệu ứng blur khi đóng popup
+        });
+
+        // Xử lý khi đóng popup bằng cách khác (X, Alt+F4)
+        popupStage.setOnCloseRequest(e -> {
+            mainContent.setEffect(null);
+        });
+
+        // Hiển thị popup
+        popupStage.show();
+    }
+
+
+    private void showFullscreenPopup(Stage ownerStage, Integer billId) {
+        // Tạo một stage mới cho popup
+        Stage popupStage = new Stage();
+
+        // Áp dụng hiệu ứng blur cho nội dung chính
+        GaussianBlur blur = new GaussianBlur(10); // Độ mờ có thể điều chỉnh
+        mainContent.setEffect(blur);
+
+        // Panel chứa nội dung popup
+        VBox popupContent = new VBox(20);
+        popupContent.setAlignment(Pos.CENTER);
+        popupContent.setMaxWidth(400);
+        popupContent.setMaxHeight(300);
+        popupContent.setStyle("-fx-background-color: white; -fx-padding: 20px; -fx-background-radius: 10px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.5, 0.0, 0.0);");
+
+        // Nội dung của popup
+        Label popupTitle = new Label("Xóa khoản thu");
+        popupTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        Label popupMessage = new Label("Thao tác này sẽ xóa khoản thu được chọn.\nBạn có chắc muốn tiếp tục.");
+        popupMessage.setStyle("-fx-font-size: 14px; -fx-text-alignment: center;");
+        popupMessage.setWrapText(true);
+
+        HBox popupButtons = new HBox(50);
+        Button next = new Button("Có");
+        Button quit = new Button("Không");
+        next.getStyleClass().add("auto-addnew-button");
+        quit.getStyleClass().add("auto-no-button");
+        popupButtons.setAlignment(Pos.CENTER);
+        popupButtons.getChildren().addAll(next, quit);
+
+        popupContent.getChildren().addAll(popupTitle, popupMessage, popupButtons);
+
+        next.setOnAction(e -> {
+            controller.deleteBillByBillId(billId);
+            quit.fire();
+            reloadTable(scene);
         });
 
         // Lớp overlay bao phủ toàn màn hình

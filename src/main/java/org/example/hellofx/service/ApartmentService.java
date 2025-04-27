@@ -4,10 +4,12 @@ import org.example.hellofx.model.Apartment;
 import org.example.hellofx.repository.ApartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class ApartmentService {
     @Autowired
     private ApartmentRepository apartmentRepository;
@@ -38,5 +40,9 @@ public class ApartmentService {
 
     public Apartment findApartmentByApartmentName(String name) {
         return apartmentRepository.findByApartmentName(name);
+    }
+
+    public void deleteApartmentById(Integer id) {
+        apartmentRepository.deleteByApartmentId(id);
     }
 }

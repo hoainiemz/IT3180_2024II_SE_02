@@ -1,6 +1,7 @@
 package org.example.hellofx.ui.theme.defaulttheme;
 
 import atlantafx.base.theme.Styles;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,6 +22,8 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import org.example.hellofx.controller.NotificationManagementController;
 import org.example.hellofx.model.NotificationItem;
+import org.example.hellofx.model.Resident;
+import org.example.hellofx.model.enums.AccountType;
 import org.example.hellofx.ui.JavaFxApplication;
 import org.example.hellofx.ui.theme.ThemeScene;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.Badge;
@@ -28,10 +31,8 @@ import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.BadgeCell;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextAndTextField;
 import org.example.hellofx.ui.theme.defaulttheme.myhandmadenodes.TextComboBox;
 import org.example.hellofx.utils.ScreenUtils;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignI;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -191,36 +192,56 @@ public class NotificationManagementScene implements ThemeScene {
                 }
         );
 
+        var col4 = new TableColumn<NotificationItem, HBox>("Thao tác");
+        col4.setCellValueFactory(
+                c -> {
+                    FontIcon pencilIcon = new FontIcon(MaterialDesignP.PENCIL);
+                    pencilIcon.setIconSize(16);        // size 16px
+                    pencilIcon.setStyle("-fx-icon-color: " + "#5fa7fc" + ";");
+
+                    FontIcon trashIcon = new FontIcon(MaterialDesignT.TRASH_CAN);
+                    trashIcon.setIconSize(16);
+                    trashIcon.setStyle("-fx-icon-color: " + "#fa4547" + ";");
+
+                    Button btnEdit   = new Button("", pencilIcon);
+                    Button btnDelete = new Button("", trashIcon);
+
+                    btnEdit.getStyleClass().add("btn-edit");
+                    btnDelete.getStyleClass().add("btn-delete");
+
+                    HBox hbox = new HBox(5, btnEdit, btnDelete);
+
+                    btnEdit.setOnAction(event -> {
+                        showInfoPopup(JavaFxApplication.getCurrentStage(), c.getValue().getId());
+                    });
+
+                    btnDelete.setOnAction(event -> {
+                        showFullscreenPopup(JavaFxApplication.getCurrentStage(), c.getValue().getId());
+                    });
+
+                    return new SimpleObjectProperty(hbox);
+                }
+        );
+
         if (table == null) {
             table = new TableView<NotificationItem>();
             pagination = new Pagination();
             masterData = FXCollections.observableArrayList();
         }
-        table.getColumns().setAll(col0, col1, col2, col3);
+        table.getColumns().setAll(col0, col1, col2, col3, col4);
         table.setPrefWidth(mainContent.getPrefWidth() * 0.9);
-        col0.setPrefWidth(table.getPrefWidth() * 0.2);
+        col0.setPrefWidth(table.getPrefWidth() * 0.25);
         col1.setPrefWidth(table.getPrefWidth() * 0.1);
-        col2.setPrefWidth(table.getPrefWidth() * 0.35);
-        col3.setPrefWidth(table.getPrefWidth() * 0.45);
-        col0.setMaxWidth(table.getPrefWidth() * 0.2);
+        col2.setPrefWidth(table.getPrefWidth() * 0.3);
+        col3.setPrefWidth(table.getPrefWidth() * 0.25);
+        col0.setMaxWidth(table.getPrefWidth() * 0.25);
         col1.setMaxWidth(table.getPrefWidth() * 0.1);
-        col2.setMaxWidth(table.getPrefWidth() * 0.35);
-        col3.setMaxWidth(table.getPrefWidth() * 0.45);
+        col2.setMaxWidth(table.getPrefWidth() * 0.3);
+        col3.setMaxWidth(table.getPrefWidth() * 0.25);
 
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS
         );
-        table.setRowFactory(tv -> {
-            TableRow<NotificationItem> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (!row.isEmpty() && event.getClickCount() == 1) {
-                    NotificationItem clickedNotificationItem = row.getItem();
-//                    controller.seeNotificationItemInformation(clickedNotificationItem.getId());
-                    showInfoPopup(JavaFxApplication.getCurrentStage(), clickedNotificationItem.getId());
-                }
-            });
-            return row;
-        });
         Styles.toggleStyleClass(table, Styles.STRIPED);
     }
 
@@ -387,6 +408,85 @@ public class NotificationManagementScene implements ThemeScene {
         });
 
         overlay.requestFocus();
+        // Hiển thị popup
+        popupStage.show();
+    }
+
+
+    private void showFullscreenPopup(Stage ownerStage, Integer id) {
+        // Tạo một stage mới cho popup
+        Stage popupStage = new Stage();
+
+        // Áp dụng hiệu ứng blur cho nội dung chính
+        GaussianBlur blur = new GaussianBlur(10); // Độ mờ có thể điều chỉnh
+        mainContent.setEffect(blur);
+
+        // Panel chứa nội dung popup
+        VBox popupContent = new VBox(20);
+        popupContent.setAlignment(Pos.CENTER);
+        popupContent.setMaxWidth(400);
+        popupContent.setMaxHeight(300);
+        popupContent.setStyle("-fx-background-color: white; -fx-padding: 20px; -fx-background-radius: 10px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.5, 0.0, 0.0);");
+
+        // Nội dung của popup
+        Label popupTitle = new Label("Xóa thông báo");
+        popupTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        Label popupMessage = new Label("Thao tác này sẽ thông báo được chọn.\nBạn có chắc muốn tiếp tục.");
+        popupMessage.setStyle("-fx-font-size: 14px; -fx-text-alignment: center;");
+        popupMessage.setWrapText(true);
+
+        HBox popupButtons = new HBox(50);
+        Button next = new Button("Có");
+        Button quit = new Button("Không");
+        next.getStyleClass().add("auto-addnew-button");
+        quit.getStyleClass().add("auto-no-button");
+        popupButtons.setAlignment(Pos.CENTER);
+        popupButtons.getChildren().addAll(next, quit);
+
+        popupContent.getChildren().addAll(popupTitle, popupMessage, popupButtons);
+
+        next.setOnAction(e -> {
+            controller.deleteNotificationByNotificationId(id);
+            quit.fire();
+            reloadTable(scene);
+        });
+
+        // Lớp overlay bao phủ toàn màn hình
+        StackPane overlay = new StackPane();
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);"); // Màu đen với độ trong suốt 50%
+        overlay.getChildren().add(popupContent);
+
+        // Scene cho popup
+        Scene popupScene = new Scene(overlay);
+        popupScene.setFill(Color.TRANSPARENT);
+        String popupCssPath = getClass().getResource("/themes/default-theme/home/home.css").toExternalForm();
+        popupScene.getStylesheets().add(popupCssPath);
+
+        // Cấu hình stage cho popup
+        popupStage.initOwner(ownerStage);
+        popupStage.initModality(Modality.APPLICATION_MODAL); // Chặn tương tác với cửa sổ chính
+        popupStage.initStyle(StageStyle.TRANSPARENT);
+        popupStage.setScene(popupScene);
+
+        // Đảm bảo popup có kích thước giống với cửa sổ chính
+        popupStage.setX(ownerStage.getX());
+        popupStage.setY(ownerStage.getY());
+        popupStage.setWidth(ownerStage.getWidth());
+        popupStage.setHeight(ownerStage.getHeight());
+
+        // Xử lý sự kiện đóng popup
+        quit.setOnAction(e -> {
+            popupStage.close();
+            mainContent.setEffect(null); // Xóa hiệu ứng blur khi đóng popup
+        });
+
+        // Xử lý khi đóng popup bằng cách khác (X, Alt+F4)
+        popupStage.setOnCloseRequest(e -> {
+            mainContent.setEffect(null);
+        });
+
         // Hiển thị popup
         popupStage.show();
     }

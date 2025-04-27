@@ -32,4 +32,6 @@ public interface ApartmentRepository extends JpaRepository<Apartment, String> {
        JOIN Settlement s ON s.apartmentId = a.apartmentId
     """)
     List<Apartment> findOccupiedApartments();
+
+    void deleteByApartmentId(Integer apartmentId);
 }
