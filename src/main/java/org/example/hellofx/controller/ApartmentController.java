@@ -40,10 +40,6 @@ public class ApartmentController {
         return FXCollections.observableArrayList(settlementService.getApartmentsAndResidentCount(s));
     }
 
-    public void seeMoreInformation(Integer apartmentId) {
-        JavaFxApplication.showApartmentInformationScene(apartmentId);
-    }
-
     public Scene getApartmentCreationScene(Scene scene) {
         return SpringBootFxApplication.context.getBean(ApartmentCreationScene.class).getScene(scene);
     }

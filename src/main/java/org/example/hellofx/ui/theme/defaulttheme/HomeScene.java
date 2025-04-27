@@ -275,7 +275,7 @@ public class HomeScene implements ThemeScene {
         quanLyKhoanThu.getStyleClass().add("menu-sub-button");
         khoanThuContainer.getChildren().addAll(khoanThu);
         if (controller.getProfile().getRole() != AccountType.Resident) {
-            khoanThuContainer.getChildren().addAll(taoKhoanThu, quanLyKhoanThu);
+            khoanThuContainer.getChildren().addAll(quanLyKhoanThu);
         }
         else {
             khoanThuContainer.getChildren().addAll(danhSachKhoanThu);

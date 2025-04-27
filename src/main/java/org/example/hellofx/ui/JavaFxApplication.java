@@ -70,12 +70,4 @@ public class JavaFxApplication extends Application {
         NotificationInformationScene theme = SpringBootFxApplication.context.getBean(NotificationInformationScene.class);
         currentStage.setScene(theme.getScene(notiId, getCurrentScene()));
     }
-
-    public static void showApartmentInformationScene(Integer apartmentId) {
-        ApartmentInformationController controller = SpringBootFxApplication.context.getBean(ApartmentInformationController.class);
-        controller.setApartmentId(apartmentId);
-        ApartmentInformationScene theme = SpringBootFxApplication.context.getBean(ApartmentInformationScene.class);
-        currentStage.setScene(theme.getScene(getCurrentScene()));
-
-    }
 }

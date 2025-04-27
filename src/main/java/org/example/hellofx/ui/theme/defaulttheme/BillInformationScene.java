@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -76,7 +77,7 @@ public class BillInformationScene extends Notificable{
         bill = controller.findBillByBillId(billId);
         reset();
         this.scene = scene;
-        HBox container = (HBox) scene.lookup("#container");
+        Pane container = (Pane) scene.lookup("#container");
         StackPane content = (StackPane) scene.lookup("#content");
         content.getChildren().clear();
         mainContent = new VBox();
@@ -193,13 +194,18 @@ public class BillInformationScene extends Notificable{
 
         HBox createButtonContainer = new HBox();
         Button savebutton = new Button("Lưu");
+        Button cancelButton = new Button("Thoát");
         savebutton.setId("save-button");
-        createButtonContainer.getChildren().add(savebutton);
+        cancelButton.setId("close");
+        cancelButton.getStyleClass().add("cancel-button");
+        createButtonContainer.getChildren().addAll(savebutton, cancelButton);
         createButtonContainer.setPrefWidth(mainContent.getPrefWidth() * 0.9);
         createButtonContainer.setMaxWidth(mainContent.getPrefWidth() * 0.9);
         createButtonContainer.setMinWidth(mainContent.getPrefWidth() * 0.9);
+        createButtonContainer.setSpacing(20);
+        createButtonContainer.setAlignment(Pos.CENTER_RIGHT);
         savebutton.setStyle("-fx-background-color: #4abc96 !important;");
-        mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
+//        mainContent.getChildren().add(new Separator(Orientation.HORIZONTAL));
         mainContent.getChildren().addAll(createButtonContainer);
         savebutton.setOnAction(actionEvent -> {
             String name = ((VerticleTextAndTextField) mainContent.lookup("#bill-name-info")).getTextField().getText();
@@ -266,8 +272,9 @@ public class BillInformationScene extends Notificable{
                 }
             }
             controller.saveButtonClicked(bill, newBill, dsIn, dsOut);
-            controller.reset(newBill);
-            showPopUpMessage("Thành công", "Lưu khoản thu thành công!");
+            cancelButton.fire();
+//            controller.reset(newBill);
+//            showPopUpMessage("Thành công", "Lưu khoản thu thành công!");
         });
         return scene;
     }

@@ -55,7 +55,6 @@ public class ApartmentScene extends Notificable implements ThemeScene {
     private TableView<ApartmentCountProjection> table;
     private Pagination pagination;
     private VBox mainContent;
-    private Notification myInfo;
     private Stage popupStage;
     private Scene scene;
 
@@ -378,45 +377,5 @@ public class ApartmentScene extends Notificable implements ThemeScene {
         overlay.requestFocus();
         // Hiển thị popup
         popupStage.show();
-    }
-
-    private void showMyPopUpMessage(String state, String message) {
-        AnchorPane tmp = (AnchorPane) popupStage.getScene().lookup("AnchorPane");
-        AnchorPane rightFrame = tmp;
-        if (myInfo == null) {
-            myInfo = new Notification(message);
-            myInfo.getStyleClass().add(Styles.ELEVATED_1);
-            myInfo.setMaxHeight(100);
-        }
-        else {
-            myInfo.setMessage(message);
-            try {
-                rightFrame.getChildren().remove(myInfo);
-            }
-            catch (NullPointerException e) {
-            }
-        }
-        try {
-            myInfo.getStyleClass().remove(Styles.WARNING);
-        }
-        catch (NullPointerException e) {}
-        try {
-            myInfo.getStyleClass().remove(Styles.SUCCESS);
-        }
-        catch (NullPointerException e) {}
-        if (state.toUpperCase().equals(ValidationState.ERROR.toString())) {
-            myInfo.getStyleClass().add(Styles.WARNING);
-            myInfo.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.TIMES_CIRCLE));
-        }
-        else {
-            myInfo.getStyleClass().add(Styles.SUCCESS);
-            myInfo.setGraphic(new FontAwesomeIconView(FontAwesomeIcon.CHECK_CIRCLE));
-        }
-        myInfo.setOnClose(event -> {
-            rightFrame.getChildren().remove(myInfo);
-        });
-        rightFrame.getChildren().add(myInfo);
-        AnchorPane.setBottomAnchor(myInfo, 10.0);
-        AnchorPane.setRightAnchor  (myInfo, 10.0);
     }
 }
