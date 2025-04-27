@@ -141,6 +141,17 @@ public class ApartmentInformationScene extends Notificable implements ThemeScene
         rightTab.getChildren().add(new VerticleTextAndTextField("Giá mỗi số nước (vnđ): ", apartment.getWaterUnitPrice().toString(), "enter the amount of money", "water-unit-price", controller.getProfile().getRole() != AccountType.Resident, true));
 
         if (controller.getProfile().getRole() == AccountType.Resident) {
+            HBox createButtonContainer = new HBox();
+            Button cancelButton = new Button("Thoát");
+            cancelButton.getStyleClass().add("cancel-button");
+            cancelButton.setId("close");
+            createButtonContainer.getChildren().addAll(cancelButton);
+            createButtonContainer.setPrefWidth(mainContent.getPrefWidth() * 0.9);
+            createButtonContainer.setMaxWidth(mainContent.getPrefWidth() * 0.9);
+            createButtonContainer.setMinWidth(mainContent.getPrefWidth() * 0.9);
+            createButtonContainer.setAlignment(Pos.CENTER_RIGHT);
+            createButtonContainer.setSpacing(20);
+            mainContent.getChildren().addAll(createButtonContainer);
             return scene;
         }
 
